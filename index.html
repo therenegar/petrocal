@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Petrocal</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="top-bar">
+      <div class="dataset-actions">
+        <button id="loadDatasetBtn" class="btn">⤴ Load Dataset</button>
+        <button id="saveDatasetBtn" class="btn">💾 Save Dataset</button>
+        <input id="datasetFileInput" type="file" accept="application/json" hidden />
+      </div>
+      <h1>Petrocal</h1>
+      <div id="saveStatus" class="save-status">Not saved yet</div>
+    </header>
+
+    <nav class="tab-bar" role="tablist" aria-label="Sections">
+      <button class="tab active" data-tab="testDetails">Test Details</button>
+      <button class="tab" data-tab="measures">Measures</button>
+      <button class="tab" data-tab="instruments">Instruments</button>
+      <button class="tab" data-tab="hoses">Hoses</button>
+      <button class="tab" data-tab="report">Report</button>
+      <button class="tab" data-tab="form6">Form 6</button>
+    </nav>
+
+    <main id="appMain">
+      <section id="testDetails" class="tab-panel active"></section>
+      <section id="measures" class="tab-panel"></section>
+      <section id="instruments" class="tab-panel"></section>
+      <section id="hoses" class="tab-panel"></section>
+      <section id="report" class="tab-panel placeholder"></section>
+      <section id="form6" class="tab-panel placeholder"></section>
+    </main>
+
+    <template id="keyValueRowTemplate">
+      <label class="form-row">
+        <span class="label"></span>
+        <input />
+      </label>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
