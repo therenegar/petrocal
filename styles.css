@@ -47,6 +47,10 @@ body {
   cursor: pointer;
 }
 
+.btn:active {
+  transform: translateY(1px);
+}
+
 .save-status {
   text-align: right;
   font-size: 1.2rem;
@@ -97,9 +101,18 @@ body {
 
 .form-grid {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) 1fr;
+  grid-template-columns: minmax(180px, 260px) 1fr;
   gap: 0.75rem 1rem;
-  max-width: 980px;
+  max-width: 900px;
+}
+
+.form-row {
+  display: contents;
+}
+
+.form-row > span {
+  align-self: center;
+  font-size: 1.5rem;
 }
 
 input,
@@ -107,7 +120,7 @@ select,
 textarea {
   border: 3px solid var(--line);
   background: #f0f0f0;
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   min-height: 2.2rem;
   padding: 0.2rem 0.5rem;
 }
@@ -128,6 +141,20 @@ textarea {
   background: #efefef;
 }
 
+.card h3 {
+  margin-top: 0;
+}
+
+.row-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.small {
+  font-size: 1rem;
+}
+
 .placeholder h2 {
   font-size: 3rem;
   margin-bottom: 0.5rem;
@@ -137,93 +164,22 @@ textarea {
   font-size: 1.5rem;
 }
 
-.inner-tabs-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.inner-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: stretch;
-}
-
-.inner-tab {
-  border: 3px solid var(--line);
-  background: #ddd;
-  font-size: 2rem;
-  padding: 0.45rem 1rem;
-  cursor: pointer;
-  margin-right: -3px;
-}
-
-.inner-tab.active {
-  background: #f1f1f1;
-}
-
-.inner-tab.add {
-  font-weight: 700;
-}
-
-.linkish {
-  border: none;
-  background: transparent;
-  color: #0a33cc;
-  text-decoration: underline;
-  font-size: 2rem;
-  cursor: pointer;
-}
-
-.inline-picker select {
-  min-width: 360px;
-}
-
-.serial-prefix-wrap {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-}
-
-.serial-prefix-wrap strong {
-  font-size: 1.6rem;
-}
-
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.data-table th,
-.data-table td {
-  text-align: left;
-  padding: 0.35rem 0.45rem;
-}
-
-.data-table input,
-.data-table select {
-  width: 100%;
-}
-
-.nested-content {
-  margin-top: 1rem;
-}
-
-.top-gap {
-  margin-top: 1rem;
+.help {
+  color: #366fb5;
+  font-size: 1rem;
 }
 
 @media (max-width: 1100px) {
   .tab {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     padding: 0.7rem 1rem;
   }
 
-  .inner-tab,
-  .linkish {
-    font-size: 1.2rem;
+  .form-row > span,
+  input,
+  select,
+  textarea {
+    font-size: 1.1rem;
   }
 
   .top-bar {
@@ -233,9 +189,5 @@ textarea {
   .top-bar h1,
   .save-status {
     text-align: left;
-  }
-
-  .form-grid {
-    grid-template-columns: 1fr;
   }
 }
