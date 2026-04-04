@@ -29,6 +29,7 @@ const defaultDataset = () => ({
 });
 
 let dataset = loadLocalDataset() || defaultDataset();
+const START_MODE = new URLSearchParams(window.location.search).get("start") || "resume";
 
 const tabButtons = [...document.querySelectorAll(".tab")];
 const tabPanels = [...document.querySelectorAll(".tab-panel")];
@@ -66,6 +67,12 @@ document.getElementById("saveDatasetBtn").addEventListener("click", () => {
   link.download = `petrocal-${new Date().toISOString().slice(0, 19).replaceAll(":", "-")}.json`;
   link.click();
   URL.revokeObjectURL(url);
+});
+
+document.getElementById("clearDatasetBtn").addEventListener("click", () => {
+  const confirmed = window.confirm("Start a new test? This clears locally saved Petrocal data on this browser.");
+  if (!confirmed) return;
+  clearDatasetAndResetUi();
 });
 
 tabButtons.forEach((button) => {
@@ -961,6 +968,33 @@ function numericTableInput(target, key, onChange) {
   return td;
 }
 
+function clearDatasetAndResetUi() {
+  localStorage.removeItem(STORAGE_KEY);
+  localStorage.removeItem("petrocal.dataset.v1");
+  dataset = defaultDataset();
+  VIEW_STATE.measuresTab = 0;
+  VIEW_STATE.instrumentsTab = 0;
+  VIEW_STATE.hosesInstrumentTab = 0;
+  VIEW_STATE.hosesTabByInstrument = {};
+  VIEW_STATE.hoseInnerTabByKey = {};
+  persistLocalDataset();
+  renderAll();
+}
+
+function handleStartMode() {
+  if (START_MODE === "new") {
+    clearDatasetAndResetUi();
+    return;
+  }
+
+  if (START_MODE === "load") {
+    clearDatasetAndResetUi();
+    setTimeout(() => {
+      document.getElementById("datasetFileInput").click();
+    }, 0);
+  }
+}
+
 function renderReportPlaceholder() {
   reportPanel.innerHTML = `
     <h2>Calibration Test Report</h2>
@@ -990,3 +1024,4 @@ function renderAll() {
 }
 
 renderAll();
+handleStartMode();
