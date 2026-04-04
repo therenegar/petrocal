@@ -1,5 +1,6 @@
 const STORAGE_KEY = "petrocal.dataset.v2";
 const REPORT_SESSION_KEY = "petrocal.report.dataset";
+const IMPORT_SESSION_KEY = "petrocal.start.import.dataset";
 
 const VIEW_STATE = {
   measuresTab: 0,
@@ -88,11 +89,8 @@ document.getElementById("loadDatasetBtn").addEventListener("click", () => {
 document.getElementById("datasetFileInput").addEventListener("change", async (event) => {
   const file = event.target.files?.[0];
   if (!file) return;
-  try {
-    dataset = normalizeDataset(JSON.parse(await file.text()));
-    persistLocalDataset();
-    renderAll();
-  } catch {
+  const imported = await importDatasetFromText(await file.text());
+  if (!imported) {
     alert("Invalid JSON dataset file.");
   }
   event.target.value = "";
@@ -259,7 +257,7 @@ function persistLocalDataset() {
   } catch {
     // no-op
   }
-  saveStatus.textContent = `Locally saved @ ${new Date().toLocaleString()}`;
+  saveStatus.textContent = `Locally saved @ ${formatNowDdMmYyyyHhMmSs()}`;
 }
 
 function updateAt(path, value) {
@@ -346,7 +344,8 @@ function instrumentLabel(instrument, index) {
     .map((n) => n.trim())
     .filter(Boolean)
     .join("/");
-  return clean ? `Pump ${clean}` : `Instrument ${index + 1}`;
+  if (!clean) return `Instrument ${index + 1}`;
+  return instrument.type === "Pressurised" ? `Dispenser ${clean}` : `Pump ${clean}`;
 }
 
 function measureLabel(measure, index) {
@@ -378,6 +377,17 @@ function toDisplayDate(value) {
     return `${day}/${month}/${year}`;
   }
   return value;
+}
+
+function formatNowDdMmYyyyHhMmSs() {
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, "0");
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const year = now.getFullYear();
+  const hours = String(now.getHours()).padStart(2, "0");
+  const minutes = String(now.getMinutes()).padStart(2, "0");
+  const seconds = String(now.getSeconds()).padStart(2, "0");
+  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
 }
 
 function toInputDate(value) {
@@ -626,7 +636,7 @@ function moveHose(instrument, hoseKey, direction) {
 
 function renderTestDetails() {
   const fields = [
-    ["Date", "date", "date", null, "field-small"],
+    ["Date", "date", "text", null, "field-small"],
     ["Job number", "jobNumber", "number", null, "field-small"],
     ["Type", "type", "select", ["commissioning", "in-service inspection", "measure check", "verification"]],
     ["Verifier's name", "verifierName", "text", null, "field-medium"],
@@ -657,6 +667,7 @@ function renderTestDetails() {
     } else {
       control = document.createElement("input");
       control.type = type;
+      if (key === "date") control.placeholder = "DD/MM/YYYY";
       if (key === "mpe") control.step = "0.1";
       if (key === "jobNumber") control.min = 0;
       if (key === "date") control.dataset.validate = "date";
@@ -664,7 +675,7 @@ function renderTestDetails() {
     }
     if (sizeClass) control.classList.add(sizeClass);
 
-    control.value = key === "date" ? toInputDate(dataset.testDetails[key]) : (dataset.testDetails[key] ?? "");
+    control.value = key === "date" ? toDisplayDate(dataset.testDetails[key]) : (dataset.testDetails[key] ?? "");
     bindInput(control, ["testDetails", key], (value) => {
       if (key === "date") return toDisplayDate(value);
       return type === "number" ? (value === "" ? "" : Number(value)) : value;
@@ -744,7 +755,7 @@ function renderMeasures() {
     ["Serial number", "serialNumber", "text", "field-medium"],
     ["Volume", "volume", "number", "field-small"],
     ["Certificate number", "certificateNumber", "text", "field-medium"],
-    ["Certificate expiry", "certificateExpiry", "date", "field-small"]
+    ["Certificate expiry", "certificateExpiry", "text", "field-small"]
   ];
 
   fields.forEach(([label, key, type, sizeClass]) => {
@@ -757,10 +768,11 @@ function renderMeasures() {
     if (key !== "numbering") span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
+    if (key === "certificateExpiry") input.placeholder = "DD/MM/YYYY";
     if (sizeClass) input.classList.add(sizeClass);
     if (type === "number") input.dataset.validate = "number";
     if (key === "certificateExpiry") input.dataset.validate = "date";
-    input.value = key === "certificateExpiry" ? toInputDate(current[key]) : (current[key] ?? "");
+    input.value = key === "certificateExpiry" ? toDisplayDate(current[key]) : (current[key] ?? "");
     bindInput(input, ["measures", VIEW_STATE.measuresTab, key], (value) => {
       if (key === "certificateExpiry") return toDisplayDate(value);
       return type === "number" ? (value === "" ? "" : Number(value)) : value;
@@ -823,7 +835,7 @@ function renderInstruments() {
     ["Make", "make", "text", "field-medium"],
     ["Model number", "modelNumber", "text", "field-medium"],
     ["Serial number", "serialNumber", "text", "field-medium"],
-    ["Manufacture date", "manufactureDate", "date", "field-small"],
+    ["Manufacture date", "manufactureDate", "text", "field-small"],
     ["NMI pattern approval", "nmiPatternApproval", "text", "field-medium"]
   ];
 
@@ -837,10 +849,11 @@ function renderInstruments() {
     if (key !== "numbering") span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
+    if (key === "manufactureDate") input.placeholder = "DD/MM/YYYY";
     if (sizeClass) input.classList.add(sizeClass);
     if (type === "number") input.dataset.validate = "number";
     if (key === "manufactureDate") input.dataset.validate = "date";
-    input.value = key === "manufactureDate" ? toInputDate(instrument[key]) : (instrument[key] ?? "");
+    input.value = key === "manufactureDate" ? toDisplayDate(instrument[key]) : (instrument[key] ?? "");
     if (key === "hoseCount") {
       input.min = 1;
       input.max = 10;
@@ -941,7 +954,9 @@ function renderHoses() {
 
   const selectorWrap = document.createElement("div");
   selectorWrap.className = "inline-picker";
-  selectorWrap.append(instrumentSelector);
+  const selectorLabel = document.createElement("span");
+  selectorLabel.textContent = "Choose an instrument: ";
+  selectorWrap.append(selectorLabel, instrumentSelector);
   root.append(selectorWrap);
 
   const hoseTabs = instrument.hoses.map((hose, hoseIndex) => hoseLabel(hose, hoseIndex));
@@ -1449,6 +1464,17 @@ function clearDatasetAndResetUi() {
   renderAll();
 }
 
+async function importDatasetFromText(rawText) {
+  try {
+    dataset = normalizeDataset(JSON.parse(rawText));
+    persistLocalDataset();
+    renderAll();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function handleStartMode() {
   if (START_MODE === "new") {
     clearDatasetAndResetUi();
@@ -1457,9 +1483,15 @@ function handleStartMode() {
 
   if (START_MODE === "load") {
     clearDatasetAndResetUi();
-    setTimeout(() => {
-      document.getElementById("datasetFileInput").click();
-    }, 0);
+    const startupDataset = sessionStorage.getItem(IMPORT_SESSION_KEY);
+    if (startupDataset) {
+      sessionStorage.removeItem(IMPORT_SESSION_KEY);
+      importDatasetFromText(startupDataset).then((imported) => {
+        if (!imported) alert("Invalid JSON dataset file.");
+      });
+      return;
+    }
+    saveStatus.textContent = "Click Load to select a dataset file.";
   }
 }
 
