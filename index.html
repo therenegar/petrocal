@@ -27,14 +27,42 @@
       <div class="launch-actions">
         <a class="btn launch-btn" href="app.html?start=new">Start new worksheet</a>
         <a class="btn launch-btn" href="app.html">Resume worksheet</a>
-        <a class="btn launch-btn" href="app.html?start=load">Load existing dataset</a>
+        <a id="launchLoadDataset" class="btn launch-btn" href="app.html?start=load">Load existing dataset</a>
         <a class="btn launch-btn" href="help.html">Get help</a>
         <a class="btn launch-btn" href="info.html">App Info</a>
+        <input id="launchDatasetFileInput" type="file" accept="application/json" hidden />
       </div>
     </main>
     <footer>
       <hr/>
       <p>&copy; Copyright 2026 Ben Renegar</p>
     </footer>
+    <script>
+      (() => {
+        const IMPORT_SESSION_KEY = "petrocal.start.import.dataset";
+        const loadLink = document.getElementById("launchLoadDataset");
+        const fileInput = document.getElementById("launchDatasetFileInput");
+
+        if (!loadLink || !fileInput) return;
+
+        loadLink.addEventListener("click", (event) => {
+          event.preventDefault();
+          fileInput.click();
+        });
+
+        fileInput.addEventListener("change", async (event) => {
+          const file = event.target.files?.[0];
+          if (!file) return;
+          try {
+            sessionStorage.setItem(IMPORT_SESSION_KEY, await file.text());
+            window.location.href = "app.html?start=load";
+          } catch {
+            alert("Unable to read dataset file.");
+          } finally {
+            event.target.value = "";
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

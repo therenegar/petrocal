@@ -1,5 +1,6 @@
 const STORAGE_KEY = "petrocal.dataset.v2";
 const REPORT_SESSION_KEY = "petrocal.report.dataset";
+const IMPORT_SESSION_KEY = "petrocal.start.import.dataset";
 
 const VIEW_STATE = {
   measuresTab: 0,
@@ -88,11 +89,8 @@ document.getElementById("loadDatasetBtn").addEventListener("click", () => {
 document.getElementById("datasetFileInput").addEventListener("change", async (event) => {
   const file = event.target.files?.[0];
   if (!file) return;
-  try {
-    dataset = normalizeDataset(JSON.parse(await file.text()));
-    persistLocalDataset();
-    renderAll();
-  } catch {
+  const imported = await importDatasetFromText(await file.text());
+  if (!imported) {
     alert("Invalid JSON dataset file.");
   }
   event.target.value = "";
@@ -1466,6 +1464,17 @@ function clearDatasetAndResetUi() {
   renderAll();
 }
 
+async function importDatasetFromText(rawText) {
+  try {
+    dataset = normalizeDataset(JSON.parse(rawText));
+    persistLocalDataset();
+    renderAll();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function handleStartMode() {
   if (START_MODE === "new") {
     clearDatasetAndResetUi();
@@ -1474,7 +1483,15 @@ function handleStartMode() {
 
   if (START_MODE === "load") {
     clearDatasetAndResetUi();
-    document.getElementById("datasetFileInput").click();
+    const startupDataset = sessionStorage.getItem(IMPORT_SESSION_KEY);
+    if (startupDataset) {
+      sessionStorage.removeItem(IMPORT_SESSION_KEY);
+      importDatasetFromText(startupDataset).then((imported) => {
+        if (!imported) alert("Invalid JSON dataset file.");
+      });
+      return;
+    }
+    saveStatus.textContent = "Click Load to select a dataset file.";
   }
 }
 
