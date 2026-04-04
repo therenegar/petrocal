@@ -1,5 +1,6 @@
 const STORAGE_KEY = "petrocal.dataset.v2";
 const REPORT_SESSION_KEY = "petrocal.report.dataset";
+const LEGACY_STORAGE_KEY = "petrocal.dataset.v1";
 const VISUAL_INSPECTION_QUESTIONS = [
   "Does the dispenser comply with its certificate/s of approval (CofA)?",
   "Are all mandatory descriptive markings clearly and permanently on a data plate that is fixed to the dispenser?",
@@ -37,7 +38,7 @@ function loadDataset() {
   const raw =
     sessionStorage.getItem(REPORT_SESSION_KEY) ||
     localStorage.getItem(STORAGE_KEY) ||
-    localStorage.getItem("petrocal.dataset.v1");
+    localStorage.getItem(LEGACY_STORAGE_KEY);
   if (!raw) return null;
   try {
     return JSON.parse(raw);

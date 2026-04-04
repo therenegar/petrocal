@@ -1,5 +1,6 @@
 const STORAGE_KEY = "petrocal.dataset.v2";
 const REPORT_SESSION_KEY = "petrocal.report.dataset";
+const LEGACY_STORAGE_KEY = "petrocal.dataset.v1";
 
 const form6Main = document.getElementById("form6Main");
 let dataset = normalizeDataset(loadDataset() || {});
@@ -54,7 +55,7 @@ function loadDataset() {
     const raw =
       sessionStorage.getItem(REPORT_SESSION_KEY) ||
       localStorage.getItem(STORAGE_KEY) ||
-      localStorage.getItem("petrocal.dataset.v1");
+      localStorage.getItem(LEGACY_STORAGE_KEY);
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
