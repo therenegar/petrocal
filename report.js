@@ -68,7 +68,20 @@ function renderMeasure(measure, index) {
   return section;
 }
 
-function renderHose(hose, index) {
+function visibleHoseSections(performanceCode) {
+  const code = (performanceCode || "").toUpperCase();
+  if (code === "A" || ["E", "F", "G", "H"].includes(code)) return ["verification", "compliance"];
+  if (code === "B") return ["measureCheck", "compliance"];
+  return ["measureCheck", "verification", "compliance"];
+}
+
+function measureVolumeLabel(measureId, dataset) {
+  const measure = dataset?.measures?.[Number(measureId)];
+  if (!measure) return text(measureId);
+  return `${text(measure.volume)}L`;
+}
+
+function renderHose(hose, index, instrument, dataset) {
   const section = document.createElement("section");
   section.className = "report-subsection";
   const heading = document.createElement("h4");
@@ -100,41 +113,71 @@ function renderHose(hose, index) {
   });
   section.append(details);
 
-  const measureCheckTitle = document.createElement("h5");
-  measureCheckTitle.textContent = "Measure Check";
-  section.append(measureCheckTitle, renderRunsTable(hose.measureCheck?.checks || [], "Check"));
+  const visibleSections = visibleHoseSections(hose.measureCheck?.performanceCode);
 
-  const verificationRows = [
-    ...(hose.verification?.deliveries || []).map((row, idx) => ({ label: `Delivery #${idx + 1}`, ...row })),
-    { label: "Preset Delivery", ...(hose.verification?.preset || {}) },
-    { label: "Gas Elimination Delivery", ...(hose.verification?.gasElimination || {}) }
-  ];
-  const verificationTitle = document.createElement("h5");
-  verificationTitle.textContent = "Verification";
-  section.append(verificationTitle, renderRunsTable(verificationRows, null, true));
+  if (visibleSections.includes("measureCheck")) {
+    const measureCheckTitle = document.createElement("h5");
+    measureCheckTitle.textContent = "Measure Check";
+    section.append(measureCheckTitle, renderRunsTable(hose.measureCheck?.checks || [], "Check", false, dataset));
+  }
 
-  const complianceTitle = document.createElement("h5");
-  complianceTitle.textContent = "Compliance";
-  const complianceGrid = document.createElement("dl");
-  complianceGrid.className = "report-grid";
-  [
-    ["Question 1", hose.compliance?.q1],
-    ["Question 2", hose.compliance?.q2],
-    ["Question 3", hose.compliance?.q3],
-    ["Overall result", hose.compliance?.overall]
-  ].forEach(([label, value]) => {
-    const dt = document.createElement("dt");
-    dt.textContent = label;
-    const dd = document.createElement("dd");
-    dd.textContent = text(value);
-    complianceGrid.append(dt, dd);
-  });
-  section.append(complianceTitle, complianceGrid);
+  if (visibleSections.includes("verification")) {
+    const verificationRows = [
+      ...(hose.verification?.deliveries || []).map((row, idx) => ({ label: `Delivery #${idx + 1}`, ...row })),
+      { label: "Preset Delivery", ...(hose.verification?.preset || {}) }
+    ];
+    if ((instrument?.type || "") === "Suction") {
+      verificationRows.push({ label: "Gas Elimination Delivery", ...(hose.verification?.gasElimination || {}) });
+    }
+
+    const verificationTitle = document.createElement("h5");
+    verificationTitle.textContent = "Verification";
+    section.append(verificationTitle, renderRunsTable(verificationRows, null, true, dataset));
+
+    const averageError = average([
+      hose.verification?.deliveries?.[0]?.efd,
+      hose.verification?.deliveries?.[1]?.efd,
+      hose.verification?.deliveries?.[2]?.efd
+    ]);
+    const verificationMeta = document.createElement("dl");
+    verificationMeta.className = "report-grid";
+    [
+      ["Average error (EAV)", averageError],
+      ["Anti-drain fuel volume (mL)", hose.verification?.antiDrainMl]
+    ].forEach(([label, value]) => {
+      const dt = document.createElement("dt");
+      dt.textContent = label;
+      const dd = document.createElement("dd");
+      dd.textContent = text(value);
+      verificationMeta.append(dt, dd);
+    });
+    section.append(verificationMeta);
+  }
+
+  if (visibleSections.includes("compliance")) {
+    const complianceTitle = document.createElement("h5");
+    complianceTitle.textContent = "Compliance";
+    const complianceGrid = document.createElement("dl");
+    complianceGrid.className = "report-grid";
+    [
+      ["Question 1", hose.compliance?.q1],
+      ["Question 2", hose.compliance?.q2],
+      ["Question 3", hose.compliance?.q3],
+      ["Overall result", hose.compliance?.overall]
+    ].forEach(([label, value]) => {
+      const dt = document.createElement("dt");
+      dt.textContent = label;
+      const dd = document.createElement("dd");
+      dd.textContent = text(value);
+      complianceGrid.append(dt, dd);
+    });
+    section.append(complianceTitle, complianceGrid);
+  }
 
   return section;
 }
 
-function renderRunsTable(rows, rowPrefix = "Run", includeEd = false) {
+function renderRunsTable(rows, rowPrefix = "Run", includeEd = false, dataset = null) {
   const table = document.createElement("table");
   table.className = "report-table";
   const header = document.createElement("thead");
@@ -145,11 +188,17 @@ function renderRunsTable(rows, rowPrefix = "Run", includeEd = false) {
   rows.forEach((row, idx) => {
     const tr = document.createElement("tr");
     const label = rowPrefix ? `${rowPrefix} ${idx + 1}` : text(row.label, `Run ${idx + 1}`);
-    tr.innerHTML = `<td>${label}</td><td>${text(row.measureId)}</td><td>${text(row.vfd)}</td><td>${text(row.vref)}</td><td>${text(row.efd)}</td>${includeEd ? `<td>${text(row.ed)}</td>` : ""}`;
+    tr.innerHTML = `<td>${label}</td><td>${measureVolumeLabel(row.measureId, dataset)}</td><td>${text(row.vfd)}</td><td>${text(row.vref)}</td><td>${text(row.efd)}</td>${includeEd ? `<td>${text(row.ed)}</td>` : ""}`;
     body.append(tr);
   });
   table.append(body);
   return table;
+}
+
+function average(values) {
+  const parsed = values.map((value) => Number(value)).filter((value) => Number.isFinite(value));
+  if (!parsed.length) return "";
+  return (parsed.reduce((sum, value) => sum + value, 0) / parsed.length).toFixed(2);
 }
 
 function renderInstrument(instrument, index) {
@@ -200,7 +249,7 @@ function renderInstrument(instrument, index) {
   } else {
     const hoseGrid = document.createElement("div");
     hoseGrid.className = "report-card-grid";
-    instrument.hoses.forEach((hose, hoseIndex) => hoseGrid.append(renderHose(hose, hoseIndex)));
+    instrument.hoses.forEach((hose, hoseIndex) => hoseGrid.append(renderHose(hose, hoseIndex, instrument, dataset)));
     hosesWrapper.append(hoseGrid);
   }
 
