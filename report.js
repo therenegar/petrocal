@@ -1,7 +1,11 @@
 const STORAGE_KEY = "petrocal.dataset.v2";
+const REPORT_SESSION_KEY = "petrocal.report.dataset";
 
 function loadDataset() {
-  const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("petrocal.dataset.v1");
+  const raw =
+    sessionStorage.getItem(REPORT_SESSION_KEY) ||
+    localStorage.getItem(STORAGE_KEY) ||
+    localStorage.getItem("petrocal.dataset.v1");
   if (!raw) return null;
   try {
     return JSON.parse(raw);

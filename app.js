@@ -1,4 +1,5 @@
 const STORAGE_KEY = "petrocal.dataset.v2";
+const REPORT_SESSION_KEY = "petrocal.report.dataset";
 
 const VIEW_STATE = {
   measuresTab: 0,
@@ -65,6 +66,16 @@ document.getElementById("saveDatasetBtn").addEventListener("click", () => {
   link.download = `petrocal-${new Date().toISOString().slice(0, 19).replaceAll(":", "-")}.json`;
   link.click();
   URL.revokeObjectURL(url);
+});
+
+document.querySelectorAll('a[href="report.html"]').forEach((link) => {
+  link.addEventListener("click", () => {
+    try {
+      sessionStorage.setItem(REPORT_SESSION_KEY, JSON.stringify(dataset));
+    } catch {
+      // no-op
+    }
+  });
 });
 
 document.getElementById("clearDatasetBtn").addEventListener("click", () => {
@@ -202,6 +213,11 @@ function normalizeHose(hose = {}) {
 
 function persistLocalDataset() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset));
+  try {
+    sessionStorage.setItem(REPORT_SESSION_KEY, JSON.stringify(dataset));
+  } catch {
+    // no-op
+  }
   saveStatus.textContent = `◉ Locally saved ${new Date().toLocaleString()}`;
 }
 
