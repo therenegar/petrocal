@@ -7,22 +7,23 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="brand-bar">
+    <header class="brand-bar no-print">
       <h1>Petrocal</h1>
     </header>
-    <header class="top-bar">
+    <header class="top-bar no-print">
       <div class="dataset-actions">
         <a class="btn nav-link-btn" href="app.html">← Back to Test</a>
         <a class="btn nav-link-btn" href="form6.html">Form 6</a>
+        <a class="btn nav-link-btn" href="/tools/generate-pdf.php">Generate PDF</a>
+        <a class="btn nav-link-btn" href="/tools/generate-word.php">Generate Word</a>
       </div>
       <div class="header-right"></div>
     </header>
 
-    <main id="appMain">
-      <section class="tab-panel active placeholder">
-        <h2>Calibration Test Report</h2>
-        <p>Report page scaffold is ready. Implementation will be added in a later phase.</p>
-      </section>
+    <main id="appMain" class="report-page">
+      <section id="reportContent" class="tab-panel active report-output"></section>
     </main>
+
+    <script src="report.js"></script>
   </body>
 </html>

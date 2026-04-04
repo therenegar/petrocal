@@ -13,7 +13,7 @@ This repository includes a vanilla JavaScript single-page prototype with:
   - Instruments
   - Hoses
 - Separate pages for:
-  - `report.html` (placeholder)
+  - `report.html` (data output + print view scaffold)
   - `form6.html` (placeholder)
 
 ### Key behavior implemented
@@ -46,4 +46,4 @@ php -S localhost:8080
 
 - Finalize field validation and formatting rules.
 - Complete remaining Form 6 and Report rendering logic.
-- Connect export buttons to PHP services for PDF/Excel/email.
+- Connect export buttons to PHP services for PDF/Word/email.

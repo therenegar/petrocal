@@ -229,6 +229,44 @@ textarea {
   gap: 1rem;
 }
 
+.report-page {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.report-output {
+  display: block;
+}
+
+.report-section {
+  border: 2px solid #bbb;
+  background: #f7f7f7;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.report-subsection {
+  border: 1px solid #ccc;
+  background: #fff;
+  padding: 0.8rem;
+  margin-bottom: 0.75rem;
+}
+
+.report-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 280px) 1fr;
+  gap: 0.35rem 0.8rem;
+  margin: 0;
+}
+
+.report-grid dt {
+  font-weight: 700;
+}
+
+.report-grid dd {
+  margin: 0;
+}
+
 .card {
   border: 3px solid var(--line);
   padding: 1rem;
@@ -347,5 +385,28 @@ textarea {
 
   .form-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  .no-print,
+  .tab-bar,
+  footer {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  #appMain {
+    padding: 0;
+  }
+
+  .report-section,
+  .report-subsection {
+    border-color: #999;
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 }
