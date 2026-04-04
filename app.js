@@ -9,6 +9,30 @@ const VIEW_STATE = {
   hoseInnerTabByKey: {}
 };
 
+const VISUAL_INSPECTION_QUESTIONS = [
+  "Does the dispenser comply with its certificate/s of approval (CofA)?",
+  "Are all mandatory descriptive markings clearly and permanently on a data plate that is fixed to the dispenser?",
+  "Is the instrument wire sealed in line with the CofA, is there a Verifier Mark on the meter(s)?",
+  "Is the dispenser firmly fixed on its foundations?",
+  "Are all panels secure and cover windows not broken?",
+  "Do the indications of volume, unit price and total price correspond with the hose selected?",
+  "Are all indications clearly visible under all conditions, day and night?",
+  "Are the hoses in reasonable condition, e.g.: they are not badly chafed, split or worn?",
+  "Does each nozzle terminate the delivery when returned to its holsters?",
+  "Is the dispenser free from any leaks?",
+  "For self-service systems: do the dispenser number/s correspond with the console?",
+  "For continuous indicators: do the price-posting wheels line up with, and follow, the internal price-setting ranger lever?"
+];
+
+const COMPLIANCE_QUESTIONS = [
+  "Checking facility for indicating devices",
+  "Zero setting",
+  "Price computing",
+  "Nozzle cut-off",
+  "Interlock",
+  "Pre-set indications"
+];
+
 const defaultDataset = () => ({
   version: 2,
   testDetails: {
@@ -124,7 +148,7 @@ function normalizeDataset(input) {
       nmiPatternApproval: "",
       productsApproved: [],
       type: "",
-      inspection: { q1: "", q2: "", comments: "" },
+      inspection: Object.fromEntries(VISUAL_INSPECTION_QUESTIONS.map((_, idx) => [`q${idx + 1}`, ""])),
       hoses: [],
       ...instrument
     };
@@ -177,7 +201,7 @@ function normalizeHose(hose = {}) {
       gasElimination: { ...emptyDelivery(), ed: "" },
       antiDrainMl: ""
     },
-    compliance: { q1: "", q2: "", q3: "", overall: "Pass" }
+    compliance: { ...Object.fromEntries(COMPLIANCE_QUESTIONS.map((_, idx) => [`q${idx + 1}`, ""])), overall: "Pass" }
   };
 
   const merged = {
@@ -382,6 +406,14 @@ function ensureErrorNode(input) {
 }
 
 function validateField(input) {
+  const touched = input.dataset.touched === "true";
+  if (!touched) {
+    input.classList.remove("invalid-field");
+    const node = ensureErrorNode(input);
+    node.textContent = "";
+    return;
+  }
+
   const required = input.dataset.required !== "false";
   const value = input.value?.trim() || "";
   const kind = getValidationKind(input);
@@ -414,11 +446,15 @@ function attachGlobalValidation() {
     const kind = getValidationKind(input);
     if (!input.dataset.validationBound) {
       if (kind === "number") restrictNumericInput(input);
-      input.addEventListener("blur", () => validateField(input));
-      input.addEventListener("change", () => validateField(input));
+      input.addEventListener("blur", () => {
+        input.dataset.touched = "true";
+        validateField(input);
+      });
+      input.addEventListener("change", () => {
+        if (input.dataset.touched === "true") validateField(input);
+      });
       input.dataset.validationBound = "true";
     }
-    validateField(input);
   });
 }
 
@@ -770,22 +806,16 @@ function renderInstruments() {
   const inspection = document.createElement("div");
   inspection.className = "form-grid";
 
-  ["q1", "q2"].forEach((key, qIndex) => {
+  VISUAL_INSPECTION_QUESTIONS.forEach((question, qIndex) => {
+    const key = `q${qIndex + 1}`;
     const span = document.createElement("span");
-    span.textContent = `Question ${qIndex + 1}`;
+    span.textContent = question;
     const select = document.createElement("select");
     ["", "yes", "no", "N/A"].forEach((value) => select.append(new Option(value, value)));
     select.value = instrument.inspection?.[key] || "";
     bindInput(select, ["instruments", index, "inspection", key]);
     inspection.append(span, select);
   });
-
-  const commentsSpan = document.createElement("span");
-  commentsSpan.textContent = "Comments";
-  const comments = document.createElement("textarea");
-  comments.value = instrument.inspection?.comments || "";
-  bindInput(comments, ["instruments", index, "inspection", "comments"]);
-  inspection.append(commentsSpan, comments);
 
   card.append(inspectionTitle, inspection);
   root.append(card);
@@ -1245,9 +1275,10 @@ function renderCompliancePanel(hose) {
   const form = document.createElement("div");
   form.className = "form-grid";
 
-  ["q1", "q2", "q3"].forEach((key, idx) => {
+  COMPLIANCE_QUESTIONS.forEach((question, idx) => {
+    const key = `q${idx + 1}`;
     const span = document.createElement("span");
-    span.textContent = `Question ${idx + 1}`;
+    span.textContent = question;
     const select = document.createElement("select");
     ["", "pass", "fail", "N/A"].forEach((option) => select.append(new Option(option, option)));
     select.value = hose.compliance[key] || "";

@@ -1,5 +1,27 @@
 const STORAGE_KEY = "petrocal.dataset.v2";
 const REPORT_SESSION_KEY = "petrocal.report.dataset";
+const VISUAL_INSPECTION_QUESTIONS = [
+  "Does the dispenser comply with its certificate/s of approval (CofA)?",
+  "Are all mandatory descriptive markings clearly and permanently on a data plate that is fixed to the dispenser?",
+  "Is the instrument wire sealed in line with the CofA, is there a Verifier Mark on the meter(s)?",
+  "Is the dispenser firmly fixed on its foundations?",
+  "Are all panels secure and cover windows not broken?",
+  "Do the indications of volume, unit price and total price correspond with the hose selected?",
+  "Are all indications clearly visible under all conditions, day and night?",
+  "Are the hoses in reasonable condition, e.g.: they are not badly chafed, split or worn?",
+  "Does each nozzle terminate the delivery when returned to its holsters?",
+  "Is the dispenser free from any leaks?",
+  "For self-service systems: do the dispenser number/s correspond with the console?",
+  "For continuous indicators: do the price-posting wheels line up with, and follow, the internal price-setting ranger lever?"
+];
+const COMPLIANCE_QUESTIONS = [
+  "Checking facility for indicating devices",
+  "Zero setting",
+  "Price computing",
+  "Nozzle cut-off",
+  "Interlock",
+  "Pre-set indications"
+];
 
 function loadDataset() {
   const raw =
@@ -18,6 +40,15 @@ function text(value, fallback = "—") {
   if (value === null || value === undefined || value === "") return fallback;
   if (Array.isArray(value)) return value.length ? value.join(", ") : fallback;
   return String(value);
+}
+
+function pick(obj, path, fallback = undefined) {
+  let current = obj;
+  for (let i = 0; i < path.length; i += 1) {
+    if (current === null || current === undefined) return fallback;
+    current = current[path[i]];
+  }
+  return current === undefined ? fallback : current;
 }
 
 function decorateOutcomeElement(element, value) {
@@ -84,7 +115,7 @@ function visibleHoseSections(performanceCode) {
 }
 
 function measureVolumeLabel(measureId, dataset) {
-  const measure = dataset?.measures?.[Number(measureId)];
+  const measure = pick(dataset, ["measures", Number(measureId)], null);
   if (!measure) return text(measureId);
   return `${text(measure.volume)}L`;
 }
@@ -108,8 +139,8 @@ function renderHose(hose, index, instrument, dataset) {
     ["Qmin", hose.qmin],
     ["Qmax", hose.qmax],
     ["Maximum achievable rate", hose.maxRate],
-    ["Performance code", hose.measureCheck?.performanceCode],
-    ["Compliance overall", hose.compliance?.overall]
+    ["Performance code", pick(hose, ["measureCheck", "performanceCode"], "")],
+    ["Compliance overall", pick(hose, ["compliance", "overall"], "")]
   ];
 
   rows.forEach(([label, value]) => {
@@ -122,21 +153,21 @@ function renderHose(hose, index, instrument, dataset) {
   });
   section.append(details);
 
-  const visibleSections = visibleHoseSections(hose.measureCheck?.performanceCode);
+  const visibleSections = visibleHoseSections(pick(hose, ["measureCheck", "performanceCode"], ""));
 
   if (visibleSections.includes("measureCheck")) {
     const measureCheckTitle = document.createElement("h5");
     measureCheckTitle.textContent = "Measure Check";
-    section.append(measureCheckTitle, renderRunsTable(hose.measureCheck?.checks || [], "Check", false, dataset));
+    section.append(measureCheckTitle, renderRunsTable(pick(hose, ["measureCheck", "checks"], []), "Check", false, dataset));
   }
 
   if (visibleSections.includes("verification")) {
     const verificationRows = [
-      ...(hose.verification?.deliveries || []).map((row, idx) => ({ label: `Delivery #${idx + 1}`, ...row })),
-      { label: "Preset Delivery", ...(hose.verification?.preset || {}) }
+      ...pick(hose, ["verification", "deliveries"], []).map(function(row, idx) { return ({ label: `Delivery #${idx + 1}`, ...row }); }),
+      { label: "Preset Delivery", ...pick(hose, ["verification", "preset"], {}) }
     ];
-    if ((instrument?.type || "") === "Suction") {
-      verificationRows.push({ label: "Gas Elimination Delivery", ...(hose.verification?.gasElimination || {}) });
+    if ((pick(instrument, ["type"], "") || "") === "Suction") {
+      verificationRows.push({ label: "Gas Elimination Delivery", ...pick(hose, ["verification", "gasElimination"], {}) });
     }
 
     const verificationTitle = document.createElement("h5");
@@ -144,15 +175,15 @@ function renderHose(hose, index, instrument, dataset) {
     section.append(verificationTitle, renderRunsTable(verificationRows, null, true, dataset));
 
     const averageError = average([
-      hose.verification?.deliveries?.[0]?.efd,
-      hose.verification?.deliveries?.[1]?.efd,
-      hose.verification?.deliveries?.[2]?.efd
+      pick(hose, ["verification", "deliveries", 0, "efd"], ""),
+      pick(hose, ["verification", "deliveries", 1, "efd"], ""),
+      pick(hose, ["verification", "deliveries", 2, "efd"], "")
     ]);
     const verificationMeta = document.createElement("dl");
     verificationMeta.className = "report-grid";
     [
       ["Average error (EAV)", averageError],
-      ["Anti-drain fuel volume (mL)", hose.verification?.antiDrainMl]
+      ["Anti-drain fuel volume (mL)", pick(hose, ["verification", "antiDrainMl"], "")]
     ].forEach(([label, value]) => {
       const dt = document.createElement("dt");
       dt.textContent = label;
@@ -170,10 +201,8 @@ function renderHose(hose, index, instrument, dataset) {
     const complianceGrid = document.createElement("dl");
     complianceGrid.className = "report-grid";
     [
-      ["Question 1", hose.compliance?.q1],
-      ["Question 2", hose.compliance?.q2],
-      ["Question 3", hose.compliance?.q3],
-      ["Overall result", hose.compliance?.overall]
+      ...COMPLIANCE_QUESTIONS.map((question, idx) => [question, pick(hose, ["compliance", `q${idx + 1}`], "")]),
+      ["Overall result", pick(hose, ["compliance", "overall"], "")]
     ].forEach(([label, value]) => {
       const dt = document.createElement("dt");
       dt.textContent = label;
@@ -198,7 +227,7 @@ function renderRunsTable(rows, rowPrefix = "Run", includeEd = false, dataset = n
   const body = document.createElement("tbody");
   rows.forEach((row, idx) => {
     const tr = document.createElement("tr");
-    const mpe = Number(dataset?.testDetails?.mpe);
+    const mpe = Number(pick(dataset, ["testDetails", "mpe"], ""));
     const efdValue = Number(row.efd);
     if (Number.isFinite(mpe) && Number.isFinite(efdValue) && Math.abs(efdValue) > Math.abs(mpe)) {
       tr.classList.add("row-error");
@@ -239,9 +268,7 @@ function renderInstrument(instrument, index, dataset) {
     ["NMI pattern approval", instrument.nmiPatternApproval],
     ["Products approved", instrument.productsApproved],
     ["Type", instrument.type],
-    ["Inspection Q1", instrument.inspection?.q1],
-    ["Inspection Q2", instrument.inspection?.q2],
-    ["Inspection comments", instrument.inspection?.comments]
+    ...VISUAL_INSPECTION_QUESTIONS.map((question, idx) => [question, pick(instrument, ["inspection", `q${idx + 1}`], "")])
   ];
 
   rows.forEach(([label, value]) => {
@@ -270,7 +297,7 @@ function renderInstrument(instrument, index, dataset) {
     instrument.hoses.forEach((hose, hoseIndex) => hoseGrid.append(renderHose(hose, hoseIndex, instrument, dataset)));
     hosesWrapper.append(hoseGrid);
   }
-Visual Inspection
+
   section.append(hosesWrapper);
   return section;
 }
@@ -286,25 +313,25 @@ function renderReport() {
 
   root.replaceChildren(
     renderKeyValueGrid("Test Details", [
-      ["Date", dataset.testDetails?.date],
-      ["Job number", dataset.testDetails?.jobNumber],
-      ["Type", dataset.testDetails?.type],
-      ["Verifier's name", dataset.testDetails?.verifierName],
-      ["Registration number", dataset.testDetails?.registrationNumber],
-      ["Verification mark", dataset.testDetails?.verificationMark],
-      ["Operator", dataset.testDetails?.operator],
-      ["Maximum permissible error", dataset.testDetails?.mpe],
-      ["Site name", dataset.testDetails?.siteName],
-      ["Site number", dataset.testDetails?.siteNumber],
-      ["Contact on site", dataset.testDetails?.contactOnSite],
-      ["Address", dataset.testDetails?.address]
+      ["Date", pick(dataset, ["testDetails", "date"], "")],
+      ["Job number", pick(dataset, ["testDetails", "jobNumber"], "")],
+      ["Type", pick(dataset, ["testDetails", "type"], "")],
+      ["Verifier's name", pick(dataset, ["testDetails", "verifierName"], "")],
+      ["Registration number", pick(dataset, ["testDetails", "registrationNumber"], "")],
+      ["Verification mark", pick(dataset, ["testDetails", "verificationMark"], "")],
+      ["Operator", pick(dataset, ["testDetails", "operator"], "")],
+      ["Maximum permissible error", pick(dataset, ["testDetails", "mpe"], "")],
+      ["Site name", pick(dataset, ["testDetails", "siteName"], "")],
+      ["Site number", pick(dataset, ["testDetails", "siteNumber"], "")],
+      ["Contact on site", pick(dataset, ["testDetails", "contactOnSite"], "")],
+      ["Address", pick(dataset, ["testDetails", "address"], "")]
     ])
   );
 
   const measuresSection = document.createElement("section");
   measuresSection.className = "report-section";
   measuresSection.append(Object.assign(document.createElement("h2"), { textContent: "Measures" }));
-  if (!dataset.measures?.length) {
+  if (!dataset.measures || !dataset.measures.length) {
     measuresSection.append(Object.assign(document.createElement("p"), { textContent: "No measures." }));
   } else {
     const measureGrid = document.createElement("div");
@@ -317,7 +344,7 @@ function renderReport() {
   const instrumentsWrapper = document.createElement("section");
   instrumentsWrapper.className = "report-section";
   instrumentsWrapper.append(Object.assign(document.createElement("h2"), { textContent: "Instruments" }));
-  if (!dataset.instruments?.length) {
+  if (!dataset.instruments || !dataset.instruments.length) {
     instrumentsWrapper.append(Object.assign(document.createElement("p"), { textContent: "No instruments." }));
   } else {
     dataset.instruments.forEach((instrument, index) => instrumentsWrapper.append(renderInstrument(instrument, index, dataset)));
