@@ -4,7 +4,7 @@ Fuel dispenser calibration tool.
 
 ## Current prototype
 
-This repository includes a vanilla JavaScript single-page prototype with:
+This repository includes a prototype with:
 
 - Landing page (`index.html`) to choose start mode
 - Main app (`app.html`) focused on test workflow sections:
