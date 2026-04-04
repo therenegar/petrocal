@@ -424,6 +424,23 @@ textarea {
   width: 100%;
 }
 
+.grade-themed[data-grade] {
+  font-weight: 700;
+  border-color: #222;
+}
+
+.grade-themed[data-grade="ULP91"] { background: #b400b8; color: #fff; }
+.grade-themed[data-grade="E10"] { background: #b400b8; color: #ff7c2c; }
+.grade-themed[data-grade="OPAL91"] { background: #b400b8; color: #25c6ff; }
+.grade-themed[data-grade="PULP95"] { background: #f5df00; color: #000; }
+.grade-themed[data-grade="E85"] { background: #ef5c22; color: #000; }
+.grade-themed[data-grade="PULP98"] { background: #252eaa; color: #e8e8e8; }
+.grade-themed[data-grade="ADBLUE"] { background: #1db3dc; color: #f0f0f0; }
+.grade-themed[data-grade="DIESEL"] { background: #989600; color: #000; }
+.grade-themed[data-grade="BIODIESEL"] { background: #009a07; color: #ffb173; }
+.grade-themed[data-grade="PREMIUMDIESEL"] { background: #989600; color: #00ff1a; }
+.grade-themed[data-grade="KEROSENE"] { background: #b7d7f7; color: #f5f1e8; }
+
 .nested-content {
   margin-top: 1rem;
 }

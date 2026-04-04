@@ -484,6 +484,19 @@ function hoseLabel(hose, index) {
   return `Hose ${index + 1}`;
 }
 
+function gradeStyleKey(value) {
+  return String(value || "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "");
+}
+
+function applyGradeStyle(element, gradeValue) {
+  element.classList.add("grade-themed");
+  const key = gradeStyleKey(gradeValue);
+  if (key) element.dataset.grade = key;
+  else delete element.dataset.grade;
+}
+
 function renderTabbedHeader(tabs, activeIndex, onChange, addAction, removeAction) {
   const row = document.createElement("div");
   row.className = "inner-tabs-row";
@@ -680,24 +693,16 @@ function renderMeasures() {
 
   const sightglassSpan = document.createElement("span");
   sightglassSpan.textContent = "Sightglass";
-  const sightglassWrap = document.createElement("div");
-  sightglassWrap.className = "inline-options";
-  ["yes", "no"].forEach((choice) => {
-    const label = document.createElement("label");
-    const radio = document.createElement("input");
-    radio.type = "radio";
-    radio.name = `measure-sightglass-${VIEW_STATE.measuresTab}`;
-    radio.value = choice;
-    radio.checked = (current.sightglass || "no") === choice;
-    radio.addEventListener("change", () => {
-      if (!radio.checked) return;
-      updateAt(["measures", VIEW_STATE.measuresTab, "sightglass"], choice);
-      renderHoses();
-    });
-    label.append(radio, document.createTextNode(choice === "yes" ? " Yes" : " No"));
-    sightglassWrap.append(label);
+  const sightglassSelect = document.createElement("select");
+  sightglassSelect.append(new Option("", ""));
+  sightglassSelect.append(new Option("Yes", "yes"));
+  sightglassSelect.append(new Option("No", "no"));
+  sightglassSelect.value = current.sightglass || "no";
+  sightglassSelect.addEventListener("change", () => {
+    updateAt(["measures", VIEW_STATE.measuresTab, "sightglass"], sightglassSelect.value || "no");
+    renderHoses();
   });
-  form.append(sightglassSpan, sightglassWrap);
+  form.append(sightglassSpan, sightglassSelect);
 
   const fields = [
     ["Serial number", "serialNumber", "text"],
@@ -948,8 +953,10 @@ function renderHoses() {
     grade.append(new Option(value, value));
   }
   grade.value = hose.grade || "";
+  applyGradeStyle(grade, grade.value);
   grade.addEventListener("change", () => {
     hose.grade = grade.value;
+    applyGradeStyle(grade, grade.value);
     persistLocalDataset();
     renderHoses();
   });

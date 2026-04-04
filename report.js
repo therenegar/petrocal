@@ -135,6 +135,12 @@ function formatPerformanceCode(value) {
   return PERFORMANCE_CODE_LABELS[code] || value;
 }
 
+function gradeStyleKey(value) {
+  return String(value || "")
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "");
+}
+
 function renderHose(hose, index, instrument, dataset) {
   const section = document.createElement("section");
   section.className = "report-subsection";
@@ -166,6 +172,11 @@ function renderHose(hose, index, instrument, dataset) {
     dt.textContent = label;
     const dd = document.createElement("dd");
     dd.textContent = text(value);
+    if (label === "Grade") {
+      dd.classList.add("grade-themed");
+      const key = gradeStyleKey(value);
+      if (key) dd.dataset.grade = key;
+    }
     decorateOutcomeElement(dd, value);
     details.append(dt, dd);
   });
