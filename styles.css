@@ -197,6 +197,23 @@ textarea {
   padding: 0.2rem 0.5rem;
 }
 
+.field-tiny { width: 4rem; }
+.field-small { width: 8rem; }
+.field-medium { width: 14rem; }
+.field-large { width: 20rem; }
+.field-xlarge { width: 28rem; }
+
+.invalid-field {
+  border-color: #b00020 !important;
+}
+
+.validation-message {
+  color: #b00020;
+  font-size: 0.9rem;
+  min-height: 1.1rem;
+  margin-top: 0.2rem;
+}
+
 textarea {
   min-height: 6rem;
   resize: vertical;

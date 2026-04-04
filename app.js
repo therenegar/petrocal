@@ -323,6 +323,81 @@ function toDisplayDate(value) {
   return value;
 }
 
+function isValidDdMmYyyy(value) {
+  if (!/^\d{2}\/\d{2}\/\d{4}$/.test(value || "")) return false;
+  const [day, month, year] = value.split("/").map(Number);
+  const date = new Date(year, month - 1, day);
+  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+}
+
+function restrictNumericInput(input) {
+  input.addEventListener("input", () => {
+    let value = input.value.replace(/[^\d.]/g, "");
+    const firstDot = value.indexOf(".");
+    if (firstDot !== -1) {
+      value = value.slice(0, firstDot + 1) + value.slice(firstDot + 1).replaceAll(".", "");
+    }
+    input.value = value;
+  });
+}
+
+function getValidationKind(input) {
+  if (input.dataset.validate) return input.dataset.validate;
+  if (input.type === "number") return "number";
+  return "text";
+}
+
+function ensureErrorNode(input) {
+  let node = input.nextElementSibling;
+  if (!node || !node.classList.contains("validation-message")) {
+    node = document.createElement("div");
+    node.className = "validation-message";
+    input.insertAdjacentElement("afterend", node);
+  }
+  return node;
+}
+
+function validateField(input) {
+  const required = input.dataset.required !== "false";
+  const value = input.value?.trim() || "";
+  const kind = getValidationKind(input);
+  let error = "";
+
+  if (required && !value) {
+    error = "This field is required";
+  } else if (value) {
+    if (kind === "number" && !/^\d+(\.\d+)?$/.test(value)) error = "Only numbers are allowed";
+    if (kind === "date" && !isValidDdMmYyyy(value)) error = "Use DD/MM/YYYY";
+    if (kind === "numbering" && !/^[0-9/]+$/.test(value)) error = "Use numbers and / only";
+  }
+
+  const errorNode = ensureErrorNode(input);
+  if (error) {
+    input.classList.add("invalid-field");
+    errorNode.textContent = error;
+  } else {
+    input.classList.remove("invalid-field");
+    errorNode.textContent = "";
+  }
+}
+
+function attachGlobalValidation() {
+  const fields = document.querySelectorAll("#appMain input, #appMain select, #appMain textarea");
+  fields.forEach((input) => {
+    if (input.type === "hidden" || input.disabled) return;
+    if (!input.dataset.required) input.dataset.required = "true";
+
+    const kind = getValidationKind(input);
+    if (!input.dataset.validationBound) {
+      if (kind === "number") restrictNumericInput(input);
+      input.addEventListener("blur", () => validateField(input));
+      input.addEventListener("change", () => validateField(input));
+      input.dataset.validationBound = "true";
+    }
+    validateField(input);
+  });
+}
+
 function hoseLabel(hose, index) {
   const pos = hose.number?.toString().trim();
   const grade = hose.grade?.toString().trim();
@@ -438,7 +513,11 @@ function renderTestDetails() {
       control.type = type;
       if (key === "mpe") control.step = "0.1";
       if (key === "jobNumber") control.min = 0;
-      if (key === "date") control.placeholder = "DD/MM/YYYY";
+      if (key === "date") {
+        control.placeholder = "DD/MM/YYYY";
+        control.dataset.validate = "date";
+      }
+      if (type === "number") control.dataset.validate = "number";
     }
 
     control.value = key === "date" ? toDisplayDate(dataset.testDetails[key]) : (dataset.testDetails[key] ?? "");
@@ -533,7 +612,9 @@ function renderMeasures() {
     span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
+    if (type === "number") input.dataset.validate = "number";
     if (key === "certificateExpiry") input.placeholder = "DD/MM/YYYY";
+    if (key === "certificateExpiry") input.dataset.validate = "date";
     input.value = key === "certificateExpiry" ? toDisplayDate(current[key]) : (current[key] ?? "");
     bindInput(input, ["measures", VIEW_STATE.measuresTab, key], (value) => {
       if (key === "certificateExpiry") return toDisplayDate(value);
@@ -604,7 +685,9 @@ function renderInstruments() {
     span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
+    if (type === "number") input.dataset.validate = "number";
     if (key === "manufactureDate") input.placeholder = "DD/MM/YYYY";
+    if (key === "manufactureDate") input.dataset.validate = "date";
     input.value = key === "manufactureDate" ? toDisplayDate(instrument[key]) : (instrument[key] ?? "");
     if (key === "hoseCount") {
       input.min = 1;
@@ -619,6 +702,7 @@ function renderInstruments() {
         renderHoses();
       });
     } else if (key === "numbering") {
+      input.dataset.validate = "numbering";
       bindInput(input, ["instruments", index, key], normaliseSlashSeparatedNumbers);
     } else if (key === "manufactureDate") {
       bindInput(input, ["instruments", index, key], toDisplayDate);
@@ -799,6 +883,7 @@ function renderHoses() {
     span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
+    if (type === "number") input.dataset.validate = "number";
     input.value = hose[key] ?? "";
     input.addEventListener("change", () => {
       hose[key] = input.value;
@@ -1167,6 +1252,7 @@ function numericTableInput(target, key, onChange, disabled = false) {
   const td = document.createElement("td");
   const input = document.createElement("input");
   input.type = "number";
+  input.dataset.validate = "number";
   input.step = "0.01";
   input.value = target[key] ?? "";
   input.disabled = disabled;
@@ -1212,6 +1298,7 @@ function renderAllPanels() {
   renderMeasures();
   renderInstruments();
   renderHoses();
+  attachGlobalValidation();
 }
 
 function renderAll() {
