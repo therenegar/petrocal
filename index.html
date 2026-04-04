@@ -3,41 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Petrocal</title>
+    <title>Petrocal – Start</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
-    <header class="title-bar">
-        <h1>Petrocal</h1>
-    </header>
-
-    <section class="main-text">
-
-        <div class="info-box">
-          <p>Petrocal is an open source web-based tool for conducting calibration and verification of fuel dispensers, in compliance with the Australian National Measurement Institute's guidelines. It is therefore only useful and applicable for use by licensed NMI Verifiers within Australia, or those acting on behalf of an NMI licensee.</p>
-          <p>Using this tool you can;
-          <ul>
-            <li>Capture all relevant job, site, measure, instrument and hose details</li>
-              <li>Enter calibration test results - with automatic calculation and clear pass/fail results</li>
-              <li>Generate a test report as per the NMI's reference - with easy printing and e-mailing</li>
-              <li>Generate a Form 6 spreadsheet that is compliant with NMI requirements</li>
-            </ul>
-        </div>
-
-        <h3>Get started</h3>
-
-        <ul class="button-menu">
-          <li><a href="app.html#start=blank">Create a new test</a></li>
-          <li><a href="app.html#start=load">Load existing data</a></li>
-          <li><a href="help.html">Help</a></li>
-          <li><a href="info.html">Information</a></li>
-        </ul>
-
-    </section>
-
-    <footer>
-      <p class="small">&copy; Copyright 2026 Ben Renegar<p>
-    </footer>
-
+  <body class="launch-body">
+    <main class="launch-card">
+      <h1>Petrocal</h1>
+      <p>Select how you want to begin.</p>
+      <div class="launch-actions">
+        <a class="btn launch-btn" href="app.html?start=blank">Start New Blank Test</a>
+        <a class="btn launch-btn" href="app.html?start=load">Load Existing Dataset</a>
+      </div>
+    </main>
   </body>
 </html>
