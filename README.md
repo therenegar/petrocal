@@ -30,24 +30,4 @@ This repository includes a vanilla JavaScript single-page prototype with:
   - provides editable licence number, business name, and ABN fields
   - persists Form 6 fields back into the shared dataset (`form6Details`)
 
-## Run locally
 
-Because this is static front-end code, run any static server:
-
-```bash
-python3 -m http.server 8080
-# open http://localhost:8080
-```
-
-or with PHP:
-
-```bash
-php -S localhost:8080
-# open http://localhost:8080
-```
-
-## Next recommended phase
-
-- Finalize field validation and formatting rules.
-- Complete remaining Form 6 and Report rendering logic.
-- Connect export buttons to PHP services for PDF/Word/email.
