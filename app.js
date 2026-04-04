@@ -60,6 +60,11 @@ const defaultDataset = () => ({
     contactOnSite: "",
     address: ""
   },
+  form6Details: {
+    licenceNumber: "",
+    businessName: "",
+    abnNumber: ""
+  },
   measures: [],
   instruments: []
 });
@@ -103,7 +108,7 @@ document.getElementById("saveDatasetBtn").addEventListener("click", () => {
   URL.revokeObjectURL(url);
 });
 
-document.querySelectorAll('a[href="report.html"]').forEach((link) => {
+document.querySelectorAll('a[href="report.html"], a[href="form6.html"]').forEach((link) => {
   link.addEventListener("click", () => {
     try {
       sessionStorage.setItem(REPORT_SESSION_KEY, JSON.stringify(dataset));
@@ -143,6 +148,7 @@ function normalizeDataset(input) {
     ...base,
     ...input,
     testDetails: { ...base.testDetails, ...(input?.testDetails || {}) },
+    form6Details: { ...base.form6Details, ...(input?.form6Details || {}) },
     measures: Array.isArray(input?.measures) ? input.measures : [],
     instruments: Array.isArray(input?.instruments) ? input.instruments : []
   };
