@@ -17,9 +17,12 @@
   box-sizing: border-box;
 }
 
+*, html, body {
+  font-family: "DM Sans", Helvetica, Arial, sans-serif;
+}
+
 body {
   margin: 0;
-  font-family: "DM Sans", "Segoe UI", Roboto, Arial, sans-serif;
   background: #fff3c4;
   background-image:
     linear-gradient(90deg, rgba(17, 17, 17, 0.1) 1px, transparent 1px),
@@ -28,6 +31,23 @@ body {
   color: #111;
 }
 
+footer {
+  margin-top: 2rem;
+}
+footer hr {
+  margin: 0 1.5rem;
+}
+footer p {
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+
+hr {
+  margin: 1rem 0;
+  border: none;
+  border-bottom: 3px solid var(--line);
+}
 
 .launch-body {
   min-height: 100vh;
@@ -43,29 +63,44 @@ body {
   margin: 2rem auto;
 }
 
+.launch-card .btn {
+  text-decoration: none;
+  color: black;
+  margin-bottom: 2rem;
+  float: left;
+}
+
+.launch-card h4 {
+  clear: both;
+}
+
+
 .launch-actions {
   display: grid;
-  gap: 0.8rem;
+  grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr)); 
+  gap: 1rem;
 }
 
 .launch-btn {
-  display: inline-block;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-decoration: none;
   text-align: center;
+  color: black;
 }
 
 .brand-bar {
-  width: 100%;
+  width: calc(100% - 2.5rem);
   background: var(--cream);
   border: 3px solid #da8a2c;
-  margin-bottom: 0.5rem;
+  margin: 1rem;
+  padding: 1rem;
 }
 
 .brand-bar h1 {
   margin: 0;
-  padding: 0.4rem 1rem;
-  text-align: center;
-  font-size: clamp(2.2rem, 4vw, 4rem);
 }
 
 .brand-home-link {
@@ -76,18 +111,26 @@ body {
 
 .brand-logo {
   display: block;
-  width: min(420px, 82vw);
-  max-height: 90px;
+  max-height: 3rem;
 }
 
 .top-bar {
+  width: calc(100% - 2.5rem);
   background: var(--cream);
-  border: 3px solid #da8a2c;
+  border: 3px solid black;
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
   gap: 1rem;
-  padding: 0.75rem 1rem;
+  padding: 1rem;
+  margin: 0 1rem 1rem;
+}
+
+.top-bar .separator {
+  text-indent: -9999em;
+  margin: 0 15px 0 20px;
+  width: 3px;
+  background: black;
 }
 
 .dataset-actions {
@@ -126,6 +169,7 @@ body {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+  color: black;
 }
 
 .inline-options {
@@ -169,12 +213,11 @@ body {
 }
 
 .tab-bar {
+  width: calc(100% - 2.5rem);
   display: flex;
   gap: 0;
-  padding: 0.35rem;
-  border: 3px solid #e0b429;
-  background: var(--gold);
-  margin-top: 0.8rem;
+  margin: 2rem 1rem 0;
+  padding-left: 2rem;
 }
 
 .tab {
@@ -182,9 +225,11 @@ body {
   border-right-width: 0;
   background: #f1f1f1;
   padding: 0.8rem 1.5rem;
-  font-size: 2rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  font-weight: 900;
   cursor: pointer;
+  border-bottom: 0;
 }
 
 .tab:last-child {
@@ -196,7 +241,8 @@ body {
 }
 
 #appMain {
-  padding: 1rem;
+  padding: 0 1rem 1rem;
+  width: calc(100% - .5rem);
 }
 
 .tab-panel {
@@ -204,7 +250,7 @@ body {
   border: 3px solid var(--line);
   background: var(--paper);
   min-height: 60vh;
-  padding: 1rem;
+  padding: 2rem;
 }
 
 .tab-panel.active {
@@ -228,11 +274,18 @@ select,
 textarea {
   border: 3px solid var(--line);
   background: #f0f0f0;
-  font-family: "JetBrains Mono", "Courier New", monospace;
-  font-size: 1.25rem;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1rem;
   min-height: 2.2rem;
   padding: 0.2rem 0.5rem;
 }
+
+input[disabled] {
+  border-color: #999;
+  background: #eee;
+  color: #000;
+}
+
 
 .field-tiny { width: 4rem; }
 .field-small { width: 8rem; }
@@ -240,15 +293,18 @@ textarea {
 .field-large { width: 20rem; }
 .field-xlarge { width: 28rem; }
 
+input[type='date'] {
+  width: 11rem;
+}
+
+
 .invalid-field {
-  border-color: #b00020 !important;
+  border-color: tomato !important;
 }
 
 .validation-message {
-  color: #b00020;
+  color: tomato;
   font-size: 0.9rem;
-  min-height: 1.1rem;
-  margin-top: 0.2rem;
 }
 
 .field-control-wrap {
@@ -326,8 +382,15 @@ textarea {
 
 .card {
   border: 3px solid var(--line);
-  padding: 1rem;
+  padding: 2rem;
   background: #efefef;
+}
+
+.card h4, .launch-card h4 {
+  font-size: 1.5rem;
+  text-transform: uppercase;
+  margin: 0;
+  margin-bottom: 1.5rem;
 }
 
 .placeholder h2 {
@@ -336,7 +399,7 @@ textarea {
 }
 
 .placeholder p {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 
 .inner-tabs-row {
@@ -363,7 +426,7 @@ textarea {
 .inner-tab {
   border: 3px solid var(--line);
   background: #ddd;
-  font-size: 2rem;
+  font-size: 1.25rem;
   padding: 0.45rem 1rem;
   cursor: pointer;
   margin-right: -3px;
@@ -398,11 +461,23 @@ textarea {
 }
 
 .serial-prefix-wrap strong {
-  font-size: 1.6rem;
+  font-size: 1rem;
+  font-family: "JetBrains Mono", monospace;
+  border: 3px solid black;
+  min-height: 2.2rem;
+  line-height: 1.8rem;
+  padding: 0 .5rem 0 .5rem;
+  border-right: 0;
+}
+
+.serial-prefix-wrap input {
+  margin-left: -.5rem;
 }
 
 .inline-guide-link {
-  font-size: 0.95rem;
+  font-size: 1rem;
+  color: black;
+  margin-left: 1rem;
 }
 
 .label-with-help {
@@ -546,7 +621,6 @@ textarea {
 /* Neo-brutalism visual refresh */
 .brand-bar,
 .top-bar,
-.tab-bar,
 .tab-panel,
 .card,
 .launch-card,
@@ -565,11 +639,6 @@ textarea {
   letter-spacing: 0.12rem;
 }
 
-.top-bar,
-.tab-bar {
-  background: #fff;
-  border: 4px solid var(--line);
-}
 
 .btn {
   border-radius: 0;

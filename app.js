@@ -119,7 +119,7 @@ document.querySelectorAll('a[href="report.html"], a[href="form6.html"]').forEach
 });
 
 document.getElementById("clearDatasetBtn").addEventListener("click", () => {
-  const confirmed = window.confirm("Start a new test? This clears locally saved Petrocal data on this browser.");
+  const confirmed = window.confirm("Start a new worksheet? This clears all locally saved Petrocal data in this browser.");
   if (!confirmed) return;
   clearDatasetAndResetUi();
 });
@@ -259,7 +259,7 @@ function persistLocalDataset() {
   } catch {
     // no-op
   }
-  saveStatus.textContent = `◉ Locally saved ${new Date().toLocaleString()}`;
+  saveStatus.textContent = `Locally saved @ ${new Date().toLocaleString()}`;
 }
 
 function updateAt(path, value) {
@@ -536,16 +536,16 @@ function renderTabbedHeader(tabs, activeIndex, onChange, options = {}) {
 
   if (addAction) {
     const add = document.createElement("button");
-    add.className = "linkish";
-    add.textContent = "➕ Add";
+    add.className = "btn small-btn";
+    add.textContent = "Add";
     add.addEventListener("click", addAction);
     actionsWrap.append(add);
   }
 
   if (removeAction) {
     const remove = document.createElement("button");
-    remove.className = "linkish";
-    remove.textContent = "⊖ Remove";
+    remove.className = "btn small-btn";
+    remove.textContent = "Remove";
     remove.addEventListener("click", removeAction);
     actionsWrap.append(remove);
   }
@@ -571,11 +571,11 @@ function renderMoveControls(onLeft, onRight) {
   wrap.className = "move-controls";
   const left = document.createElement("button");
   left.className = "btn small-btn";
-  left.textContent = "‹";
+  left.textContent = "←";
   left.addEventListener("click", onLeft);
   const right = document.createElement("button");
   right.className = "btn small-btn";
-  right.textContent = "›";
+  right.textContent = "→";
   right.addEventListener("click", onRight);
   wrap.append(left, right);
   return wrap;
@@ -683,7 +683,7 @@ function renderMeasures() {
   if (dataset.measures.length === 0) {
     const addOnly = document.createElement("button");
     addOnly.className = "btn";
-    addOnly.textContent = "➕ Add Measure";
+    addOnly.textContent = "Add Measure";
     addOnly.addEventListener("click", addMeasure);
     root.append(addOnly);
     measuresPanel.replaceChildren(root);
@@ -780,7 +780,7 @@ function renderInstruments() {
   if (dataset.instruments.length === 0) {
     const addOnly = document.createElement("button");
     addOnly.className = "btn";
-    addOnly.textContent = "➕ Add Instrument";
+    addOnly.textContent = "Add Instrument";
     addOnly.addEventListener("click", addInstrument);
     root.append(addOnly);
     instrumentsPanel.replaceChildren(root);
@@ -801,8 +801,8 @@ function renderInstruments() {
         addAction: addInstrument,
         removeAction: () => removeInstrument(VIEW_STATE.instrumentsTab),
         extraActions: [
-          { label: "‹", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, -1) },
-          { label: "›", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, 1) }
+          { label: "←", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, -1) },
+          { label: "→", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, 1) }
         ]
       }
     )
@@ -958,8 +958,8 @@ function renderHoses() {
       },
       {
         extraActions: [
-          { label: "‹", onClick: () => moveHose(instrument, hoseKey, -1) },
-          { label: "›", onClick: () => moveHose(instrument, hoseKey, 1) }
+          { label: "←", onClick: () => moveHose(instrument, hoseKey, -1) },
+          { label: "→", onClick: () => moveHose(instrument, hoseKey, 1) }
         ]
       }
     )
