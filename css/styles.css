@@ -308,6 +308,14 @@ input[type='date'] {
   border-color: tomato !important;
 }
 
+.select-good {
+  background: lightgreen !important;
+}
+
+.select-bad {
+  background: tomato !important;
+}
+
 .validation-message {
   color: tomato;
   font-size: 0.9rem;
