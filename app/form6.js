@@ -1,6 +1,5 @@
-const STORAGE_KEY = "petrocal.dataset.v2";
+const STORAGE_KEY = "petrocal.dataset.v3";
 const REPORT_SESSION_KEY = "petrocal.report.dataset";
-const LEGACY_STORAGE_KEY = "petrocal.dataset.v1";
 
 const form6Main = document.getElementById("form6Main");
 let dataset = normalizeDataset(loadDataset() || {});
@@ -15,7 +14,11 @@ function defaultDataset() {
       registrationNumber: "",
       verificationMark: "",
       operator: "",
-      address: ""
+      streetAddress: "",
+      suburb: "",
+      state: "",
+      postCode: "",
+      comments: ""
     },
     form6Details: {
       licenceNumber: "",
@@ -54,8 +57,7 @@ function loadDataset() {
   try {
     const raw =
       sessionStorage.getItem(REPORT_SESSION_KEY) ||
-      localStorage.getItem(STORAGE_KEY) ||
-      localStorage.getItem(LEGACY_STORAGE_KEY);
+      localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : null;
   } catch {
     return null;
@@ -74,26 +76,6 @@ function persistDataset() {
 function text(value, fallback = "") {
   if (value === null || value === undefined || value === "") return fallback;
   return String(value);
-}
-
-function splitAddress(addressRaw) {
-  const lines = String(addressRaw || "")
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
-
-  const firstLine = lines[0] || "";
-  const secondLine = lines[1] || "";
-
-  const streetNoMatch = firstLine.match(/^(\d+[A-Za-z0-9/-]*)\b\s*(.*)$/);
-  const streetNumber = streetNoMatch ? streetNoMatch[1] : "";
-  const streetName = streetNoMatch ? streetNoMatch[2] : firstLine;
-
-  const postcodeMatch = String(addressRaw || "").match(/(\d{4})(?![\s\S]*\d{4})/);
-  const postcode = postcodeMatch ? postcodeMatch[1] : "";
-  const suburbLocality = postcode ? secondLine.replace(new RegExp(`\\b${postcode}\\b`), "").trim() : secondLine;
-
-  return { streetNumber, streetName, suburbLocality, postcode };
 }
 
 function hoseRows() {
@@ -152,7 +134,6 @@ function editableField(label, key) {
 }
 
 function renderForm6() {
-  const address = splitAddress(dataset.testDetails.address);
   const root = document.createElement("section");
   root.className = "form6-sheet";
 
@@ -169,10 +150,10 @@ function renderForm6() {
     labelledField("Trader's name", text(dataset.testDetails.operator)),
     labelledField("Business type", "Fuel Retail"),
     Object.assign(document.createElement("h3"), { textContent: "Instrument Location Details" }),
-    labelledField("Street number", address.streetNumber),
-    labelledField("Street name", address.streetName),
-    labelledField("Suburb/locality", address.suburbLocality),
-    labelledField("Postcode", address.postcode)
+    labelledField("Street address", text(dataset.testDetails.streetAddress)),
+    labelledField("Suburb/locality", text(dataset.testDetails.suburb)),
+    labelledField("State", text(dataset.testDetails.state)),
+    labelledField("Postcode", text(dataset.testDetails.postCode))
   );
 
   const right = document.createElement("section");

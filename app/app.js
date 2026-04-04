@@ -1,7 +1,6 @@
-const STORAGE_KEY = "petrocal.dataset.v2";
+const STORAGE_KEY = "petrocal.dataset.v3";
 const REPORT_SESSION_KEY = "petrocal.report.dataset";
 const IMPORT_SESSION_KEY = "petrocal.start.import.dataset";
-const LEGACY_STORAGE_KEY = "petrocal.dataset.v1";
 
 const VIEW_STATE = {
   measuresTab: 0,
@@ -47,7 +46,7 @@ const PERFORMANCE_CODES = [
 ];
 
 const defaultDataset = () => ({
-  version: 2,
+  version: 3,
   testDetails: {
     date: "",
     jobNumber: "",
@@ -60,7 +59,11 @@ const defaultDataset = () => ({
     siteName: "",
     siteNumber: "",
     contactOnSite: "",
-    address: ""
+    streetAddress: "",
+    suburb: "",
+    state: "",
+    postCode: "",
+    comments: ""
   },
   form6Details: {
     licenceNumber: "",
@@ -134,7 +137,7 @@ function selectMainTab(tabId) {
 
 function loadLocalDataset() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? normalizeDataset(JSON.parse(raw)) : null;
   } catch {
     return null;
@@ -174,24 +177,16 @@ function normalizeDataset(input) {
     enforceHoseCount(safe);
     return safe;
   });
-  normalized.measures = normalized.measures.map((measure) => {
-    const convertedType = Array.isArray(measure?.type) ? (measure.type.includes("cylindrical") ? "cylindrical" : "conical") : (measure?.type || "");
-    const convertedSightglass = Array.isArray(measure?.type)
-      ? (measure.type.includes("sightglass") ? "yes" : "no")
-      : (measure?.sightglass || "no");
-    return {
-      type: convertedType,
-      sightglass: convertedSightglass,
-      serialNumber: "",
-      volume: "",
-      certificateNumber: "",
-      certificateExpiry: "",
-      ...measure,
-      type: convertedType,
-      sightglass: convertedSightglass,
-      certificateExpiry: toDisplayDate(measure?.certificateExpiry || "")
-    };
-  });
+  normalized.measures = normalized.measures.map((measure) => ({
+    type: "",
+    sightglass: "no",
+    serialNumber: "",
+    volume: "",
+    certificateNumber: "",
+    certificateExpiry: "",
+    ...measure,
+    certificateExpiry: toDisplayDate(measure?.certificateExpiry || "")
+  }));
 
   return normalized;
 }
@@ -675,7 +670,11 @@ function renderTestDetails() {
     ["Site name", "siteName", "text", null, "field-medium"],
     ["Site number", "siteNumber", "text", null, "field-small"],
     ["Contact on site", "contactOnSite", "text", null, "field-medium"],
-    ["Address", "address", "textarea", null, "field-large"]
+    ["Street Address", "streetAddress", "text", null, "field-large"],
+    ["Suburb", "suburb", "text", null, "field-medium"],
+    ["State", "state", "select", ["ACT", "NSW", "NT", "QLD", "TAS", "VIC", "WA"], "field-small"],
+    ["Post Code", "postCode", "number", null, "field-small"],
+    ["Comments", "comments", "textarea", null, "field-large"]
   ];
 
   const form = document.createElement("div");
@@ -698,6 +697,11 @@ function renderTestDetails() {
       if (key === "date") control.placeholder = "DD/MM/YYYY";
       if (key === "mpe") control.step = "0.1";
       if (key === "jobNumber") control.min = 0;
+      if (key === "postCode") {
+        control.min = 1000;
+        control.max = 9999;
+        control.step = 1;
+      }
       if (key === "date") control.dataset.validate = "date";
       if (type === "number") control.dataset.validate = "number";
     }
@@ -706,6 +710,12 @@ function renderTestDetails() {
     control.value = key === "date" ? toDisplayDate(dataset.testDetails[key]) : (dataset.testDetails[key] ?? "");
     bindInput(control, ["testDetails", key], (value) => {
       if (key === "date") return toDisplayDate(value);
+      if (key === "postCode") {
+        if (value === "") return "";
+        const numeric = Math.trunc(Number(value));
+        if (Number.isNaN(numeric)) return "";
+        return Math.max(1000, Math.min(9999, numeric));
+      }
       return type === "number" ? (value === "" ? "" : Number(value)) : value;
     });
 
@@ -1481,7 +1491,6 @@ function numericTableInput(target, key, onChange, disabled = false) {
 
 function clearDatasetAndResetUi() {
   localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem("petrocal.dataset.v1");
   dataset = defaultDataset();
   VIEW_STATE.measuresTab = 0;
   VIEW_STATE.instrumentsTab = 0;
