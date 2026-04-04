@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Petrocal App</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="brand-bar">
+      <h1>Petrocal</h1>
+    </header>
+    <header class="top-bar">
+      <div class="dataset-actions">
+        <button id="clearDatasetBtn" class="btn">✳ New</button>
+        <button id="loadDatasetBtn" class="btn">⤴ Load Dataset</button>
+        <button id="saveDatasetBtn" class="btn">💾 Save Dataset</button>
+        <a class="btn nav-link-btn" href="report.html">Report</a>
+        <a class="btn nav-link-btn" href="form6.html">Form 6</a>
+        <input id="datasetFileInput" type="file" accept="application/json" hidden />
+      </div>
+      <div class="header-right">
+        <div id="saveStatus" class="save-status">Not saved yet</div>
+      </div>
+    </header>
+
+    <nav class="tab-bar" role="tablist" aria-label="Sections">
+      <button class="tab active" data-tab="testDetails">Test Details</button>
+      <button class="tab" data-tab="measures">Measures</button>
+      <button class="tab" data-tab="instruments">Instruments</button>
+      <button class="tab" data-tab="hoses">Hoses</button>
+    </nav>
+
+    <main id="appMain">
+      <section id="testDetails" class="tab-panel active"></section>
+      <section id="measures" class="tab-panel"></section>
+      <section id="instruments" class="tab-panel"></section>
+      <section id="hoses" class="tab-panel"></section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
