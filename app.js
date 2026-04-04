@@ -33,6 +33,17 @@ const COMPLIANCE_QUESTIONS = [
   "Pre-set indications"
 ];
 
+const PERFORMANCE_CODES = [
+  { code: "A", label: "A- new instrument" },
+  { code: "B", label: "B- routine inspection or contract requirement (without recalibration or repair)" },
+  { code: "C", label: "C- routine inspection or contract requirement (within MPE but recalibrated)" },
+  { code: "D", label: "D- outside MPE and recalibrated" },
+  { code: "E", label: "E- instrument repaired" },
+  { code: "F", label: "F- removed from trade" },
+  { code: "G", label: "G- modified/upgraded" },
+  { code: "H", label: "H- mark removed and not re-verified" }
+];
+
 const defaultDataset = () => ({
   version: 2,
   testDetails: {
@@ -517,6 +528,28 @@ function renderMoveControls(onLeft, onRight) {
   return wrap;
 }
 
+function buildLabelWithHelp(labelText, helpText = "") {
+  const wrapper = document.createElement("span");
+  wrapper.className = "label-with-help";
+  const label = document.createElement("span");
+  label.textContent = labelText;
+  wrapper.append(label);
+
+  if (helpText) {
+    const trigger = document.createElement("button");
+    trigger.type = "button";
+    trigger.className = "help-tip-trigger";
+    trigger.textContent = "?";
+    const tip = document.createElement("span");
+    tip.className = "help-tip-bubble";
+    tip.textContent = helpText;
+    trigger.append(tip);
+    wrapper.append(trigger);
+  }
+
+  return wrapper;
+}
+
 function moveInstrument(index, direction) {
   const target = index + direction;
   if (target < 0 || target >= dataset.instruments.length) return;
@@ -668,8 +701,13 @@ function renderMeasures() {
   ];
 
   fields.forEach(([label, key, type]) => {
-    const span = document.createElement("span");
-    span.textContent = label;
+    const span = key === "numbering"
+      ? buildLabelWithHelp(
+          label,
+          "Enter each number assigned to the instrument at POS separated by a forward-slash /"
+        )
+      : document.createElement("span");
+    if (key !== "numbering") span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
     if (type === "number") input.dataset.validate = "number";
@@ -741,8 +779,13 @@ function renderInstruments() {
   ];
 
   fields.forEach(([label, key, type]) => {
-    const span = document.createElement("span");
-    span.textContent = label;
+    const span = key === "numbering"
+      ? buildLabelWithHelp(
+          label,
+          "Enter each number assigned to the instrument at POS separated by a forward-slash /"
+        )
+      : document.createElement("span");
+    if (key !== "numbering") span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
     if (type === "number") input.dataset.validate = "number";
@@ -920,7 +963,13 @@ function renderHoses() {
     hose.hoseSerialSuffix = suffix.value;
     persistLocalDataset();
   });
-  hoseSerialWrap.append(prefix, suffix);
+  const guideLink = document.createElement("a");
+  guideLink.href = "https://www.industry.gov.au/sites/default/files/2019-06/fuel-dispenser-numbering-guide.pdf";
+  guideLink.target = "_blank";
+  guideLink.rel = "noopener noreferrer";
+  guideLink.textContent = "Numbering Guide";
+  guideLink.className = "inline-guide-link";
+  hoseSerialWrap.append(prefix, suffix, guideLink);
   grid.append(hoseSerialPrefix, hoseSerialWrap);
 
   const basicFields = [
@@ -950,7 +999,8 @@ function renderHoses() {
   const perfSpan = document.createElement("span");
   perfSpan.textContent = "Performance code";
   const perf = document.createElement("select");
-  ["", "A", "B", "C", "D", "E", "F", "G", "H"].forEach((value) => perf.append(new Option(value, value)));
+  perf.append(new Option("", ""));
+  PERFORMANCE_CODES.forEach((item) => perf.append(new Option(item.label, item.code)));
   perf.value = hose.measureCheck.performanceCode || "";
   perf.addEventListener("change", () => {
     hose.measureCheck.performanceCode = perf.value;

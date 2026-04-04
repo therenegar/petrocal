@@ -22,6 +22,16 @@ const COMPLIANCE_QUESTIONS = [
   "Interlock",
   "Pre-set indications"
 ];
+const PERFORMANCE_CODE_LABELS = {
+  A: "A- new instrument",
+  B: "B- routine inspection or contract requirement (without recalibration or repair)",
+  C: "C- routine inspection or contract requirement (within MPE but recalibrated)",
+  D: "D- outside MPE and recalibrated",
+  E: "E- instrument repaired",
+  F: "F- removed from trade",
+  G: "G- modified/upgraded",
+  H: "H- mark removed and not re-verified"
+};
 
 function loadDataset() {
   const raw =
@@ -100,7 +110,7 @@ function renderMeasure(measure, index) {
     dt.textContent = label;
     const dd = document.createElement("dd");
     dd.textContent = text(value);
-    decorateOutcomeElement(dd, value);
+    if (label !== "Sightglass") decorateOutcomeElement(dd, value);
     grid.append(dt, dd);
   });
   section.append(grid);
@@ -120,6 +130,11 @@ function measureVolumeLabel(measureId, dataset) {
   return `${text(measure.volume)}L`;
 }
 
+function formatPerformanceCode(value) {
+  const code = String(value || "").trim().toUpperCase();
+  return PERFORMANCE_CODE_LABELS[code] || value;
+}
+
 function renderHose(hose, index, instrument, dataset) {
   const section = document.createElement("section");
   section.className = "report-subsection";
@@ -132,14 +147,17 @@ function renderHose(hose, index, instrument, dataset) {
   const rows = [
     ["POS Number", hose.number],
     ["Grade", hose.grade],
-    ["Hose serial suffix", hose.hoseSerialSuffix],
+    [
+      "Hose serial",
+      `${text(instrument.serialNumber, "")}${instrument.serialNumber && hose.hoseSerialSuffix ? "-" : ""}${text(hose.hoseSerialSuffix, "")}` || "—"
+    ],
     ["Unit price", hose.unitPrice],
     ["Start tote", hose.startTote],
     ["End tote", hose.endTote],
     ["Qmin", hose.qmin],
     ["Qmax", hose.qmax],
     ["Maximum achievable rate", hose.maxRate],
-    ["Performance code", pick(hose, ["measureCheck", "performanceCode"], "")],
+    ["Performance code", formatPerformanceCode(pick(hose, ["measureCheck", "performanceCode"], ""))],
     ["Compliance overall", pick(hose, ["compliance", "overall"], "")]
   ];
 
