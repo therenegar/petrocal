@@ -670,10 +670,10 @@ function renderTestDetails() {
     ["Site name", "siteName", "text", null, "field-medium"],
     ["Site number", "siteNumber", "text", null, "field-small"],
     ["Contact on site", "contactOnSite", "text", null, "field-medium"],
-    ["Street Address", "streetAddress", "textarea", null, "field-large"],
+    ["Street Address", "streetAddress", "text", null, "field-large"],
     ["Suburb", "suburb", "text", null, "field-medium"],
-    ["State", "state", "text", null, "field-small"],
-    ["Post Code", "postCode", "text", null, "field-small"],
+    ["State", "state", "select", ["ACT", "NSW", "NT", "QLD", "TAS", "VIC", "WA"], "field-small"],
+    ["Post Code", "postCode", "number", null, "field-small"],
     ["Comments", "comments", "textarea", null, "field-large"]
   ];
 
@@ -697,6 +697,11 @@ function renderTestDetails() {
       if (key === "date") control.placeholder = "DD/MM/YYYY";
       if (key === "mpe") control.step = "0.1";
       if (key === "jobNumber") control.min = 0;
+      if (key === "postCode") {
+        control.min = 1000;
+        control.max = 9999;
+        control.step = 1;
+      }
       if (key === "date") control.dataset.validate = "date";
       if (type === "number") control.dataset.validate = "number";
     }
@@ -705,6 +710,12 @@ function renderTestDetails() {
     control.value = key === "date" ? toDisplayDate(dataset.testDetails[key]) : (dataset.testDetails[key] ?? "");
     bindInput(control, ["testDetails", key], (value) => {
       if (key === "date") return toDisplayDate(value);
+      if (key === "postCode") {
+        if (value === "") return "";
+        const numeric = Math.trunc(Number(value));
+        if (Number.isNaN(numeric)) return "";
+        return Math.max(1000, Math.min(9999, numeric));
+      }
       return type === "number" ? (value === "" ? "" : Number(value)) : value;
     });
 
