@@ -156,8 +156,8 @@ function renderForm6() {
   const root = document.createElement("section");
   root.className = "form6-sheet";
 
-  const heading = document.createElement("h2");
-  heading.textContent = "NMI Form 6";
+  
+  
 
   const columns = document.createElement("div");
   columns.className = "form6-columns";
@@ -242,6 +242,6 @@ function renderForm6() {
   }
 
   tableSection.append(table);
-  root.append(heading, columns, tableSection);
+  root.append(columns, tableSection);
   form6Main.replaceChildren(root);
 }

@@ -575,7 +575,7 @@ function renderTabbedHeader(tabs, activeIndex, onChange, options = {}) {
   if (addAction) {
     const add = document.createElement("button");
     add.className = "btn small-btn";
-    add.textContent = "Add";
+    add.textContent = "Add another";
     add.addEventListener("click", addAction);
     actionsWrap.append(add);
   }
@@ -963,7 +963,7 @@ function renderHoses() {
   root.className = "stack";
 
   if (dataset.instruments.length === 0) {
-    root.textContent = "Add an instrument first.";
+    root.textContent = "Add an instrument first to be able to view hoses.";
     hosesPanel.replaceChildren(root);
     return;
   }

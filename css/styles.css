@@ -185,7 +185,7 @@ hr {
 }
 
 .small-btn {
-  font-size: 1.4rem;
+  font-size: 1.15rem;
   padding: 0.2rem 0.8rem;
 }
 
@@ -338,16 +338,55 @@ textarea {
 }
 
 .report-section {
-  border: 2px solid #bbb;
-  background: #f7f7f7;
-  padding: 1rem;
+  border-bottom: 3px solid var(--line);
+  padding-bottom: 2rem;
   margin-bottom: 1rem;
+  box-shadow: none;
 }
 
 .report-subsection {
-  background: #fff;
+  background: whitesmoke;
   padding: 0.8rem;
   margin-bottom: 0.75rem;
+}
+
+.report-section h2:first-child {
+  margin-top: 0;
+}
+
+.report-subsection h3:first-child {
+  margin-top: 0;
+}
+
+.report-section h2 {
+  font-size: 1.6rem;
+  text-transform: uppercase;
+}
+
+.report-section > .report-section h2 {
+  text-transform: none;
+}
+
+
+.report-section h3 {
+  font-size: 1.6rem;
+}
+
+.report-subsection h3 {
+  font-size: 1.25rem;
+}
+
+.report-section h4 {
+  font-size: 1.4rem;
+}
+
+.report-section h4:first-child {
+  margin-top: 0;
+}
+
+.report-section h5 {
+  font-size: 1.25rem;
+  margin: 1rem 0;
 }
 
 .report-card-grid {
@@ -358,17 +397,24 @@ textarea {
 
 .report-grid {
   display: grid;
-  grid-template-columns: minmax(220px, 280px) 1fr;
+  grid-template-columns: minmax(220px, 380px) 1fr;
   gap: 0.35rem 0.8rem;
   margin: 0;
 }
 
 .report-grid dt {
-  font-weight: 700;
+  font-weight: normal;
+  font-size: .9rem;
+  border-bottom: 1px dotted #999;
+  padding-bottom: .5rem;
 }
 
 .report-grid dd {
+  font-weight: bold;
+  font-family: "JetBrains Mono", monospace;
   margin: 0;
+  font-size: 0.9rem;
+
 }
 
 .report-table {
@@ -383,6 +429,13 @@ textarea {
   border: 1px solid #cfcfcf;
   padding: 0.25rem 0.35rem;
   text-align: left;
+}
+
+.report-table td {
+  font-family: "JetBrains Mono", monospace;
+}
+.report-table td:first-child {
+  font-family: inherit;
 }
 
 .card {
@@ -560,19 +613,14 @@ textarea {
   margin-top: 1rem;
 }
 
-.form6-page {
-  padding: 1rem;
-}
-
 .form6-sheet {
   border: 3px solid var(--line);
   background: var(--paper);
   padding: 1rem;
 }
 
-.form6-sheet h2 {
-  font-size: 2.8rem;
-  margin: 0 0 1rem;
+.form6-sheet h3:first-child {
+  margin-top: 0;
 }
 
 .form6-columns {
@@ -581,8 +629,8 @@ textarea {
   gap: 2rem;
 }
 
-.form6-block h3 {
-  font-size: 2rem;
+.form6-block h3, .form6-table-section h3 {
+  font-size: 1.52rem;
   margin: 1.2rem 0 0.65rem;
 }
 
@@ -596,18 +644,15 @@ textarea {
 
 .form6-info-row dt,
 .form6-info-row label {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 0.9rem;
+  font-weight: normal;
 }
 
 .form6-info-row dd {
   margin: 0;
-  font-size: 1.1rem;
-}
-
-.form6-table-section h3 {
-  font-size: 2rem;
-  margin: 1.5rem 0 0.65rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  font-family: "JetBrains Mono", monospace;
 }
 
 .form6-table {
@@ -618,9 +663,13 @@ textarea {
 
 .form6-table th,
 .form6-table td {
-  border: 3px solid var(--line);
+  border: 1px solid var(--line);
   padding: 0.35rem;
   text-align: left;
+}
+
+.form6-table th {
+  background: whitesmoke;
 }
 
 /* Neo-brutalism visual refresh */
@@ -629,8 +678,7 @@ textarea {
 .tab-panel,
 .card,
 .launch-card,
-.form6-sheet,
-.report-section {
+.form6-sheet {
   box-shadow: var(--shadow);
 }
 
@@ -686,14 +734,13 @@ textarea {
   background: #fff;
 }
 
-.report-subsection,
-.report-table th,
+  .report-table th,
 .report-table td {
-  border: 3px solid var(--line);
+  border: 1px solid var(--line);
 }
 
 .report-table th {
-  background: var(--accent);
+  background: gainsboro;
 }
 
 .data-table {
