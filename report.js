@@ -44,14 +44,28 @@ function renderKeyValueGrid(title, rows) {
 }
 
 function renderMeasure(measure, index) {
-  return renderKeyValueGrid(`Measure ${index + 1}`, [
+  const section = document.createElement("section");
+  section.className = "report-subsection";
+  section.append(Object.assign(document.createElement("h3"), { textContent: `Measure ${index + 1}` }));
+
+  const grid = document.createElement("dl");
+  grid.className = "report-grid";
+  [
     ["Type", measure.type],
     ["Sightglass", measure.sightglass],
     ["Serial number", measure.serialNumber],
     ["Volume (L)", measure.volume],
     ["Certificate number", measure.certificateNumber],
     ["Certificate expiry", measure.certificateExpiry]
-  ]);
+  ].forEach(([label, value]) => {
+    const dt = document.createElement("dt");
+    dt.textContent = label;
+    const dd = document.createElement("dd");
+    dd.textContent = text(value);
+    grid.append(dt, dd);
+  });
+  section.append(grid);
+  return section;
 }
 
 function renderHose(hose, index) {
@@ -86,7 +100,56 @@ function renderHose(hose, index) {
   });
   section.append(details);
 
+  const measureCheckTitle = document.createElement("h5");
+  measureCheckTitle.textContent = "Measure Check";
+  section.append(measureCheckTitle, renderRunsTable(hose.measureCheck?.checks || [], "Check"));
+
+  const verificationRows = [
+    ...(hose.verification?.deliveries || []).map((row, idx) => ({ label: `Delivery #${idx + 1}`, ...row })),
+    { label: "Preset Delivery", ...(hose.verification?.preset || {}) },
+    { label: "Gas Elimination Delivery", ...(hose.verification?.gasElimination || {}) }
+  ];
+  const verificationTitle = document.createElement("h5");
+  verificationTitle.textContent = "Verification";
+  section.append(verificationTitle, renderRunsTable(verificationRows, null, true));
+
+  const complianceTitle = document.createElement("h5");
+  complianceTitle.textContent = "Compliance";
+  const complianceGrid = document.createElement("dl");
+  complianceGrid.className = "report-grid";
+  [
+    ["Question 1", hose.compliance?.q1],
+    ["Question 2", hose.compliance?.q2],
+    ["Question 3", hose.compliance?.q3],
+    ["Overall result", hose.compliance?.overall]
+  ].forEach(([label, value]) => {
+    const dt = document.createElement("dt");
+    dt.textContent = label;
+    const dd = document.createElement("dd");
+    dd.textContent = text(value);
+    complianceGrid.append(dt, dd);
+  });
+  section.append(complianceTitle, complianceGrid);
+
   return section;
+}
+
+function renderRunsTable(rows, rowPrefix = "Run", includeEd = false) {
+  const table = document.createElement("table");
+  table.className = "report-table";
+  const header = document.createElement("thead");
+  header.innerHTML = `<tr><th>${rowPrefix ? "" : "Run"}</th><th>Measure</th><th>VFD</th><th>VREF</th><th>EFD (%)</th>${includeEd ? "<th>ED (%)</th>" : ""}</tr>`;
+  table.append(header);
+
+  const body = document.createElement("tbody");
+  rows.forEach((row, idx) => {
+    const tr = document.createElement("tr");
+    const label = rowPrefix ? `${rowPrefix} ${idx + 1}` : text(row.label, `Run ${idx + 1}`);
+    tr.innerHTML = `<td>${label}</td><td>${text(row.measureId)}</td><td>${text(row.vfd)}</td><td>${text(row.vref)}</td><td>${text(row.efd)}</td>${includeEd ? `<td>${text(row.ed)}</td>` : ""}`;
+    body.append(tr);
+  });
+  table.append(body);
+  return table;
 }
 
 function renderInstrument(instrument, index) {
@@ -135,7 +198,10 @@ function renderInstrument(instrument, index) {
     none.textContent = "No hoses.";
     hosesWrapper.append(none);
   } else {
-    instrument.hoses.forEach((hose, hoseIndex) => hosesWrapper.append(renderHose(hose, hoseIndex)));
+    const hoseGrid = document.createElement("div");
+    hoseGrid.className = "report-card-grid";
+    instrument.hoses.forEach((hose, hoseIndex) => hoseGrid.append(renderHose(hose, hoseIndex)));
+    hosesWrapper.append(hoseGrid);
   }
 
   section.append(hosesWrapper);
@@ -174,7 +240,10 @@ function renderReport() {
   if (!dataset.measures?.length) {
     measuresSection.append(Object.assign(document.createElement("p"), { textContent: "No measures." }));
   } else {
-    dataset.measures.forEach((measure, index) => measuresSection.append(renderMeasure(measure, index)));
+    const measureGrid = document.createElement("div");
+    measureGrid.className = "report-card-grid";
+    dataset.measures.forEach((measure, index) => measureGrid.append(renderMeasure(measure, index)));
+    measuresSection.append(measureGrid);
   }
   root.append(measuresSection);
 
