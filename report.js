@@ -201,7 +201,7 @@ function average(values) {
   return (parsed.reduce((sum, value) => sum + value, 0) / parsed.length).toFixed(2);
 }
 
-function renderInstrument(instrument, index) {
+function renderInstrument(instrument, index, dataset) {
   const section = document.createElement("section");
   section.className = "report-section";
 
@@ -302,7 +302,7 @@ function renderReport() {
   if (!dataset.instruments?.length) {
     instrumentsWrapper.append(Object.assign(document.createElement("p"), { textContent: "No instruments." }));
   } else {
-    dataset.instruments.forEach((instrument, index) => instrumentsWrapper.append(renderInstrument(instrument, index)));
+    dataset.instruments.forEach((instrument, index) => instrumentsWrapper.append(renderInstrument(instrument, index, dataset)));
   }
 
   root.append(instrumentsWrapper);
