@@ -101,7 +101,7 @@ document.getElementById("saveDatasetBtn").addEventListener("click", () => {
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `petrocal-${new Date().toISOString().slice(0, 19).replaceAll(":", "-")}.json`;
+  link.download = buildDatasetFilename();
   link.click();
   URL.revokeObjectURL(url);
 });
@@ -367,6 +367,33 @@ function normaliseSlashSeparatedNumbers(value) {
     .map((part) => part.trim())
     .filter(Boolean)
     .join("/");
+}
+
+function sanitiseFilenamePart(value, fallback) {
+  const cleaned = String(value || "")
+    .replace(/[<>:"/\\|?*\u0000-\u001F]/g, "")
+    .trim();
+  return cleaned || fallback;
+}
+
+function dateForFilename(value) {
+  const displayDate = toDisplayDate(value || "");
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(displayDate)) {
+    const [day, month, year] = displayDate.split("/");
+    return `${year}${month}${day}`;
+  }
+  const now = new Date();
+  const day = String(now.getDate()).padStart(2, "0");
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const year = String(now.getFullYear());
+  return `${year}${month}${day}`;
+}
+
+function buildDatasetFilename() {
+  const datePart = dateForFilename(dataset.testDetails?.date);
+  const sitePart = sanitiseFilenamePart(dataset.testDetails?.siteName, "Unknown Site");
+  const jobPart = sanitiseFilenamePart(dataset.testDetails?.jobNumber, "NoJob");
+  return `${datePart}-${sitePart}-${jobPart}.cal`;
 }
 
 function toDisplayDate(value) {
