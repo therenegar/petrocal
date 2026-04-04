@@ -26,12 +26,12 @@ const VISUAL_INSPECTION_QUESTIONS = [
 ];
 
 const COMPLIANCE_QUESTIONS = [
-  "Checking facility for indicating devices",
-  "Zero setting",
-  "Price computing",
-  "Nozzle cut-off",
-  "Interlock",
-  "Pre-set indications"
+  "Checking facility for indicating devices (clause 4.1)",
+  "Zero setting (clause 4.2)",
+  "Price computing (clause 4.3)",
+  "Nozzle cut-off (clause 4.4)",
+  "Interlock (clause 4.5)",
+  "Pre-set indications (clause 4.6)"
 ];
 
 const PERFORMANCE_CODES = [
@@ -663,14 +663,14 @@ function moveHose(instrument, hoseKey, direction) {
 
 function renderTestDetails() {
   const fields = [
-    ["Date", "date", "text", null, "field-small"],
+    ["Date of test", "date", "text", null, "field-small"],
     ["Job number", "jobNumber", "number", null, "field-small"],
-    ["Type", "type", "select", ["commissioning", "in-service inspection", "measure check", "verification"]],
+    ["Type of test", "type", "select", ["commissioning", "in-service inspection", "measure check", "verification"]],
     ["Verifier's name", "verifierName", "text", null, "field-medium"],
     ["Registration number", "registrationNumber", "text", null, "field-small"],
     ["Verification mark", "verificationMark", "text", null, "field-small"],
-    ["Operator", "operator", "select", ["ampol", "bp", "shell", "liberty", "united", "other"], "field-medium"],
-    ["Maximum permissible error", "mpe", "number", null, "field-small"],
+    ["Operator/owner", "operator", "select", ["ampol", "bp", "shell", "liberty", "united", "other"], "field-medium"],
+    ["Maximum permissible error (MPE)", "mpe", "number", null, "field-small"],
     ["Site name", "siteName", "text", null, "field-medium"],
     ["Site number", "siteNumber", "text", null, "field-small"],
     ["Contact on site", "contactOnSite", "text", null, "field-medium"],
@@ -765,7 +765,7 @@ function renderMeasures() {
   form.append(typeSpan, typeSelect);
 
   const sightglassSpan = document.createElement("span");
-  sightglassSpan.textContent = "Sightglass";
+  sightglassSpan.textContent = "Sightglass?";
   const sightglassSelect = document.createElement("select");
   sightglassSelect.classList.add("field-small");
   sightglassSelect.append(new Option("", ""));
@@ -779,8 +779,8 @@ function renderMeasures() {
   form.append(sightglassSpan, sightglassSelect);
 
   const fields = [
-    ["Serial number", "serialNumber", "text", "field-medium"],
     ["Volume", "volume", "number", "field-small"],
+    ["Serial number", "serialNumber", "text", "field-medium"],
     ["Certificate number", "certificateNumber", "text", "field-medium"],
     ["Certificate expiry", "certificateExpiry", "text", "field-small"]
   ];
@@ -856,14 +856,14 @@ function renderInstruments() {
   form.className = "form-grid";
 
   const fields = [
-    ["Numbering", "numbering", "text", "field-small"],
+    ["POS Numbering", "numbering", "text", "field-small"],
     ["Hose count", "hoseCount", "number", "field-small"],
     ["Manufacturer", "manufacturer", "text", "field-medium"],
     ["Make", "make", "text", "field-medium"],
     ["Model number", "modelNumber", "text", "field-medium"],
     ["Serial number", "serialNumber", "text", "field-medium"],
     ["Manufacture date", "manufactureDate", "text", "field-small"],
-    ["NMI pattern approval", "nmiPatternApproval", "text", "field-medium"]
+    ["NMI pattern approval number", "nmiPatternApproval", "text", "field-medium"]
   ];
 
   fields.forEach(([label, key, type, sizeClass]) => {
@@ -905,7 +905,7 @@ function renderInstruments() {
   });
 
   const productsSpan = document.createElement("span");
-  productsSpan.textContent = "Products approved";
+  productsSpan.textContent = "Products approved for delivery";
   const productsSelect = document.createElement("select");
   productsSelect.classList.add("field-medium");
   productsSelect.multiple = true;
@@ -925,7 +925,7 @@ function renderInstruments() {
   form.append(productsSpan, productsSelect);
 
   const typeSpan = document.createElement("span");
-  typeSpan.textContent = "Type";
+  typeSpan.textContent = "Type of system";
   const typeSelect = document.createElement("select");
   typeSelect.classList.add("field-small");
   ["", "Pressurised", "Suction"].forEach((option) => typeSelect.append(new Option(option, option)));
@@ -936,7 +936,7 @@ function renderInstruments() {
   card.append(form, document.createElement("hr"));
 
   const inspectionTitle = document.createElement("h4");
-  inspectionTitle.textContent = "Visual Inspection";
+  inspectionTitle.textContent = "General Characteristics (clause 3.1)";
   const inspection = document.createElement("div");
   inspection.className = "form-grid inspection-grid";
 
@@ -980,9 +980,9 @@ function renderHoses() {
   });
 
   const selectorWrap = document.createElement("div");
-  selectorWrap.className = "inline-picker";
+  selectorWrap.className = "instrument-select";
   const selectorLabel = document.createElement("span");
-  selectorLabel.textContent = "Choose an instrument: ";
+  selectorLabel.textContent = "Choose instrument to view hoses: ";
   selectorWrap.append(selectorLabel, instrumentSelector);
   root.append(selectorWrap);
 
@@ -1077,7 +1077,7 @@ function renderHoses() {
     ["End tote", "endTote", "number"],
     ["Qmin (L/min)", "qmin", "number"],
     ["Qmax (L/min)", "qmax", "number"],
-    ["Maximum achievable rate (L/min)", "maxRate", "number"]
+    ["Maximum achievable rate (clause 4.7)", "maxRate", "number"]
   ];
 
   basicFields.forEach(([label, key, type]) => {
@@ -1246,7 +1246,7 @@ function renderMeasureCheckPanel(hose) {
   const wrap = document.createElement("div");
   const table = document.createElement("table");
   table.className = "data-table";
-  table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th>EFD (%)</th></tr></thead>";
+  table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th>EFD (%)<br>Accuracy<br/>(clause 4.8)</th></tr></thead>";
   const body = document.createElement("tbody");
 
   hose.measureCheck.checks.forEach((check, idx) => {
@@ -1310,8 +1310,8 @@ function verificationRows(hose) {
     ["Delivery #2 (regular flow)", hose.verification.deliveries[1]],
     ["Delivery #3 (regular flow)", hose.verification.deliveries[2]],
     ["Delivery #4 (slow flow)", hose.verification.deliveries[3]],
-    ["Preset Delivery", hose.verification.preset],
-    ["Gas Elimination Delivery", hose.verification.gasElimination]
+    ["Preset Delivery (clause 4.9)", hose.verification.preset],
+    ["Gas Elimination Delivery (clause 4.10)", hose.verification.gasElimination]
   ];
 }
 
@@ -1319,7 +1319,7 @@ function renderVerificationPanel(hose, instrumentType) {
   const wrap = document.createElement("div");
   const table = document.createElement("table");
   table.className = "data-table";
-  table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th>EFD (%)</th><th>ED (%)</th></tr></thead>";
+  table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th>EFD (%)<br/>Accuracy<br/>(clause 4.8)</th><th>ED (%)</th></tr></thead>";
   const body = document.createElement("tbody");
 
   verificationRows(hose).forEach(([labelText, rowObj], rowIndex) => {
@@ -1398,12 +1398,12 @@ function renderVerificationPanel(hose, instrumentType) {
   meta.className = "form-grid top-gap";
 
   const avgLabel = document.createElement("span");
-  avgLabel.textContent = "Average error (EAV)";
+  avgLabel.textContent = "Average error (EAV) (clause 4.0)";
   const avgVal = document.createElement("strong");
   avgVal.textContent = avgError === "" ? "" : avgError;
 
   const antiLabel = document.createElement("span");
-  antiLabel.textContent = "Anti-drain fuel volume (mL)";
+  antiLabel.textContent = "Anti-drain volume of drained fuel (clause 4.11)";
   const antiInput = document.createElement("input");
   antiInput.type = "number";
   antiInput.classList.add("field-small");
