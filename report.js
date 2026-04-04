@@ -270,7 +270,7 @@ function renderInstrument(instrument, index, dataset) {
     instrument.hoses.forEach((hose, hoseIndex) => hoseGrid.append(renderHose(hose, hoseIndex, instrument, dataset)));
     hosesWrapper.append(hoseGrid);
   }
-
+Visual Inspection
   section.append(hosesWrapper);
   return section;
 }
