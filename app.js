@@ -86,7 +86,7 @@ function selectMainTab(tabId) {
 
 function loadLocalDataset() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("petrocal.dataset.v1");
+    const raw = localStorage.getIteadditionsm(STORAGE_KEY) || localStorage.getItem("petrocal.dataset.v1");
     return raw ? normalizeDataset(JSON.parse(raw)) : null;
   } catch {
     return null;
@@ -120,7 +120,7 @@ function normalizeDataset(input) {
       ...instrument
     };
 
-    safe.hoseCount = Math.max(1, Math.min(10, Number(safe.hoseCount) || 1));
+    safe.hoseCount = additionsMath.max(1, Math.min(10, Number(safe.hoseCount) || 1));
     safe.hoses = Array.isArray(safe.hoses) ? safe.hoses.map((hose) => normalizeHose(hose)) : [];
     enforceHoseCount(safe);
     return safe;

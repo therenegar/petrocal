@@ -3,28 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Petrocal App</title>
+    <title>Petrocal</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header class="top-bar">
+    <header class="title-bar">
+        <h1>Petrocal</h1>
+    </header>
+    <nav class="top-bar">
       <div class="dataset-actions">
-        <button id="newDatasetBtn" class="btn">✳ New</button>
-        <button id="loadDatasetBtn" class="btn">⤴ Load Dataset</button>
-        <button id="saveDatasetBtn" class="btn">💾 Save Dataset</button>
+        <button id="clearDatasetBtn" class="btn">New</button>
+        <button id="loadDatasetBtn" class="btn">Load<br/>Data</button>
+        <button id="saveDatasetBtn" class="btn">Save<br/>Data</button>
+        <button id="reportDatasetBtn" class="btn">View<br/>Report</button>
+        <button id="form6DatasetBtn" class="btn">Generate<br/>Form 6</button>
         <input id="datasetFileInput" type="file" accept="application/json" hidden />
       </div>
-      <h1>Petrocal</h1>
+      <div></div>
       <div id="saveStatus" class="save-status">Not saved yet</div>
-    </header>
+    </nav>
 
     <nav class="tab-bar" role="tablist" aria-label="Sections">
       <button class="tab active" data-tab="testDetails">Test Details</button>
       <button class="tab" data-tab="measures">Measures</button>
       <button class="tab" data-tab="instruments">Instruments</button>
       <button class="tab" data-tab="hoses">Hoses</button>
-      <button class="tab" data-tab="report">Report</button>
-      <button class="tab" data-tab="form6">Form 6</button>
     </nav>
 
     <main id="appMain">
