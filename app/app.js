@@ -1,6 +1,7 @@
 const STORAGE_KEY = "petrocal.dataset.v2";
 const REPORT_SESSION_KEY = "petrocal.report.dataset";
 const IMPORT_SESSION_KEY = "petrocal.start.import.dataset";
+const LEGACY_STORAGE_KEY = "petrocal.dataset.v1";
 
 const VIEW_STATE = {
   measuresTab: 0,
@@ -133,7 +134,7 @@ function selectMainTab(tabId) {
 
 function loadLocalDataset() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem("petrocal.dataset.v1");
+    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
     return raw ? normalizeDataset(JSON.parse(raw)) : null;
   } catch {
     return null;
