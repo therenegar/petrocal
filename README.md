@@ -28,7 +28,9 @@ This repository includes a vanilla JavaScript single-page prototype with:
 
 ## Run locally
 
-Because this is static front-end code, run any static server:
+Because this is static front-end Description
+
+code, run any static server:
 
 ```bash
 python3 -m http.server 8080
