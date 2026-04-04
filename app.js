@@ -627,7 +627,7 @@ function renderInstruments() {
     }
     form.append(span, input);
   });
-Date
+
   const productsSpan = document.createElement("span");
   productsSpan.textContent = "Products approved";
   const productsSelect = document.createElement("select");
@@ -710,7 +710,7 @@ function renderHoses() {
   selectorWrap.className = "inline-picker";
   selectorWrap.append(instrumentSelector);
   root.append(selectorWrap);
-Date
+
   const hoseTabs = instrument.hoses.map((hose, hoseIndex) => hoseLabel(hose, hoseIndex));
   const hoseKey = `i${VIEW_STATE.hosesInstrumentTab}`;
   VIEW_STATE.hosesTabByInstrument[hoseKey] = clampIndex(VIEW_STATE.hosesTabByInstrument[hoseKey] || 0, hoseTabs.length);
@@ -756,9 +756,10 @@ Date
   const gradeSpan = document.createElement("span");
   gradeSpan.textContent = "Grade";
   const grade = document.createElement("select");
-  ["", "ULP91", "PULP95", "PULP98", "E-10", "E85", "OPAL 91", "Diesel", "Premium Diesel", "Bio Diesel", "AdBlue", "Kerosene"].forEach((value) =>
-    grade.append(new Option(value, value))Date
-  );
+  const gradeOptions = ["", "ULP91", "PULP95", "PULP98", "E-10", "E85", "OPAL 91", "Diesel", "Premium Diesel", "Bio Diesel", "AdBlue", "Kerosene"];
+  for (const value of gradeOptions) {
+    grade.append(new Option(value, value));
+  }
   grade.value = hose.grade || "";
   grade.addEventListener("change", () => {
     hose.grade = grade.value;
