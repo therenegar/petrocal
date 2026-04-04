@@ -214,6 +214,11 @@ textarea {
   margin-top: 0.2rem;
 }
 
+.field-control-wrap {
+  display: grid;
+  align-content: start;
+}
+
 textarea {
   min-height: 6rem;
   resize: vertical;

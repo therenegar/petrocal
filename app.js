@@ -348,11 +348,19 @@ function getValidationKind(input) {
 }
 
 function ensureErrorNode(input) {
-  let node = input.nextElementSibling;
-  if (!node || !node.classList.contains("validation-message")) {
+  let wrapper = input.parentElement;
+  if (!wrapper || !wrapper.classList.contains("field-control-wrap")) {
+    wrapper = document.createElement("div");
+    wrapper.className = "field-control-wrap";
+    input.replaceWith(wrapper);
+    wrapper.append(input);
+  }
+
+  let node = wrapper.querySelector(".validation-message");
+  if (!node) {
     node = document.createElement("div");
     node.className = "validation-message";
-    input.insertAdjacentElement("afterend", node);
+    wrapper.append(node);
   }
   return node;
 }
