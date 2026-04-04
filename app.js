@@ -627,7 +627,7 @@ function renderInstruments() {
     }
     form.append(span, input);
   });
-
+Date
   const productsSpan = document.createElement("span");
   productsSpan.textContent = "Products approved";
   const productsSelect = document.createElement("select");
@@ -710,7 +710,7 @@ function renderHoses() {
   selectorWrap.className = "inline-picker";
   selectorWrap.append(instrumentSelector);
   root.append(selectorWrap);
-
+Date
   const hoseTabs = instrument.hoses.map((hose, hoseIndex) => hoseLabel(hose, hoseIndex));
   const hoseKey = `i${VIEW_STATE.hosesInstrumentTab}`;
   VIEW_STATE.hosesTabByInstrument[hoseKey] = clampIndex(VIEW_STATE.hosesTabByInstrument[hoseKey] || 0, hoseTabs.length);
@@ -757,7 +757,7 @@ function renderHoses() {
   gradeSpan.textContent = "Grade";
   const grade = document.createElement("select");
   ["", "ULP91", "PULP95", "PULP98", "E-10", "E85", "OPAL 91", "Diesel", "Premium Diesel", "Bio Diesel", "AdBlue", "Kerosene"].forEach((value) =>
-    grade.append(new Option(value, value))
+    grade.append(new Option(value, value))Date
   );
   grade.value = hose.grade || "";
   grade.addEventListener("change", () => {
@@ -827,9 +827,10 @@ function renderHoses() {
 
   content.append(grid, document.createElement("hr"));
 
-  const innerTabs = ["Measure Check", "Verification", "Compliance"];
+  const innerTabs = visibleHoseTabs(hose.measureCheck.performanceCode);
   const hoseInnerKey = `${hoseKey}:h${hoseIndex}`;
-  const innerTab = VIEW_STATE.hoseInnerTabByKey[hoseInnerKey] || 0;
+  const innerTab = Math.min(VIEW_STATE.hoseInnerTabByKey[hoseInnerKey] || 0, innerTabs.length - 1);
+  VIEW_STATE.hoseInnerTabByKey[hoseInnerKey] = innerTab;
   content.append(
     renderTabbedHeader(
       innerTabs,
@@ -843,14 +844,23 @@ function renderHoses() {
 
   const body = document.createElement("div");
   body.className = "nested-content";
-  if (innerTab === 0) body.append(renderMeasureCheckPanel(hose));
-  if (innerTab === 1) body.append(renderVerificationPanel(hose));
-  if (innerTab === 2) body.append(renderCompliancePanel(hose));
+  const activeTabLabel = innerTabs[innerTab];
+  if (activeTabLabel === "Measure Check") body.append(renderMeasureCheckPanel(hose));
+  if (activeTabLabel === "Verification") body.append(renderVerificationPanel(hose, instrument.type));
+  if (activeTabLabel === "Compliance") body.append(renderCompliancePanel(hose));
 
   content.append(body);
   root.append(content);
 
   hosesPanel.replaceChildren(root);
+}
+
+function visibleHoseTabs(performanceCode) {
+  const code = (performanceCode || "").toUpperCase();
+  const tabs = ["Measure Check", "Verification", "Compliance"];
+  if (code === "A" || ["E", "F", "G", "H"].includes(code)) return ["Verification", "Compliance"];
+  if (code === "B") return ["Measure Check", "Compliance"];
+  return tabs;
 }
 
 function renderMeasureSelect(value, onChange) {
@@ -884,6 +894,51 @@ function calculateEfd(vfd, vref) {
   return (((a - b) / b) * 100).toFixed(2);
 }
 
+function findMeasure(measureId) {
+  return dataset.measures[Number(measureId)];
+}
+
+function parseDateDdMmYyyy(value) {
+  if (!/^\d{2}\/\d{2}\/\d{4}$/.test(value || "")) return null;
+  const [day, month, year] = value.split("/").map(Number);
+  const date = new Date(year, month - 1, day);
+  if (Number.isNaN(date.getTime())) return null;
+  return date;
+}
+
+function isMeasureExpired(measure) {
+  const expiry = parseDateDdMmYyyy(toDisplayDate(measure?.certificateExpiry || ""));
+  if (!expiry) return false;
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return expiry < today;
+}
+
+function validateMeasureSize(hose, measure) {
+  if (!measure) return "";
+  const measureVolume = Number(measure.volume);
+  const qmin = Number(hose.qmin);
+  const qmax = Number(hose.qmax);
+  const maxRate = Number(hose.maxRate);
+
+  if (Number.isFinite(qmin) && Number.isFinite(measureVolume) && measureVolume < qmin) {
+    return "Invalid measure size selected";
+  }
+
+  if (Number.isFinite(qmax) && qmax > 60 && Number.isFinite(maxRate) && Number.isFinite(measureVolume) && measureVolume < maxRate) {
+    return "Invalid measure size selected";
+  }
+
+  return "";
+}
+
+function exceedsMpe(efd) {
+  const mpe = Number(dataset.testDetails.mpe);
+  const efdVal = Number(efd);
+  if (!Number.isFinite(mpe) || !Number.isFinite(efdVal)) return false;
+  return Math.abs(efdVal) > Math.abs(mpe);
+}
+
 function renderMeasureCheckPanel(hose) {
   const wrap = document.createElement("div");
   const table = document.createElement("table");
@@ -897,7 +952,9 @@ function renderMeasureCheckPanel(hose) {
     label.textContent = `Check #${idx + 1}`;
 
     const measureCell = document.createElement("td");
-    measureCell.append(
+    const measureWrap = document.createElement("div");
+    measureCell.append(measureWrap);
+    measureWrap.append(
       renderMeasureSelect(check.measureId, (id) => {
         check.measureId = id;
         sightglassDefaults(check, id);
@@ -905,18 +962,37 @@ function renderMeasureCheckPanel(hose) {
         renderHoses();
       })
     );
+    const selectedMeasure = findMeasure(check.measureId);
+    const sizeError = validateMeasureSize(hose, selectedMeasure);
+    if (isMeasureExpired(selectedMeasure)) {
+      const expired = document.createElement("div");
+      expired.className = "field-error";
+      expired.textContent = "Measure expired";
+      measureWrap.append(expired);
+    }
+    if (sizeError) {
+      const invalid = document.createElement("div");
+      invalid.className = "field-error";
+      invalid.textContent = sizeError;
+      measureWrap.append(invalid);
+    }
+
+    const sightglassYes = (selectedMeasure?.sightglass || "no") === "yes";
+    if (sightglassYes && selectedMeasure) check.vfd = selectedMeasure.volume || "";
+    if (!sightglassYes && selectedMeasure) check.vref = selectedMeasure.volume || "";
 
     const vfd = numericTableInput(check, "vfd", () => {
       check.efd = calculateEfd(check.vfd, check.vref);
-    });
+    }, sightglassYes);
     const vref = numericTableInput(check, "vref", () => {
       check.efd = calculateEfd(check.vfd, check.vref);
-    });
+    }, !sightglassYes && !!selectedMeasure);
 
     const efd = document.createElement("td");
     efd.textContent = check.efd || "";
 
     tr.append(label, measureCell, vfd, vref, efd);
+    if (exceedsMpe(check.efd)) tr.classList.add("row-error");
     body.append(tr);
   });
 
@@ -936,7 +1012,7 @@ function verificationRows(hose) {
   ];
 }
 
-function renderVerificationPanel(hose) {
+function renderVerificationPanel(hose, instrumentType) {
   const wrap = document.createElement("div");
   const table = document.createElement("table");
   table.className = "data-table";
@@ -944,12 +1020,15 @@ function renderVerificationPanel(hose) {
   const body = document.createElement("tbody");
 
   verificationRows(hose).forEach(([labelText, rowObj], rowIndex) => {
+    if (labelText === "Gas Elimination Delivery" && instrumentType !== "Suction") return;
     const tr = document.createElement("tr");
     const label = document.createElement("td");
     label.textContent = labelText;
 
     const measureCell = document.createElement("td");
-    measureCell.append(
+    const measureWrap = document.createElement("div");
+    measureCell.append(measureWrap);
+    measureWrap.append(
       renderMeasureSelect(rowObj.measureId, (id) => {
         rowObj.measureId = id;
         sightglassDefaults(rowObj, id);
@@ -957,13 +1036,30 @@ function renderVerificationPanel(hose) {
         renderHoses();
       })
     );
+    const selectedMeasure = findMeasure(rowObj.measureId);
+    const sizeError = validateMeasureSize(hose, selectedMeasure);
+    if (isMeasureExpired(selectedMeasure)) {
+      const expired = document.createElement("div");
+      expired.className = "field-error";
+      expired.textContent = "Measure expired";
+      measureWrap.append(expired);
+    }
+    if (sizeError) {
+      const invalid = document.createElement("div");
+      invalid.className = "field-error";
+      invalid.textContent = sizeError;
+      measureWrap.append(invalid);
+    }
+    const sightglassYes = (selectedMeasure?.sightglass || "no") === "yes";
+    if (sightglassYes && selectedMeasure) rowObj.vfd = selectedMeasure.volume || "";
+    if (!sightglassYes && selectedMeasure) rowObj.vref = selectedMeasure.volume || "";
 
     const vfd = numericTableInput(rowObj, "vfd", () => {
       rowObj.efd = calculateEfd(rowObj.vfd, rowObj.vref);
-    });
+    }, sightglassYes);
     const vref = numericTableInput(rowObj, "vref", () => {
       rowObj.efd = calculateEfd(rowObj.vfd, rowObj.vref);
-    });
+    }, !sightglassYes && !!selectedMeasure);
 
     const efd = document.createElement("td");
     efd.textContent = rowObj.efd || "";
@@ -982,6 +1078,7 @@ function renderVerificationPanel(hose) {
     }
 
     tr.append(label, measureCell, vfd, vref, efd, ed);
+    if (exceedsMpe(rowObj.efd)) tr.classList.add("row-error");
     body.append(tr);
   });
 
@@ -1031,7 +1128,7 @@ function renderCompliancePanel(hose) {
     const span = document.createElement("span");
     span.textContent = `Question ${idx + 1}`;
     const select = document.createElement("select");
-    ["", "yes", "no", "N/A"].forEach((option) => select.append(new Option(option, option)));
+    ["", "pass", "fail", "N/A"].forEach((option) => select.append(new Option(option, option)));
     select.value = hose.compliance[key] || "";
     select.addEventListener("change", () => {
       hose.compliance[key] = select.value;
@@ -1042,24 +1139,24 @@ function renderCompliancePanel(hose) {
 
   const resultSpan = document.createElement("span");
   resultSpan.textContent = "Overall result";
-  const result = document.createElement("select");
-  ["Pass", "Fail"].forEach((option) => result.append(new Option(option, option)));
-  result.value = hose.compliance.overall || "Pass";
-  result.addEventListener("change", () => {
-    hose.compliance.overall = result.value;
-    persistLocalDataset();
-  });
+  const result = document.createElement("strong");
+  const allChecks = [...hose.measureCheck.checks, ...hose.verification.deliveries, hose.verification.preset, hose.verification.gasElimination];
+  const anyOutOfMpe = allChecks.some((entry) => exceedsMpe(entry?.efd));
+  const compliancePass = ["q1", "q2", "q3"].every((key) => (hose.compliance[key] || "").toLowerCase() === "pass");
+  hose.compliance.overall = !anyOutOfMpe && compliancePass ? "Pass" : "Fail";
+  result.textContent = hose.compliance.overall;
   form.append(resultSpan, result);
 
   return form;
 }
 
-function numericTableInput(target, key, onChange) {
+function numericTableInput(target, key, onChange, disabled = false) {
   const td = document.createElement("td");
   const input = document.createElement("input");
   input.type = "number";
   input.step = "0.01";
   input.value = target[key] ?? "";
+  input.disabled = disabled;
   input.addEventListener("change", () => {
     target[key] = input.value;
     onChange?.();

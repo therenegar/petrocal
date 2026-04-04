@@ -127,6 +127,16 @@ body {
   padding: 0.2rem 0.8rem;
 }
 
+.field-error {
+  color: #b00020;
+  font-size: 0.95rem;
+  margin-top: 0.2rem;
+}
+
+.row-error {
+  background: rgba(176, 0, 32, 0.18);
+}
+
 .tab-bar {
   display: flex;
   gap: 0;
