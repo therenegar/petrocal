@@ -21,7 +21,7 @@ body {
 .launch-body {
   min-height: 100vh;
   display: grid;
-  place-items: center;
+  align-content: start;
 }
 
 .launch-card {
@@ -29,11 +29,7 @@ body {
   background: var(--cream);
   padding: 2rem;
   width: min(720px, 95vw);
-}
-
-.launch-card h1 {
-  margin: 0 0 0.5rem;
-  font-size: clamp(2.2rem, 5vw, 4rem);
+  margin: 2rem auto;
 }
 
 .launch-actions {
@@ -47,24 +43,33 @@ body {
   text-align: center;
 }
 
+.brand-bar {
+  width: 100%;
+  background: var(--cream);
+  border: 3px solid #da8a2c;
+  margin-bottom: 0.5rem;
+}
+
+.brand-bar h1 {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  font-size: clamp(2.2rem, 4vw, 4rem);
+}
+
 .top-bar {
   background: var(--cream);
   border: 3px solid #da8a2c;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr auto;
   align-items: center;
   gap: 1rem;
   padding: 0.75rem 1rem;
 }
 
-.top-bar h1 {
-  margin: 0;
-  font-size: clamp(2rem, 3vw, 4rem);
-  text-align: center;
-}
-
 .dataset-actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
 }
 
@@ -98,6 +103,28 @@ body {
   text-decoration: none;
   display: inline-flex;
   align-items: center;
+}
+
+.inline-options {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.inline-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.move-controls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.small-btn {
+  font-size: 1.4rem;
+  padding: 0.2rem 0.8rem;
 }
 
 .tab-bar {
@@ -278,7 +305,6 @@ textarea {
     grid-template-columns: 1fr;
   }
 
-  .top-bar h1,
   .save-status {
     text-align: left;
   }

@@ -123,6 +123,24 @@ function normalizeDataset(input) {
     enforceHoseCount(safe);
     return safe;
   });
+  normalized.measures = normalized.measures.map((measure) => {
+    const convertedType = Array.isArray(measure?.type) ? (measure.type.includes("cylindrical") ? "cylindrical" : "conical") : (measure?.type || "");
+    const convertedSightglass = Array.isArray(measure?.type)
+      ? (measure.type.includes("sightglass") ? "yes" : "no")
+      : (measure?.sightglass || "no");
+    return {
+      type: convertedType,
+      sightglass: convertedSightglass,
+      serialNumber: "",
+      volume: "",
+      certificateNumber: "",
+      certificateExpiry: "",
+      ...measure,
+      type: convertedType,
+      sightglass: convertedSightglass,
+      certificateExpiry: toDisplayDate(measure?.certificateExpiry || "")
+    };
+  });
 
   return normalized;
 }
@@ -203,7 +221,8 @@ function bindInput(input, path, parser = (v) => v, rerender = true) {
 
 function addMeasure() {
   dataset.measures.push({
-    type: [],
+    type: "",
+    sightglass: "no",
     serialNumber: "",
     volume: "",
     certificateNumber: "",
@@ -266,7 +285,7 @@ function instrumentLabel(instrument, index) {
   const numbering = (instrument.numbering || "").trim();
   if (!numbering) return `Instrument ${index + 1}`;
   const clean = numbering
-    .split(",")
+    .split("/")
     .map((n) => n.trim())
     .filter(Boolean)
     .join("/");
@@ -280,9 +299,28 @@ function measureLabel(measure, index) {
 
 function parseInstrumentPositions(instrument) {
   return (instrument.numbering || "")
-    .split(",")
+    .split("/")
     .map((value) => value.trim())
     .filter(Boolean);
+}
+
+function normaliseSlashSeparatedNumbers(value) {
+  return value
+    .replaceAll(",", "/")
+    .split("/")
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join("/");
+}
+
+function toDisplayDate(value) {
+  if (!value) return "";
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) return value;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [year, month, day] = value.split("-");
+    return `${day}/${month}/${year}`;
+  }
+  return value;
 }
 
 function hoseLabel(hose, index) {
@@ -329,9 +367,45 @@ function renderTabbedHeader(tabs, activeIndex, onChange, addAction, removeAction
   return row;
 }
 
+function renderMoveControls(onLeft, onRight) {
+  const wrap = document.createElement("div");
+  wrap.className = "move-controls";
+  const left = document.createElement("button");
+  left.className = "btn small-btn";
+  left.textContent = "‹";
+  left.addEventListener("click", onLeft);
+  const right = document.createElement("button");
+  right.className = "btn small-btn";
+  right.textContent = "›";
+  right.addEventListener("click", onRight);
+  wrap.append(left, right);
+  return wrap;
+}
+
+function moveInstrument(index, direction) {
+  const target = index + direction;
+  if (target < 0 || target >= dataset.instruments.length) return;
+  [dataset.instruments[index], dataset.instruments[target]] = [dataset.instruments[target], dataset.instruments[index]];
+  VIEW_STATE.instrumentsTab = target;
+  VIEW_STATE.hosesInstrumentTab = clampIndex(VIEW_STATE.hosesInstrumentTab, dataset.instruments.length);
+  persistLocalDataset();
+  renderInstruments();
+  renderHoses();
+}
+
+function moveHose(instrument, hoseKey, direction) {
+  const current = VIEW_STATE.hosesTabByInstrument[hoseKey];
+  const target = current + direction;
+  if (target < 0 || target >= instrument.hoses.length) return;
+  [instrument.hoses[current], instrument.hoses[target]] = [instrument.hoses[target], instrument.hoses[current]];
+  VIEW_STATE.hosesTabByInstrument[hoseKey] = target;
+  persistLocalDataset();
+  renderHoses();
+}
+
 function renderTestDetails() {
   const fields = [
-    ["Date", "date", "date"],
+    ["Date", "date", "text"],
     ["Job number", "jobNumber", "number"],
     ["Type", "type", "select", ["commissioning", "in-service inspection", "measure check", "verification"]],
     ["Verifier's name", "verifierName", "text"],
@@ -364,10 +438,14 @@ function renderTestDetails() {
       control.type = type;
       if (key === "mpe") control.step = "0.1";
       if (key === "jobNumber") control.min = 0;
+      if (key === "date") control.placeholder = "DD/MM/YYYY";
     }
 
-    control.value = dataset.testDetails[key] ?? "";
-    bindInput(control, ["testDetails", key], (value) => (type === "number" ? (value === "" ? "" : Number(value)) : value));
+    control.value = key === "date" ? toDisplayDate(dataset.testDetails[key]) : (dataset.testDetails[key] ?? "");
+    bindInput(control, ["testDetails", key], (value) => {
+      if (key === "date") return toDisplayDate(value);
+      return type === "number" ? (value === "" ? "" : Number(value)) : value;
+    });
 
     form.append(span, control);
   });
@@ -413,25 +491,41 @@ function renderMeasures() {
   const typeSpan = document.createElement("span");
   typeSpan.textContent = "Type";
   const typeSelect = document.createElement("select");
-  typeSelect.multiple = true;
-  typeSelect.size = 4;
-  ["conical", "cylindrical", "sightglass", "no sightglass"].forEach((option) => {
-    const opt = new Option(option, option);
-    opt.selected = (current.type || []).includes(option);
-    typeSelect.append(opt);
-  });
+  ["", "conical", "cylindrical"].forEach((option) => typeSelect.append(new Option(option, option)));
+  typeSelect.value = current.type || "";
   typeSelect.addEventListener("change", () => {
-    updateAt(["measures", VIEW_STATE.measuresTab, "type"], [...typeSelect.selectedOptions].map((o) => o.value));
+    updateAt(["measures", VIEW_STATE.measuresTab, "type"], typeSelect.value);
     renderMeasures();
     renderHoses();
   });
   form.append(typeSpan, typeSelect);
 
+  const sightglassSpan = document.createElement("span");
+  sightglassSpan.textContent = "Sightglass";
+  const sightglassWrap = document.createElement("div");
+  sightglassWrap.className = "inline-options";
+  ["yes", "no"].forEach((choice) => {
+    const label = document.createElement("label");
+    const radio = document.createElement("input");
+    radio.type = "radio";
+    radio.name = `measure-sightglass-${VIEW_STATE.measuresTab}`;
+    radio.value = choice;
+    radio.checked = (current.sightglass || "no") === choice;
+    radio.addEventListener("change", () => {
+      if (!radio.checked) return;
+      updateAt(["measures", VIEW_STATE.measuresTab, "sightglass"], choice);
+      renderHoses();
+    });
+    label.append(radio, document.createTextNode(choice === "yes" ? " Yes" : " No"));
+    sightglassWrap.append(label);
+  });
+  form.append(sightglassSpan, sightglassWrap);
+
   const fields = [
     ["Serial number", "serialNumber", "text"],
     ["Volume", "volume", "number"],
     ["Certificate number", "certificateNumber", "text"],
-    ["Certificate expiry", "certificateExpiry", "date"]
+    ["Certificate expiry", "certificateExpiry", "text"]
   ];
 
   fields.forEach(([label, key, type]) => {
@@ -439,8 +533,12 @@ function renderMeasures() {
     span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
-    input.value = current[key] ?? "";
-    bindInput(input, ["measures", VIEW_STATE.measuresTab, key], (value) => (type === "number" ? (value === "" ? "" : Number(value)) : value));
+    if (key === "certificateExpiry") input.placeholder = "DD/MM/YYYY";
+    input.value = key === "certificateExpiry" ? toDisplayDate(current[key]) : (current[key] ?? "");
+    bindInput(input, ["measures", VIEW_STATE.measuresTab, key], (value) => {
+      if (key === "certificateExpiry") return toDisplayDate(value);
+      return type === "number" ? (value === "" ? "" : Number(value)) : value;
+    });
     form.append(span, input);
   });
 
@@ -477,6 +575,10 @@ function renderInstruments() {
       () => removeInstrument(VIEW_STATE.instrumentsTab)
     )
   );
+  root.append(renderMoveControls(
+    () => moveInstrument(VIEW_STATE.instrumentsTab, -1),
+    () => moveInstrument(VIEW_STATE.instrumentsTab, 1)
+  ));
 
   const index = VIEW_STATE.instrumentsTab;
   const instrument = dataset.instruments[index];
@@ -493,7 +595,7 @@ function renderInstruments() {
     ["Make", "make", "text"],
     ["Model number", "modelNumber", "text"],
     ["Serial number", "serialNumber", "text"],
-    ["Manufacture date", "manufactureDate", "month"],
+    ["Manufacture date", "manufactureDate", "text"],
     ["NMI pattern approval", "nmiPatternApproval", "text"]
   ];
 
@@ -502,7 +604,8 @@ function renderInstruments() {
     span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
-    input.value = instrument[key] ?? "";
+    if (key === "manufactureDate") input.placeholder = "DD/MM/YYYY";
+    input.value = key === "manufactureDate" ? toDisplayDate(instrument[key]) : (instrument[key] ?? "");
     if (key === "hoseCount") {
       input.min = 1;
       input.max = 10;
@@ -515,6 +618,10 @@ function renderInstruments() {
         renderInstruments();
         renderHoses();
       });
+    } else if (key === "numbering") {
+      bindInput(input, ["instruments", index, key], normaliseSlashSeparatedNumbers);
+    } else if (key === "manufactureDate") {
+      bindInput(input, ["instruments", index, key], toDisplayDate);
     } else {
       bindInput(input, ["instruments", index, key], (value) => (type === "number" ? (value === "" ? "" : Number(value)) : value));
     }
@@ -617,16 +724,13 @@ function renderHoses() {
         renderHoses();
       },
       null,
-      () => {
-        instrument.hoses.splice(VIEW_STATE.hosesTabByInstrument[hoseKey], 1);
-        instrument.hoseCount = Math.max(1, instrument.hoses.length || 1);
-        enforceHoseCount(instrument);
-        persistLocalDataset();
-        renderInstruments();
-        renderHoses();
-      }
+      null
     )
   );
+  root.append(renderMoveControls(
+    () => moveHose(instrument, hoseKey, -1),
+    () => moveHose(instrument, hoseKey, 1)
+  ));
 
   const hoseIndex = VIEW_STATE.hosesTabByInstrument[hoseKey];
   const hose = instrument.hoses[hoseIndex];
@@ -764,7 +868,7 @@ function sightglassDefaults(target, measureId) {
   const measure = dataset.measures[Number(measureId)];
   if (!measure) return;
   const volume = measure.volume || "";
-  const hasSightglass = Array.isArray(measure.type) && measure.type.includes("sightglass");
+  const hasSightglass = (measure.sightglass || "no") === "yes";
   if (hasSightglass) {
     target.vfd = volume;
   } else {

@@ -7,19 +7,19 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
+    <header class="brand-bar">
+      <h1>Petrocal</h1>
+    </header>
     <header class="top-bar">
       <div class="dataset-actions">
         <button id="clearDatasetBtn" class="btn">✳ New</button>
         <button id="loadDatasetBtn" class="btn">⤴ Load Dataset</button>
         <button id="saveDatasetBtn" class="btn">💾 Save Dataset</button>
+        <a class="btn nav-link-btn" href="report.html">Report</a>
+        <a class="btn nav-link-btn" href="form6.html">Form 6</a>
         <input id="datasetFileInput" type="file" accept="application/json" hidden />
       </div>
-      <h1>Petrocal</h1>
       <div class="header-right">
-        <div class="header-links">
-          <a class="btn nav-link-btn" href="report.html">Report</a>
-          <a class="btn nav-link-btn" href="form6.html">Form 6</a>
-        </div>
         <div id="saveStatus" class="save-status">Not saved yet</div>
       </div>
     </header>
