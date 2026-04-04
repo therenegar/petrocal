@@ -816,6 +816,7 @@ function renderHoses() {
   perf.addEventListener("change", () => {
     hose.measureCheck.performanceCode = perf.value;
     persistLocalDataset();
+    renderHoses();
   });
   grid.append(perfSpan, perf);
 
@@ -915,18 +916,28 @@ function isMeasureExpired(measure) {
   return expiry < today;
 }
 
-function validateMeasureSize(hose, measure) {
+function validateMeasureSize(hose, measure, context = { section: "measureCheck", rowIndex: 0 }) {
   if (!measure) return "";
   const measureVolume = Number(measure.volume);
   const qmin = Number(hose.qmin);
   const qmax = Number(hose.qmax);
   const maxRate = Number(hose.maxRate);
 
-  if (Number.isFinite(qmin) && Number.isFinite(measureVolume) && measureVolume < qmin) {
+  if (Number.isFinite(qmin) && Number.isFinite(measureVolume) && measureVolume <= qmin) {
     return "Invalid measure size selected";
   }
 
-  if (Number.isFinite(qmax) && qmax > 60 && Number.isFinite(maxRate) && Number.isFinite(measureVolume) && measureVolume < maxRate) {
+  const isMeasureCheckFirstTwo = context.section === "measureCheck" && [0, 1].includes(context.rowIndex);
+  const isVerificationFirstThree = context.section === "verification" && [0, 1, 2].includes(context.rowIndex);
+  const enforceQmaxRule = isMeasureCheckFirstTwo || isVerificationFirstThree;
+  if (
+    enforceQmaxRule &&
+    Number.isFinite(qmax) &&
+    qmax > 60 &&
+    Number.isFinite(maxRate) &&
+    Number.isFinite(measureVolume) &&
+    measureVolume <= maxRate
+  ) {
     return "Invalid measure size selected";
   }
 
@@ -964,7 +975,7 @@ function renderMeasureCheckPanel(hose) {
       })
     );
     const selectedMeasure = findMeasure(check.measureId);
-    const sizeError = validateMeasureSize(hose, selectedMeasure);
+    const sizeError = validateMeasureSize(hose, selectedMeasure, { section: "measureCheck", rowIndex: idx });
     if (isMeasureExpired(selectedMeasure)) {
       const expired = document.createElement("div");
       expired.className = "field-error";
@@ -1038,7 +1049,7 @@ function renderVerificationPanel(hose, instrumentType) {
       })
     );
     const selectedMeasure = findMeasure(rowObj.measureId);
-    const sizeError = validateMeasureSize(hose, selectedMeasure);
+    const sizeError = validateMeasureSize(hose, selectedMeasure, { section: "verification", rowIndex });
     if (isMeasureExpired(selectedMeasure)) {
       const expired = document.createElement("div");
       expired.className = "field-error";
@@ -1140,12 +1151,13 @@ function renderCompliancePanel(hose) {
 
   const resultSpan = document.createElement("span");
   resultSpan.textContent = "Overall result";
-  const result = document.createElement("strong");
-  const allChecks = [...hose.measureCheck.checks, ...hose.verification.deliveries, hose.verification.preset, hose.verification.gasElimination];
-  const anyOutOfMpe = allChecks.some((entry) => exceedsMpe(entry?.efd));
-  const compliancePass = ["q1", "q2", "q3"].every((key) => (hose.compliance[key] || "").toLowerCase() === "pass");
-  hose.compliance.overall = !anyOutOfMpe && compliancePass ? "Pass" : "Fail";
-  result.textContent = hose.compliance.overall;
+  const result = document.createElement("select");
+  ["Pass", "Fail"].forEach((option) => result.append(new Option(option, option)));
+  result.value = hose.compliance.overall || "Pass";
+  result.addEventListener("change", () => {
+    hose.compliance.overall = result.value;
+    persistLocalDataset();
+  });
   form.append(resultSpan, result);
 
   return form;
