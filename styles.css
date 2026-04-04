@@ -734,6 +734,7 @@ textarea {
   .tab-bar {
     flex-direction: column;
     align-items: stretch;
+    padding-left: 0;
   }
 
   .inner-tabs-row {
