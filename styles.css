@@ -13,10 +13,64 @@ body {
   color: #000;
 }
 
+
+footer {
+  border-top: 1px solid gainsboro;
+}
+
+footer p.small {
+  text-align: center;
+  font-size: .8rem;
+  color: gray;
+}
+
 hr {
   border: none;
   border-bottom: 1px solid #aaa;
   margin: 25px 0;
+}
+
+.main-text {
+  margin: 2rem auto;
+  width: 100%;
+  max-width: 800px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid black;
+}
+
+.info-box {
+  background: lavender;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.info-box > :first-child {
+  margin-top: 0;
+}
+
+.button-menu {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.button-menu li {
+  display: inline-block;
+  border: 1px solid #000;
+  border-radius: 8px;
+  background: gainsboro;
+  box-shadow: 2px 2px 0 0 rgba(0,0,0,.5);
+  margin: 0 10px 0 0;
+}
+
+.button-menu li a {
+  display: block;
+  padding: 25px 30px;
+  color: #000;
+  text-decoration: none;
+  font-size: 1.15rem;
 }
 
 .top-bar {
@@ -28,10 +82,18 @@ hr {
   padding: 10px;
 }
 
-.top-bar h1 {
+.title-bar {
+  width: 100%; 
+  display: block;
+  padding: 10px 0;
+  background: slategray;
+}
+
+.title-bar h1 {
   margin: 0;
   font-size: 1.8rem;
   text-align: center;
+  color: white;
 }
 
 .dataset-actions {
@@ -40,13 +102,13 @@ hr {
 }
 
 .btn, button.linkish {
-  border: 1px outset #eee;
-  background: #ccc;
+  border: 1px solid #000;
+  background: gainsboro;
   border-radius: 7px;
   font-size: 1rem;
   padding: 0.5rem 0.75rem;
   cursor: pointer;
-  font-weight: bold;
+  box-shadow: 2px 2px 0 0 rgba(0,0,0,.5);
 }
 .btn:hover, button.linkish:hover {
   background: #ddd;
@@ -141,7 +203,7 @@ textarea {
   font-size: 1rem;
   min-height: 2.2rem;
   padding: 0.2rem 0.5rem;
-  box-shadow: 2px 2px 0 #999;
+  box-shadow: 2px 2px 0 rgba(0,0,0,.25);
   cursor: pointer;
 }
 
@@ -186,9 +248,7 @@ textarea {
 }
 
 .inner-tabs-row > button:last-child {
-  float: right;
   position: relative;
-  bottom: -80px;
   z-index: 300;
   right: 40px;
 }

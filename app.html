@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Petrocal</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="title-bar">
+        <h1>Petrocal</h1>
+    </header>
+    <nav class="top-bar">
+      <div class="dataset-actions">
+        <button id="clearDatasetBtn" class="btn">New</button>
+        <button id="loadDatasetBtn" class="btn">Load<br/>Data</button>
+        <button id="saveDatasetBtn" class="btn">Save<br/>Data</button>
+        <button id="reportDatasetBtn" class="btn">View<br/>Report</button>
+        <button id="form6DatasetBtn" class="btn">Generate<br/>Form 6</button>
+        <input id="datasetFileInput" type="file" accept="application/json" hidden />
+      </div>
+      <div></div>
+      <div id="saveStatus" class="save-status">Not saved yet</div>
+    </nav>
+
+    <nav class="tab-bar" role="tablist" aria-label="Sections">
+      <button class="tab active" data-tab="testDetails">Test Details</button>
+      <button class="tab" data-tab="measures">Measures</button>
+      <button class="tab" data-tab="instruments">Instruments</button>
+      <button class="tab" data-tab="hoses">Hoses</button>
+    </nav>
+
+    <main id="appMain">
+      <section id="testDetails" class="tab-panel active"></section>
+      <section id="measures" class="tab-panel"></section>
+      <section id="instruments" class="tab-panel"></section>
+      <section id="hoses" class="tab-panel"></section>
+      <section id="report" class="tab-panel placeholder"></section>
+      <section id="form6" class="tab-panel placeholder"></section>
+    </main>
+
+    <template id="keyValueRowTemplate">
+      <label class="form-row">
+        <span class="label"></span>
+        <input />
+      </label>
+    </template>
+
+    <footer>
+      <p class="small">&copy; Copyright 2026 Ben Renegar<p>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
