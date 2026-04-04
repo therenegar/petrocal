@@ -380,9 +380,26 @@ function toDisplayDate(value) {
   return value;
 }
 
+function toInputDate(value) {
+  if (!value) return "";
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(value)) {
+    const [day, month, year] = value.split("/");
+    return `${year}-${month}-${day}`;
+  }
+  return value;
+}
+
 function isValidDdMmYyyy(value) {
   if (!/^\d{2}\/\d{2}\/\d{4}$/.test(value || "")) return false;
   const [day, month, year] = value.split("/").map(Number);
+  const date = new Date(year, month - 1, day);
+  return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
+}
+
+function isValidIsoDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value || "")) return false;
+  const [year, month, day] = value.split("-").map(Number);
   const date = new Date(year, month - 1, day);
   return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
 }
@@ -440,7 +457,7 @@ function validateField(input) {
     error = "This field is required";
   } else if (value) {
     if (kind === "number" && !/^\d+(\.\d+)?$/.test(value)) error = "Only numbers are allowed";
-    if (kind === "date" && !isValidDdMmYyyy(value)) error = "Use DD/MM/YYYY";
+    if (kind === "date" && !isValidDdMmYyyy(value) && !isValidIsoDate(value)) error = "Use a valid date";
     if (kind === "numbering" && !/^[0-9/]+$/.test(value)) error = "Use numbers and / only";
   }
 
@@ -497,7 +514,8 @@ function applyGradeStyle(element, gradeValue) {
   else delete element.dataset.grade;
 }
 
-function renderTabbedHeader(tabs, activeIndex, onChange, addAction, removeAction) {
+function renderTabbedHeader(tabs, activeIndex, onChange, options = {}) {
+  const { addAction = null, removeAction = null, extraActions = [] } = options;
   const row = document.createElement("div");
   row.className = "inner-tabs-row";
 
@@ -511,22 +529,38 @@ function renderTabbedHeader(tabs, activeIndex, onChange, addAction, removeAction
     tabsWrap.append(btn);
   });
 
-  if (addAction) {
-    const addBtn = document.createElement("button");
-    addBtn.className = "inner-tab add";
-    addBtn.textContent = "➕ Add";
-    addBtn.addEventListener("click", addAction);
-    tabsWrap.append(addBtn);
-  }
-
   row.append(tabsWrap);
+
+  const actionsWrap = document.createElement("div");
+  actionsWrap.className = "tabs-toolbar";
+
+  if (addAction) {
+    const add = document.createElement("button");
+    add.className = "linkish";
+    add.textContent = "➕ Add";
+    add.addEventListener("click", addAction);
+    actionsWrap.append(add);
+  }
 
   if (removeAction) {
     const remove = document.createElement("button");
     remove.className = "linkish";
     remove.textContent = "⊖ Remove";
     remove.addEventListener("click", removeAction);
-    row.append(remove);
+    actionsWrap.append(remove);
+  }
+
+  extraActions.forEach(({ label, onClick }) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "btn small-btn";
+    button.textContent = label;
+    button.addEventListener("click", onClick);
+    actionsWrap.append(button);
+  });
+
+  if (actionsWrap.childElementCount > 0) {
+    row.append(actionsWrap);
   }
 
   return row;
@@ -592,24 +626,24 @@ function moveHose(instrument, hoseKey, direction) {
 
 function renderTestDetails() {
   const fields = [
-    ["Date", "date", "text"],
-    ["Job number", "jobNumber", "number"],
+    ["Date", "date", "date", null, "field-small"],
+    ["Job number", "jobNumber", "number", null, "field-small"],
     ["Type", "type", "select", ["commissioning", "in-service inspection", "measure check", "verification"]],
-    ["Verifier's name", "verifierName", "text"],
-    ["Registration number", "registrationNumber", "text"],
-    ["Verification mark", "verificationMark", "text"],
-    ["Operator", "operator", "select", ["ampol", "bp", "shell", "liberty", "united", "other"]],
-    ["Maximum permissible error", "mpe", "number"],
-    ["Site name", "siteName", "text"],
-    ["Site number", "siteNumber", "text"],
-    ["Contact on site", "contactOnSite", "text"],
-    ["Address", "address", "textarea"]
+    ["Verifier's name", "verifierName", "text", null, "field-medium"],
+    ["Registration number", "registrationNumber", "text", null, "field-small"],
+    ["Verification mark", "verificationMark", "text", null, "field-small"],
+    ["Operator", "operator", "select", ["ampol", "bp", "shell", "liberty", "united", "other"], "field-medium"],
+    ["Maximum permissible error", "mpe", "number", null, "field-small"],
+    ["Site name", "siteName", "text", null, "field-medium"],
+    ["Site number", "siteNumber", "text", null, "field-small"],
+    ["Contact on site", "contactOnSite", "text", null, "field-medium"],
+    ["Address", "address", "textarea", null, "field-large"]
   ];
 
   const form = document.createElement("div");
   form.className = "form-grid";
 
-  fields.forEach(([label, key, type, options]) => {
+  fields.forEach(([label, key, type, options, sizeClass]) => {
     const span = document.createElement("span");
     span.textContent = label;
 
@@ -625,14 +659,12 @@ function renderTestDetails() {
       control.type = type;
       if (key === "mpe") control.step = "0.1";
       if (key === "jobNumber") control.min = 0;
-      if (key === "date") {
-        control.placeholder = "DD/MM/YYYY";
-        control.dataset.validate = "date";
-      }
+      if (key === "date") control.dataset.validate = "date";
       if (type === "number") control.dataset.validate = "number";
     }
+    if (sizeClass) control.classList.add(sizeClass);
 
-    control.value = key === "date" ? toDisplayDate(dataset.testDetails[key]) : (dataset.testDetails[key] ?? "");
+    control.value = key === "date" ? toInputDate(dataset.testDetails[key]) : (dataset.testDetails[key] ?? "");
     bindInput(control, ["testDetails", key], (value) => {
       if (key === "date") return toDisplayDate(value);
       return type === "number" ? (value === "" ? "" : Number(value)) : value;
@@ -668,8 +700,10 @@ function renderMeasures() {
         VIEW_STATE.measuresTab = index;
         renderMeasures();
       },
-      addMeasure,
-      () => removeMeasure(VIEW_STATE.measuresTab)
+      {
+        addAction: addMeasure,
+        removeAction: () => removeMeasure(VIEW_STATE.measuresTab)
+      }
     )
   );
 
@@ -683,6 +717,7 @@ function renderMeasures() {
   typeSpan.textContent = "Type";
   const typeSelect = document.createElement("select");
   ["", "conical", "cylindrical"].forEach((option) => typeSelect.append(new Option(option, option)));
+  typeSelect.classList.add("field-medium");
   typeSelect.value = current.type || "";
   typeSelect.addEventListener("change", () => {
     updateAt(["measures", VIEW_STATE.measuresTab, "type"], typeSelect.value);
@@ -694,6 +729,7 @@ function renderMeasures() {
   const sightglassSpan = document.createElement("span");
   sightglassSpan.textContent = "Sightglass";
   const sightglassSelect = document.createElement("select");
+  sightglassSelect.classList.add("field-small");
   sightglassSelect.append(new Option("", ""));
   sightglassSelect.append(new Option("Yes", "yes"));
   sightglassSelect.append(new Option("No", "no"));
@@ -705,13 +741,13 @@ function renderMeasures() {
   form.append(sightglassSpan, sightglassSelect);
 
   const fields = [
-    ["Serial number", "serialNumber", "text"],
-    ["Volume", "volume", "number"],
-    ["Certificate number", "certificateNumber", "text"],
-    ["Certificate expiry", "certificateExpiry", "text"]
+    ["Serial number", "serialNumber", "text", "field-medium"],
+    ["Volume", "volume", "number", "field-small"],
+    ["Certificate number", "certificateNumber", "text", "field-medium"],
+    ["Certificate expiry", "certificateExpiry", "date", "field-small"]
   ];
 
-  fields.forEach(([label, key, type]) => {
+  fields.forEach(([label, key, type, sizeClass]) => {
     const span = key === "numbering"
       ? buildLabelWithHelp(
           label,
@@ -721,10 +757,10 @@ function renderMeasures() {
     if (key !== "numbering") span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
+    if (sizeClass) input.classList.add(sizeClass);
     if (type === "number") input.dataset.validate = "number";
-    if (key === "certificateExpiry") input.placeholder = "DD/MM/YYYY";
     if (key === "certificateExpiry") input.dataset.validate = "date";
-    input.value = key === "certificateExpiry" ? toDisplayDate(current[key]) : (current[key] ?? "");
+    input.value = key === "certificateExpiry" ? toInputDate(current[key]) : (current[key] ?? "");
     bindInput(input, ["measures", VIEW_STATE.measuresTab, key], (value) => {
       if (key === "certificateExpiry") return toDisplayDate(value);
       return type === "number" ? (value === "" ? "" : Number(value)) : value;
@@ -761,14 +797,16 @@ function renderInstruments() {
         VIEW_STATE.instrumentsTab = index;
         renderInstruments();
       },
-      addInstrument,
-      () => removeInstrument(VIEW_STATE.instrumentsTab)
+      {
+        addAction: addInstrument,
+        removeAction: () => removeInstrument(VIEW_STATE.instrumentsTab),
+        extraActions: [
+          { label: "‹", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, -1) },
+          { label: "›", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, 1) }
+        ]
+      }
     )
   );
-  root.append(renderMoveControls(
-    () => moveInstrument(VIEW_STATE.instrumentsTab, -1),
-    () => moveInstrument(VIEW_STATE.instrumentsTab, 1)
-  ));
 
   const index = VIEW_STATE.instrumentsTab;
   const instrument = dataset.instruments[index];
@@ -779,17 +817,17 @@ function renderInstruments() {
   form.className = "form-grid";
 
   const fields = [
-    ["Numbering", "numbering", "text"],
-    ["Hose count", "hoseCount", "number"],
-    ["Manufacturer", "manufacturer", "text"],
-    ["Make", "make", "text"],
-    ["Model number", "modelNumber", "text"],
-    ["Serial number", "serialNumber", "text"],
-    ["Manufacture date", "manufactureDate", "text"],
-    ["NMI pattern approval", "nmiPatternApproval", "text"]
+    ["Numbering", "numbering", "text", "field-small"],
+    ["Hose count", "hoseCount", "number", "field-small"],
+    ["Manufacturer", "manufacturer", "text", "field-medium"],
+    ["Make", "make", "text", "field-medium"],
+    ["Model number", "modelNumber", "text", "field-medium"],
+    ["Serial number", "serialNumber", "text", "field-medium"],
+    ["Manufacture date", "manufactureDate", "date", "field-small"],
+    ["NMI pattern approval", "nmiPatternApproval", "text", "field-medium"]
   ];
 
-  fields.forEach(([label, key, type]) => {
+  fields.forEach(([label, key, type, sizeClass]) => {
     const span = key === "numbering"
       ? buildLabelWithHelp(
           label,
@@ -799,10 +837,10 @@ function renderInstruments() {
     if (key !== "numbering") span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
+    if (sizeClass) input.classList.add(sizeClass);
     if (type === "number") input.dataset.validate = "number";
-    if (key === "manufactureDate") input.placeholder = "DD/MM/YYYY";
     if (key === "manufactureDate") input.dataset.validate = "date";
-    input.value = key === "manufactureDate" ? toDisplayDate(instrument[key]) : (instrument[key] ?? "");
+    input.value = key === "manufactureDate" ? toInputDate(instrument[key]) : (instrument[key] ?? "");
     if (key === "hoseCount") {
       input.min = 1;
       input.max = 10;
@@ -829,6 +867,7 @@ function renderInstruments() {
   const productsSpan = document.createElement("span");
   productsSpan.textContent = "Products approved";
   const productsSelect = document.createElement("select");
+  productsSelect.classList.add("field-medium");
   productsSelect.multiple = true;
   productsSelect.size = 6;
   ["Petrol", "Diesel", "Bio-diesel", "Ethanol", "DEF/AdBlue", "Kerosene"].forEach((option) => {
@@ -848,6 +887,7 @@ function renderInstruments() {
   const typeSpan = document.createElement("span");
   typeSpan.textContent = "Type";
   const typeSelect = document.createElement("select");
+  typeSelect.classList.add("field-small");
   ["", "Pressurised", "Suction"].forEach((option) => typeSelect.append(new Option(option, option)));
   typeSelect.value = instrument.type || "";
   bindInput(typeSelect, ["instruments", index, "type"]);
@@ -858,13 +898,14 @@ function renderInstruments() {
   const inspectionTitle = document.createElement("h4");
   inspectionTitle.textContent = "Visual Inspection";
   const inspection = document.createElement("div");
-  inspection.className = "form-grid";
+  inspection.className = "form-grid inspection-grid";
 
   VISUAL_INSPECTION_QUESTIONS.forEach((question, qIndex) => {
     const key = `q${qIndex + 1}`;
     const span = document.createElement("span");
     span.textContent = question;
     const select = document.createElement("select");
+    select.classList.add("field-small");
     ["", "yes", "no", "N/A"].forEach((value) => select.append(new Option(value, value)));
     select.value = instrument.inspection?.[key] || "";
     bindInput(select, ["instruments", index, "inspection", key]);
@@ -915,14 +956,14 @@ function renderHoses() {
         VIEW_STATE.hosesTabByInstrument[hoseKey] = hoseIndex;
         renderHoses();
       },
-      null,
-      null
+      {
+        extraActions: [
+          { label: "‹", onClick: () => moveHose(instrument, hoseKey, -1) },
+          { label: "›", onClick: () => moveHose(instrument, hoseKey, 1) }
+        ]
+      }
     )
   );
-  root.append(renderMoveControls(
-    () => moveHose(instrument, hoseKey, -1),
-    () => moveHose(instrument, hoseKey, 1)
-  ));
 
   const hoseIndex = VIEW_STATE.hosesTabByInstrument[hoseKey];
   const hose = instrument.hoses[hoseIndex];
@@ -935,6 +976,7 @@ function renderHoses() {
   const posSpan = document.createElement("span");
   posSpan.textContent = "POS Number";
   const posSelect = document.createElement("select");
+  posSelect.classList.add("field-tiny");
   posSelect.append(new Option("", ""));
   parseInstrumentPositions(instrument).forEach((value) => posSelect.append(new Option(value, value)));
   posSelect.value = hose.number || "";
@@ -948,6 +990,7 @@ function renderHoses() {
   const gradeSpan = document.createElement("span");
   gradeSpan.textContent = "Grade";
   const grade = document.createElement("select");
+  grade.classList.add("field-medium");
   const gradeOptions = ["", "ULP91", "PULP95", "PULP98", "E-10", "E85", "OPAL 91", "Diesel", "Premium Diesel", "Bio Diesel", "AdBlue", "Kerosene"];
   for (const value of gradeOptions) {
     grade.append(new Option(value, value));
@@ -971,6 +1014,7 @@ function renderHoses() {
   prefix.textContent = baseSerial ? `${baseSerial}-` : "";
   const suffix = document.createElement("input");
   suffix.type = "text";
+  suffix.classList.add("field-tiny");
   suffix.value = hose.hoseSerialSuffix || "";
   suffix.addEventListener("change", () => {
     hose.hoseSerialSuffix = suffix.value;
@@ -999,6 +1043,7 @@ function renderHoses() {
     span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
+    input.classList.add("field-small");
     if (type === "number") input.dataset.validate = "number";
     input.value = hose[key] ?? "";
     input.addEventListener("change", () => {
@@ -1012,6 +1057,7 @@ function renderHoses() {
   const perfSpan = document.createElement("span");
   perfSpan.textContent = "Performance code";
   const perf = document.createElement("select");
+  perf.classList.add("field-large");
   perf.append(new Option("", ""));
   PERFORMANCE_CODES.forEach((item) => perf.append(new Option(item.label, item.code)));
   perf.value = hose.measureCheck.performanceCode || "";
@@ -1069,6 +1115,7 @@ function visibleHoseTabs(performanceCode) {
 
 function renderMeasureSelect(value, onChange) {
   const select = document.createElement("select");
+  select.classList.add("field-small");
   select.append(new Option("", ""));
   dataset.measures.forEach((measure, index) => {
     select.append(new Option(measureLabel(measure, index), String(index)));
@@ -1282,6 +1329,7 @@ function renderVerificationPanel(hose, instrumentType) {
     if (rowIndex === 5) {
       const input = document.createElement("input");
       input.type = "number";
+      input.classList.add("field-small");
       input.step = "0.01";
       input.value = rowObj.ed || "";
       input.addEventListener("change", () => {
@@ -1316,6 +1364,7 @@ function renderVerificationPanel(hose, instrumentType) {
   antiLabel.textContent = "Anti-drain fuel volume (mL)";
   const antiInput = document.createElement("input");
   antiInput.type = "number";
+  antiInput.classList.add("field-small");
   antiInput.value = hose.verification.antiDrainMl || "";
   antiInput.addEventListener("change", () => {
     hose.verification.antiDrainMl = antiInput.value;
@@ -1343,6 +1392,7 @@ function renderCompliancePanel(hose) {
     const span = document.createElement("span");
     span.textContent = question;
     const select = document.createElement("select");
+    select.classList.add("field-small");
     ["", "pass", "fail", "N/A"].forEach((option) => select.append(new Option(option, option)));
     select.value = hose.compliance[key] || "";
     select.addEventListener("change", () => {
@@ -1355,6 +1405,7 @@ function renderCompliancePanel(hose) {
   const resultSpan = document.createElement("span");
   resultSpan.textContent = "Overall result";
   const result = document.createElement("select");
+  result.classList.add("field-small");
   ["Pass", "Fail"].forEach((option) => result.append(new Option(option, option)));
   result.value = hose.compliance.overall || "Pass";
   result.addEventListener("change", () => {
@@ -1370,6 +1421,7 @@ function numericTableInput(target, key, onChange, disabled = false) {
   const td = document.createElement("td");
   const input = document.createElement("input");
   input.type = "number";
+  input.classList.add("field-small");
   input.dataset.validate = "number";
   input.step = "0.01";
   input.value = target[key] ?? "";

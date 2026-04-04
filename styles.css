@@ -195,6 +195,11 @@ body {
   max-width: 980px;
 }
 
+.inspection-grid {
+  grid-template-columns: 70% 30%;
+  max-width: none;
+}
+
 input,
 select,
 textarea {
@@ -315,6 +320,13 @@ textarea {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.tabs-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
