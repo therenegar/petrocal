@@ -15,7 +15,13 @@
         <input id="datasetFileInput" type="file" accept="application/json" hidden />
       </div>
       <h1>Petrocal</h1>
-      <div id="saveStatus" class="save-status">Not saved yet</div>
+      <div class="header-right">
+        <div class="header-links">
+          <a class="btn nav-link-btn" href="report.html">Report</a>
+          <a class="btn nav-link-btn" href="form6.html">Form 6</a>
+        </div>
+        <div id="saveStatus" class="save-status">Not saved yet</div>
+      </div>
     </header>
 
     <nav class="tab-bar" role="tablist" aria-label="Sections">
@@ -23,8 +29,6 @@
       <button class="tab" data-tab="measures">Measures</button>
       <button class="tab" data-tab="instruments">Instruments</button>
       <button class="tab" data-tab="hoses">Hoses</button>
-      <button class="tab" data-tab="report">Report</button>
-      <button class="tab" data-tab="form6">Form 6</button>
     </nav>
 
     <main id="appMain">
@@ -32,8 +36,6 @@
       <section id="measures" class="tab-panel"></section>
       <section id="instruments" class="tab-panel"></section>
       <section id="hoses" class="tab-panel"></section>
-      <section id="report" class="tab-panel placeholder"></section>
-      <section id="form6" class="tab-panel placeholder"></section>
     </main>
 
     <script src="app.js"></script>

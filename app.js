@@ -38,8 +38,6 @@ const testDetailsPanel = document.getElementById("testDetails");
 const measuresPanel = document.getElementById("measures");
 const instrumentsPanel = document.getElementById("instruments");
 const hosesPanel = document.getElementById("hoses");
-const reportPanel = document.getElementById("report");
-const form6Panel = document.getElementById("form6");
 const saveStatus = document.getElementById("saveStatus");
 
 document.getElementById("loadDatasetBtn").addEventListener("click", () => {
@@ -995,20 +993,6 @@ function handleStartMode() {
   }
 }
 
-function renderReportPlaceholder() {
-  reportPanel.innerHTML = `
-    <h2>Calibration Test Report</h2>
-    <p>Report output and export tooling will be added in a later phase.</p>
-  `;
-}
-
-function renderForm6Placeholder() {
-  form6Panel.innerHTML = `
-    <h2>NMI Form 6</h2>
-    <p>Form 6 implementation will be added in a later phase.</p>
-  `;
-}
-
 function renderAllPanels() {
   renderTestDetails();
   renderMeasures();
@@ -1018,8 +1002,6 @@ function renderAllPanels() {
 
 function renderAll() {
   renderAllPanels();
-  renderReportPlaceholder();
-  renderForm6Placeholder();
   if (!saveStatus.textContent.includes("Locally saved")) persistLocalDataset();
 }
 

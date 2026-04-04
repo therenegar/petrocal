@@ -7,13 +7,14 @@ Fuel dispenser calibration tool.
 This repository includes a vanilla JavaScript single-page prototype with:
 
 - Landing page (`index.html`) to choose start mode
-- Main app (`app.html`) with sections for:
+- Main app (`app.html`) focused on test workflow sections:
   - Test Details
   - Measures
   - Instruments
   - Hoses
-  - Report (placeholder)
-  - Form 6 (placeholder)
+- Separate pages for:
+  - `report.html` (placeholder)
+  - `form6.html` (placeholder)
 
 ### Key behavior implemented
 
@@ -27,7 +28,9 @@ This repository includes a vanilla JavaScript single-page prototype with:
 
 ## Run locally
 
-Because this is static front-end code, run any static server:
+Because this is static front-end Description
+
+code, run any static server:
 
 ```bash
 python3 -m http.server 8080

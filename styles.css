@@ -69,7 +69,6 @@ body {
 }
 
 .btn {
-
   border: 3px solid var(--line);
   background: #f5f5f5;
   border-radius: 0.5rem;
@@ -81,6 +80,24 @@ body {
 .save-status {
   text-align: right;
   font-size: 1.2rem;
+}
+
+
+.header-right {
+  display: grid;
+  justify-items: end;
+  gap: 0.45rem;
+}
+
+.header-links {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-link-btn {
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
 }
 
 .tab-bar {
@@ -113,7 +130,6 @@ body {
 #appMain {
   padding: 1rem;
 }
-
 
 .tab-panel {
   display: none;
@@ -156,7 +172,6 @@ textarea {
 
 .card {
   border: 3px solid var(--line);
-
   padding: 1rem;
   background: #efefef;
 }
@@ -266,6 +281,10 @@ textarea {
   .top-bar h1,
   .save-status {
     text-align: left;
+  }
+
+  .header-right {
+    justify-items: start;
   }
 
   .form-grid {
