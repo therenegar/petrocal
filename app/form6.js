@@ -123,6 +123,7 @@ function editableField(label, key) {
 
   const input = document.createElement("input");
   input.id = `form6-${key}`;
+  input.dataset.schemaName = key;
   input.value = dataset.form6Details[key] || "";
   input.addEventListener("input", () => {
     dataset.form6Details[key] = input.value;
