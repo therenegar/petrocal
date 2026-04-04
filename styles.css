@@ -63,9 +63,21 @@ body {
 
 .brand-bar h1 {
   margin: 0;
-  padding: 0.5rem 1rem;
+  padding: 0.4rem 1rem;
   text-align: center;
   font-size: clamp(2.2rem, 4vw, 4rem);
+}
+
+.brand-home-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brand-logo {
+  display: block;
+  width: min(420px, 82vw);
+  max-height: 90px;
 }
 
 .top-bar {
