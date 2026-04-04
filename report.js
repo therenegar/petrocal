@@ -20,6 +20,12 @@ function text(value, fallback = "—") {
   return String(value);
 }
 
+function decorateOutcomeElement(element, value) {
+  const val = String(value || "").trim().toLowerCase();
+  if (["yes", "pass"].includes(val)) element.classList.add("value-good");
+  if (["no", "fail"].includes(val)) element.classList.add("value-bad");
+}
+
 function renderKeyValueGrid(title, rows) {
   const section = document.createElement("section");
   section.className = "report-section";
@@ -36,6 +42,7 @@ function renderKeyValueGrid(title, rows) {
     dt.textContent = label;
     const dd = document.createElement("dd");
     dd.textContent = text(value);
+    decorateOutcomeElement(dd, value);
     grid.append(dt, dd);
   });
 
@@ -62,6 +69,7 @@ function renderMeasure(measure, index) {
     dt.textContent = label;
     const dd = document.createElement("dd");
     dd.textContent = text(value);
+    decorateOutcomeElement(dd, value);
     grid.append(dt, dd);
   });
   section.append(grid);
@@ -109,6 +117,7 @@ function renderHose(hose, index, instrument, dataset) {
     dt.textContent = label;
     const dd = document.createElement("dd");
     dd.textContent = text(value);
+    decorateOutcomeElement(dd, value);
     details.append(dt, dd);
   });
   section.append(details);
@@ -149,6 +158,7 @@ function renderHose(hose, index, instrument, dataset) {
       dt.textContent = label;
       const dd = document.createElement("dd");
       dd.textContent = text(value);
+      decorateOutcomeElement(dd, value);
       verificationMeta.append(dt, dd);
     });
     section.append(verificationMeta);
@@ -169,6 +179,7 @@ function renderHose(hose, index, instrument, dataset) {
       dt.textContent = label;
       const dd = document.createElement("dd");
       dd.textContent = text(value);
+      decorateOutcomeElement(dd, value);
       complianceGrid.append(dt, dd);
     });
     section.append(complianceTitle, complianceGrid);
@@ -187,8 +198,14 @@ function renderRunsTable(rows, rowPrefix = "Run", includeEd = false, dataset = n
   const body = document.createElement("tbody");
   rows.forEach((row, idx) => {
     const tr = document.createElement("tr");
+    const mpe = Number(dataset?.testDetails?.mpe);
+    const efdValue = Number(row.efd);
+    if (Number.isFinite(mpe) && Number.isFinite(efdValue) && Math.abs(efdValue) > Math.abs(mpe)) {
+      tr.classList.add("row-error");
+    }
     const label = rowPrefix ? `${rowPrefix} ${idx + 1}` : text(row.label, `Run ${idx + 1}`);
     tr.innerHTML = `<td>${label}</td><td>${measureVolumeLabel(row.measureId, dataset)}</td><td>${text(row.vfd)}</td><td>${text(row.vref)}</td><td>${text(row.efd)}</td>${includeEd ? `<td>${text(row.ed)}</td>` : ""}`;
+    [...tr.children].forEach((cell) => decorateOutcomeElement(cell, cell.textContent));
     body.append(tr);
   });
   table.append(body);
@@ -232,6 +249,7 @@ function renderInstrument(instrument, index, dataset) {
     dt.textContent = label;
     const dd = document.createElement("dd");
     dd.textContent = text(value);
+    decorateOutcomeElement(dd, value);
     grid.append(dt, dd);
   });
   section.append(grid);
@@ -252,7 +270,7 @@ function renderInstrument(instrument, index, dataset) {
     instrument.hoses.forEach((hose, hoseIndex) => hoseGrid.append(renderHose(hose, hoseIndex, instrument, dataset)));
     hosesWrapper.append(hoseGrid);
   }
-
+Visual Inspection
   section.append(hosesWrapper);
   return section;
 }

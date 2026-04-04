@@ -137,6 +137,14 @@ body {
   background: rgba(176, 0, 32, 0.18);
 }
 
+.value-good {
+  background: rgba(0, 128, 0, 0.18);
+}
+
+.value-bad {
+  background: rgba(176, 0, 32, 0.18);
+}
+
 .tab-bar {
   display: flex;
   gap: 0;
