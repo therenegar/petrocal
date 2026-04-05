@@ -17,17 +17,18 @@ const PERFORMANCE_CODE_LABELS = {
   H: "H- mark removed and not re-verified",
 };
 const FORM6_DATA_CELLS = {
-  B3: ["testDetails", "operator"],
-  B5: ["testDetails", "suburb"],
-  B6: ["testDetails", "state"],
-  B7: ["testDetails", "postCode"],
-  B8: ["form6Details", "licenceNumber"],
-  B9: ["form6Details", "businessName"],
-  B11: ["testDetails", "registrationNumber"],
-  B13: ["testDetails", "verificationMark"],
+  B10: ["testDetails", "operator"],
+  D12: ["testDetails", "suburb"],
+  E12: ["testDetails", "postCode"],
+  B14: ["form6Details", "licenceNumber"],
+  C14: ["form6Details", "businessName"],
+  D14: ["form6Details", "abnNumber"],
+  B16: ["testDetails", "registrationNumber"],
+  D16: ["testDetails", "verificationMark"],
+  C16: ["testDetails", "verifierName"],
 };
 const FORM6_HOSE_TABLE = {
-  startRow: 16,
+  startRow: 18,
   columns: {
     location: "A",
     verificationDate: "B",

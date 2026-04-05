@@ -1,0 +1,69 @@
+  
+body {
+  zoom: 75%; /* Scales the entire page to 75% of its original size */
+  background-image: none;
+  background: none;
+}
+header, .brand-bar, .top-bar, footer { 
+  display: none; 
+}
+
+#appMain { 
+  width: 100%; 
+  padding: 0;
+}  
+
+.report-page {
+  max-width: none;
+  margin: none;
+}
+
+.tab-panel {
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  background: none;
+}
+
+.report-section { 
+  border-bottom: none 
+}
+
+.report-subsection {
+  background: none;
+  border: 3px solid black;
+  border-radius: 4px;
+}
+
+#reportContent > section:nth-child(3) {
+   break-before: page;
+}
+
+.grade-themed {
+  background: black !important;
+  color: white !important;
+}
+
+.report-grid dt {
+  border-bottom: 1px solid gainsboro;
+}
+
+.report-section h5 {
+  border-top: none;
+  padding-top: 0;
+  margin: 1rem 0 0 0;
+}
+
+.report-subsection h3 {
+  font-weight: bold;
+}
+
+@media (max-width: 900px) {
+  .instrument-columns {
+    grid-template-columns: repeat(2, minmax(280px, 1fr));
+  }
+}
+@media (max-width: 900px) {
+  .report-two-column-grid {
+    grid-template-columns: repeat(2, minmax(380px, 1fr));
+}
