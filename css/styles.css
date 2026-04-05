@@ -998,25 +998,3 @@ textarea {
   }
 }
 
-@media print {
-  .no-print,
-  .tab-bar,
-  footer {
-    display: none !important;
-  }
-
-  body {
-    background: #fff;
-  }
-
-  #appMain {
-    padding: 0;
-  }
-
-  .report-section,
-  .report-subsection {
-    border-color: #999;
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-}
