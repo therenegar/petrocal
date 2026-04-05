@@ -744,7 +744,7 @@ function renderTestDetails() {
   const fields = [
     ["Date of test", "date", "text", null, "field-small"],
     ["Job number", "jobNumber", "number", null, "field-small"],
-    ["Type of test", "type", "select", ["commissioning", "in-service inspection", "measure check", "verification"]],
+    ["Type of test", "type", "select", ["Verification", "Re-verification", "In-service Inspection"]],
     ["Verifier's name", "verifierName", "text", null, "field-medium"],
     ["Registration number", "registrationNumber", "text", null, "field-small"],
     ["Verification mark", "verificationMark", "text", null, "field-small"],
@@ -902,7 +902,7 @@ function renderMeasures() {
   const typeSpan = document.createElement("span");
   typeSpan.textContent = "Type";
   const typeSelect = document.createElement("select");
-  ["", "conical", "cylindrical"].forEach((option) => typeSelect.append(new Option(option, option)));
+  ["", "Conical", "Cylindrical"].forEach((option) => typeSelect.append(new Option(option, option)));
   typeSelect.classList.add("field-medium");
   setSchemaNameAttr(typeSelect, "type");
   typeSelect.value = current.type || "";
@@ -1301,7 +1301,7 @@ function renderHoses() {
   const body = document.createElement("div");
   body.className = "nested-content";
   const activeTabLabel = innerTabs[innerTab];
-  if (activeTabLabel === "Measure Check") body.append(renderMeasureCheckPanel(hose));
+  if (activeTabLabel === "In-service Inspection") body.append(renderMeasureCheckPanel(hose));
   if (activeTabLabel === "Verification") body.append(renderVerificationPanel(hose, instrument.type));
   if (activeTabLabel === "Compliance") body.append(renderCompliancePanel(hose));
 
@@ -1315,9 +1315,9 @@ function renderHoses() {
 
 function visibleHoseTabs(performanceCode) {
   const code = (performanceCode || "").toUpperCase();
-  const tabs = ["Measure Check", "Verification", "Compliance"];
+  const tabs = ["In-service Inspection", "Verification", "Compliance"];
   if (code === "A" || ["E", "F", "G", "H"].includes(code)) return ["Verification", "Compliance"];
-  if (code === "B") return ["Measure Check", "Compliance"];
+  if (code === "B") return ["In-service Inspection", "Compliance"];
   return tabs;
 }
 

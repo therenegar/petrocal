@@ -424,7 +424,7 @@ function renderHose(hose, index, instrument, dataset) {
 
   if (visibleSections.includes("measureCheck")) {
     const measureCheckTitle = document.createElement("h5");
-    measureCheckTitle.textContent = "Measure Check";
+    measureCheckTitle.textContent = "In-service Inspection";
     section.append(measureCheckTitle, renderRunsTable(hoseDeliveryRows(hose, "measureCheck", instrument.type), null, true, dataset));
 
     const measureCheckAverage = average([
