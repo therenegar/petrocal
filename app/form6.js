@@ -3,6 +3,7 @@ const REPORT_SESSION_KEY = "petrocal.report.dataset";
 
 const form6Main = document.getElementById("form6Main");
 let dataset = normalizeDataset(loadDataset() || {});
+const FORM6_TEMPLATE_URL = "ref/form-6-verification-notification-template.xlsx";
 const FORM6_SHEET_NAME = "Form 6";
 const FORM6_DATA_CELLS = {
   B3: ["testDetails", "operator"],
@@ -58,8 +59,11 @@ async function exportForm6Spreadsheet() {
   setExportStatus("Generating spreadsheet...");
 
   try {
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet(FORM6_SHEET_NAME);
+    const workbook = await loadTemplateWorkbook();
+    const worksheet = workbook.getWorksheet(FORM6_SHEET_NAME) || workbook.worksheets[0];
+    if (!worksheet) {
+      throw new Error("Template workbook did not contain any worksheets.");
+    }
 
     applyForm6FieldCells(worksheet);
     applyForm6HoseTable(worksheet, hoseRows());
@@ -77,6 +81,25 @@ async function exportForm6Spreadsheet() {
   } catch (error) {
     setExportStatus(`Spreadsheet export failed: ${error.message || "unknown error"}`, true);
   }
+}
+
+async function loadTemplateWorkbook() {
+  const response = await fetch(FORM6_TEMPLATE_URL, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(
+      `Unable to load Form 6 template at "${FORM6_TEMPLATE_URL}" (${response.status}). ` +
+      "Please add the converted .xlsx template to ref/ before exporting.",
+    );
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  if (!arrayBuffer.byteLength) {
+    throw new Error("Template workbook is empty.");
+  }
+
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(arrayBuffer);
+  return workbook;
 }
 
 function getAtPath(source, path) {
