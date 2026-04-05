@@ -154,12 +154,6 @@ function visibleHoseSections(performanceCode) {
   return ["measureCheck", "verification", "compliance"];
 }
 
-function measureVolumeLabel(measureId, dataset) {
-  const measure = pick(dataset, ["measures", Number(measureId)], null);
-  if (!measure) return text(measureId);
-  return `${text(measure.volume)}L`;
-}
-
 function formatPerformanceCode(value) {
   const code = String(value || "").trim().toUpperCase();
   return PERFORMANCE_CODE_LABELS[code] || value;
@@ -289,7 +283,7 @@ function renderRunsTable(rows, runLabel = null, includeEd = false, dataset = nul
   const table = document.createElement("table");
   table.className = "report-table";
   const header = document.createElement("thead");
-  header.innerHTML = `<tr><th>Run</th><th>Measure</th><th>VFD</th><th>VREF</th><th>EFD (%)</th>${includeEd ? "<th>ED (%)</th>" : ""}</tr>`;
+  header.innerHTML = `<tr><th>Run</th><th>VFD</th><th>VREF</th><th>EFD (%)</th>${includeEd ? "<th>ED (%)</th>" : ""}</tr>`;
   table.append(header);
 
   const body = document.createElement("tbody");
@@ -301,7 +295,7 @@ function renderRunsTable(rows, runLabel = null, includeEd = false, dataset = nul
       tr.classList.add("row-error");
     }
     const label = runLabel ? runLabel(row, idx) : text(row.label, String(idx + 1));
-    tr.innerHTML = `<td>${label}</td><td>${measureVolumeLabel(row.measureId, dataset)}</td><td>${text(row.vfd)}</td><td>${text(row.vref)}</td><td>${text(row.efd)}</td>${includeEd ? `<td>${text(row.ed)}</td>` : ""}`;
+    tr.innerHTML = `<td>${label}</td><td>${text(row.vfd)}</td><td>${text(row.vref)}</td><td>${text(row.efd)}</td>${includeEd ? `<td>${text(row.ed)}</td>` : ""}`;
     [...tr.children].forEach((cell) => decorateOutcomeElement(cell, cell.textContent));
     body.append(tr);
   });
