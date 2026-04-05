@@ -8,13 +8,22 @@ header, .brand-bar, .top-bar, footer {
   display: none; 
 }
 
+.print-only {
+  display: inherit;
+}
+
 #appMain { 
   width: 100%; 
   padding: 0;
 }  
 
+#appMain h1 {
+  border-bottom: 3px solid black;
+  padding-bottom: 1rem;
+}
+
 #appMain h1::after {
-  content: " for Fuel Dispensers (other than LPG Dispensers)";
+  content: " for Fuel Dispensers";
 }
 
 .report-page {

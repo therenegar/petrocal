@@ -338,7 +338,7 @@ function renderHose(hose, index, instrument, dataset) {
     ["End tote", hose.endTote],
     ["Qmin (L/min)", hose.qmin],
     ["Qmax (L/min)", hose.qmax],
-    ["Maximum achievable rate (L/min) (clause 3.8)", hose.maxRate],
+    ["Max achievable rate (L/min) (clause 3.8)", hose.maxRate],
     ["Performance code", pick(hose, ["measureCheck", "performanceCode"], "")]
   ];
 

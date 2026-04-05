@@ -46,6 +46,10 @@ hr {
   border-bottom: 3px solid var(--line);
 }
 
+.print-only {
+  display: none;
+}
+
 .launch-body {
   min-height: 100vh;
   display: grid;
@@ -510,6 +514,7 @@ textarea {
   font-size: .9rem;
   border-bottom: 1px dotted #999;
   padding-bottom: .5rem;
+  line-height: 1.5rem;
 }
 
 .report-grid dd {
@@ -517,7 +522,17 @@ textarea {
   font-family: "JetBrains Mono", monospace;
   margin: 0;
   font-size: 0.9rem;
+  background: var(--cream);
+  line-height: 1.5rem;
+  padding-left: .3rem;
+}
 
+.report-grid dd.value-good {
+  background: var(--good);
+}
+
+.report-grid dd.value-bad {
+  background: var(--bad);
 }
 
 .instrument-columns section:first-child .report-grid {
@@ -550,6 +565,8 @@ textarea {
 
 .report-table td {
   font-family: "JetBrains Mono", monospace;
+  background: var(--cream);
+  font-weight: bold;
 }
 .report-table td:first-child {
   font-family: inherit;
@@ -798,8 +815,10 @@ textarea {
 
 .form6-info-row dt,
 .form6-info-row label {
-  font-size: 0.9rem;
   font-weight: normal;
+  font-size: .9rem;
+  border-bottom: 1px dotted #999;
+  padding-bottom: .5rem;
 }
 
 .form6-info-row dd {
@@ -824,6 +843,13 @@ textarea {
 
 .form6-table th {
   background: var(--accent);
+}
+
+.form6-preview-note {
+  background: var(--good);
+  padding: 1rem;
+  margin-bottom: 2rem;
+  margin-top: 0;
 }
 
 /* Neo-brutalism visual refresh */
@@ -894,7 +920,8 @@ textarea {
 }
 
 .report-table th {
-  background: gainsboro;
+  background: var(--line);
+  color: white;
 }
 
 .data-table {
