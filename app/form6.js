@@ -4,7 +4,117 @@ const REPORT_SESSION_KEY = "petrocal.report.dataset";
 const form6Main = document.getElementById("form6Main");
 let dataset = normalizeDataset(loadDataset() || {});
 
-renderForm6();
+
+const DEFAULT_FORM6_ENDPOINT = "http://localhost:8080/petrocal/tools/form6_generate_spreadsheet.php";
+const FORM6_ENDPOINT_STORAGE_KEY = "petrocal.form6.endpoint";
+
+function resolveForm6Endpoint() {
+  const params = new URLSearchParams(window.location.search);
+  const query = (params.get("form6Endpoint") || "").trim();
+  if (query) return query;
+
+  const winValue = String(window.PETROCAL_FORM6_ENDPOINT || "").trim();
+  if (winValue) return winValue;
+
+  const stored = String(localStorage.getItem(FORM6_ENDPOINT_STORAGE_KEY) || "").trim();
+  if (stored) return stored;
+
+  return DEFAULT_FORM6_ENDPOINT;
+}
+
+function setExportStatus(message, isError = false) {
+  const status = document.getElementById("form6ExportStatus");
+  if (!status) return;
+  status.textContent = message;
+  status.classList.toggle("error", isError);
+}
+
+function buildSpreadsheetFilename() {
+  const parts = [
+    "form6",
+    text(dataset.testDetails?.jobNumber),
+    text(dataset.testDetails?.siteName),
+    new Date().toISOString().slice(0, 10)
+  ].filter(Boolean);
+
+  return `${parts.join("-")}.xls`;
+}
+
+async function exportForm6Spreadsheet() {
+  setExportStatus("Generating spreadsheet...");
+
+  try {
+    const response = await fetch(resolveForm6Endpoint(), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ dataset })
+    });
+
+    const responseClone = response.clone();
+
+    if (!response.ok) {
+      const detail = await responseClone.text();
+      let message = detail || `Request failed (${response.status})`;
+      try {
+        const parsed = JSON.parse(detail);
+        if (parsed && parsed.error) message = parsed.error;
+      } catch {
+        // use raw response text
+      }
+      throw new Error(message);
+    }
+
+    const contentType = String(response.headers.get("content-type") || "").toLowerCase();
+    if (contentType.includes("application/json")) {
+      const payload = await responseClone.json().catch(() => null);
+      if (payload && payload.ok === false) {
+        throw new Error(payload.error || "Spreadsheet export failed.");
+      }
+    }
+
+    const blob = await response.blob();
+    if (!blob || blob.size === 0) {
+      throw new Error("The server returned an empty spreadsheet file.");
+    }
+
+    downloadBlob(blob, buildSpreadsheetFilename());
+    setExportStatus("Spreadsheet downloaded.");
+  } catch (error) {
+    setExportStatus(`Spreadsheet export failed: ${error.message || "unknown error"}`, true);
+  }
+}
+
+function bindExportButton() {
+  const button = document.getElementById("generateForm6Btn");
+  if (!button) return;
+
+  button.addEventListener("click", () => {
+    exportForm6Spreadsheet();
+  });
+}
+
+initForm6Page();
+
+
+function downloadBlob(blob, filename) {
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => {
+    URL.revokeObjectURL(objectUrl);
+  }, 1500);
+}
+
+function initForm6Page() {
+  renderForm6();
+  bindExportButton();
+}
 
 function defaultDataset() {
   return {
