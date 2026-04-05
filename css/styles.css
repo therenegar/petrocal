@@ -704,13 +704,34 @@ textarea {
 }
 
 .verification-mark {
-  border: 2px solid var(--line);
+  border: 10px solid #9ac559;
   border-radius: 0.4rem;
   font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: 0.06em;
   margin-bottom: 0.85rem;
   padding: 0.5rem 0.75rem;
+  position: relative;
+  padding-top: 2rem;
+  display: inline-block;
+  min-width: 15rem;
+  text-align: center;
+  font-family: "JetBrains Mono", monospace;
+  background: lightgray;
+}
+.verification-mark::before {
+  content: "Instrument verified under the National Measurement Act 1960";
+  position: absolute;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  top: 0px;
+  background: #9ac559;
+  letter-spacing: -0.03rem;
+  left: 0;
+  text-align: center;
+  line-height: 0.65rem;
+  padding-bottom: 7px;
+  font-family: "DM Sans", sans-serif;
 }
 
 .form6-sheet {
