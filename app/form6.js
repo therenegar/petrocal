@@ -54,18 +54,22 @@ async function exportForm6Spreadsheet() {
 
     if (!response.ok) {
       const detail = await response.text();
-      throw new Error(detail || `Request failed (${response.status})`);
+      let message = detail || `Request failed (${response.status})`;
+      try {
+        const parsed = JSON.parse(detail);
+        if (parsed && parsed.error) message = parsed.error;
+      } catch {
+        // use raw response text
+      }
+      thrhttp://localhost:8080/petrocal/report.htmlow new Error(message);
     }
 
     const blob = await response.blob();
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = buildSpreadsheetFilename();
-    document.body.append(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(link.href);
+    if (!blob || blob.size === 0) {
+      throw new Error("The server returned an empty spreadsheet file.");
+    }
 
+    downloadBlob(blob, buildSpreadsheetFilename());
     setExportStatus("Spreadsheet downloaded.");
   } catch (error) {
     setExportStatus(`Spreadsheet export failed: ${error.message || "unknown error"}`, true);
@@ -81,8 +85,26 @@ function bindExportButton() {
   });
 }
 
-renderForm6();
-bindExportButton();
+initForm6Page();
+
+
+function downloadBlob(blob, filename) {
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = objectUrl;
+  link.download = filename;
+  document.body.append(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => {
+    URL.revokeObjectURL(objectUrl);
+  }, 1500);
+}
+
+function initForm6Page() {
+  renderForm6();
+  bindExportButton();
+}
 
 function defaultDataset() {
   return {
