@@ -376,7 +376,7 @@ function renderMeasure(measure, index) {
     dt.textContent = label;
     const dd = document.createElement("dd");
     dd.textContent = text(value);
-    if (label !== "Sightglass") decorateOutcomeElement(dd, value);
+    if (!label.toLowerCase().startsWith("sightglass")) decorateOutcomeElement(dd, value);
     grid.append(dt, dd);
   });
   section.append(grid);
@@ -645,6 +645,12 @@ function renderInstrument(instrument, index, dataset) {
   return section;
 }
 
+function createReportIntro() {
+  const intro = document.createElement("p");
+  intro.textContent = "A preview of the Test Report is shown below. Click Print in your browser to print a specially formatted print version, or turn into a PDF file.";
+  return intro;
+}
+
 function renderReport() {
   const root = document.getElementById("reportContent");
   const dataset = loadDataset();
@@ -652,7 +658,10 @@ function renderReport() {
   if (!dataset) {
     syncPrintOperatorLogo(null);
     syncPrintBusinessName(null);
-    root.innerHTML = "<p>No local dataset found. Open the app and load or enter data first.</p>";
+    root.replaceChildren(
+      createReportIntro(),
+      Object.assign(document.createElement("p"), { textContent: "No local dataset found. Open the app and load or enter data first." })
+    );
     return;
   }
 
@@ -660,6 +669,7 @@ function renderReport() {
   syncPrintBusinessName(dataset);
 
   root.replaceChildren(
+    createReportIntro(),
     renderTwoColumnKeyValueGrid("Test Details", [
       ["Date of test", pick(dataset, ["testDetails", "date"], "")],
       ["Job number", pick(dataset, ["testDetails", "jobNumber"], "")],
