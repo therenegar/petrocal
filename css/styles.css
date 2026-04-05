@@ -464,6 +464,12 @@ textarea {
   margin: 0;
 }
 
+.report-two-column-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 0.8rem;
+}
+
 .report-grid dt {
   font-weight: normal;
   font-size: .9rem;
@@ -481,6 +487,12 @@ textarea {
 
 .instrument-columns section:first-child .report-grid {
   grid-template-columns: minmax(0px, 180px) 1fr;
+}
+
+@media (max-width: 900px) {
+  .report-two-column-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .grade-themed + .report-grid {

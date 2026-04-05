@@ -814,6 +814,9 @@ function renderTestDetails() {
 function renderMeasures() {
   const root = document.createElement("div");
   root.className = "stack";
+  const intro = document.createElement("p");
+  intro.textContent = "Details of the Reference Standards of Measurement in use (clause 2.0)";
+  root.append(intro);
 
   if (dataset.measures.length === 0) {
     const addOnly = document.createElement("button");
