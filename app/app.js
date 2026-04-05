@@ -752,7 +752,7 @@ function renderTestDetails() {
       ],
       "field-medium"
     ],
-    ["Maximum permissible error (MPE)", "mpe", "number", null, "field-small"],
+    ["Maximum permissible error (MPE) %", "mpe", "number", null, "field-small"],
     ["Site name", "siteName", "text", null, "field-medium"],
     ["Site number", "siteNumber", "text", null, "field-small"],
     ["Contact on site", "contactOnSite", "text", null, "field-medium"],
@@ -881,7 +881,7 @@ function renderMeasures() {
   form.append(sightglassSpan, sightglassSelect);
 
   const fields = [
-    ["Volume", "volume", "number", "field-small"],
+    ["Volume (L)", "volume", "number", "field-small"],
     ["Serial number", "serialNumber", "text", "field-medium"],
     ["Certificate number", "certificateNumber", "text", "field-medium"],
     ["Certificate expiry", "certificateExpiry", "text", "field-small"]
@@ -1179,12 +1179,12 @@ function renderHoses() {
   grid.append(hoseSerialPrefix, hoseSerialWrap);
 
   const basicFields = [
-    ["Unit price (c/L)", "unitPrice", "number"],
+    ["Unit price (¢/L)", "unitPrice", "number"],
     ["Start tote", "startTote", "number"],
     ["End tote", "endTote", "number"],
     ["Qmin (L/min)", "qmin", "number"],
     ["Qmax (L/min)", "qmax", "number"],
-    ["Maximum achievable rate (clause 3.8)", "maxRate", "number"]
+    ["Maximum achievable rate (L/min) (clause 3.8)", "maxRate", "number"]
   ];
 
   basicFields.forEach(([label, key, type]) => {
@@ -1254,6 +1254,8 @@ function renderHoses() {
   root.append(content);
 
   hosesPanel.replaceChildren(root);
+  attachOutcomeSelectStyling();
+  attachGlobalValidation();
 }
 
 function visibleHoseTabs(performanceCode) {
@@ -1515,7 +1517,7 @@ function renderVerificationPanel(hose, instrumentType) {
   avgVal.textContent = avgError === "" ? "" : avgError;
 
   const antiLabel = document.createElement("span");
-  antiLabel.textContent = "Anti-drain/Hose dilation vol. of drained fuel (clause 3.13)";
+  antiLabel.textContent = "Anti-drain/Hose dilation vol. of drained fuel (mL) (clause 3.13)";
   const antiInput = document.createElement("input");
   antiInput.type = "number";
   antiInput.classList.add("field-small");

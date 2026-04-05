@@ -201,12 +201,12 @@ function renderHose(hose, index, instrument, dataset) {
       "Hose serial",
       `${text(instrument.serialNumber, "")}${instrument.serialNumber && hose.hoseSerialSuffix ? "-" : ""}${text(hose.hoseSerialSuffix, "")}` || "—"
     ],
-    ["Unit price", hose.unitPrice],
+    ["Unit price (¢/L)", hose.unitPrice],
     ["Start tote", hose.startTote],
     ["End tote", hose.endTote],
-    ["Qmin", hose.qmin],
-    ["Qmax", hose.qmax],
-    ["Maximum achievable rate (clause 3.8)", hose.maxRate],
+    ["Qmin (L/min)", hose.qmin],
+    ["Qmax (L/min)", hose.qmax],
+    ["Maximum achievable rate (L/min) (clause 3.8)", hose.maxRate],
     ["Performance code", formatPerformanceCode(pick(hose, ["measureCheck", "performanceCode"], ""))]
   ];
 
@@ -407,7 +407,7 @@ function renderReport() {
       ["Registration number", pick(dataset, ["testDetails", "registrationNumber"], "")],
       ["Verification mark", pick(dataset, ["testDetails", "verificationMark"], "")],
       ["Operator", pick(dataset, ["testDetails", "operator"], "")],
-      ["Maximum permissible error (MPE)", pick(dataset, ["testDetails", "mpe"], "")]
+      ["Maximum permissible error (MPE) %", pick(dataset, ["testDetails", "mpe"], "")]
     ], [
       ["Site name", pick(dataset, ["testDetails", "siteName"], "")],
       ["Site number", pick(dataset, ["testDetails", "siteNumber"], "")],
