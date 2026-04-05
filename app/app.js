@@ -715,6 +715,22 @@ function moveHose(instrument, hoseKey, direction) {
 }
 
 function renderTestDetails() {
+  const operatorLogos = [
+    ["Ampol", "res/logos/icon-ampol.svg"],
+    ["BP", "res/logos/icon-bp.svg"],
+    ["Caltex", "res/logos/icon-caltex.svg"],
+    ["EG", "res/logos/icon-eg.svg"],
+    ["Liberty", "res/logos/icon-liberty.svg"],
+    ["Mobil", "res/logos/icon-mobil.svg"],
+    ["Shell", "res/logos/icon-shell.svg"],
+    ["United", "res/logos/icon-united.svg"]
+  ];
+  const getOperatorLogoPath = (operatorName) => {
+    const value = String(operatorName || "");
+    const match = operatorLogos.find(([needle]) => value.includes(needle));
+    return match ? match[1] : "";
+  };
+
   const fields = [
     ["Date of test", "date", "text", null, "field-small"],
     ["Job number", "jobNumber", "number", null, "field-small"],
@@ -804,6 +820,28 @@ function renderTestDetails() {
       }
       return type === "number" ? (value === "" ? "" : Number(value)) : value;
     });
+
+    if (key === "operator") {
+      const wrap = document.createElement("div");
+      wrap.className = "operator-control-wrap";
+      const logo = document.createElement("img");
+      logo.className = "operator-logo";
+      logo.alt = "Operator logo";
+      const syncOperatorLogo = () => {
+        const logoPath = getOperatorLogoPath(control.value);
+        logo.hidden = !logoPath;
+        if (logoPath) {
+          logo.src = logoPath;
+        } else {
+          logo.removeAttribute("src");
+        }
+      };
+      control.addEventListener("change", syncOperatorLogo);
+      syncOperatorLogo();
+      wrap.append(control, logo);
+      form.append(span, wrap);
+      return;
+    }
 
     form.append(span, control);
   });
