@@ -134,6 +134,19 @@ function formatPerformanceCode(value) {
   return PERFORMANCE_CODE_LABELS[code] || value;
 }
 
+
+function instrumentLabel(instrument, index) {
+  const numbering = (instrument.numbering || "").trim();
+  if (!numbering) return `Instrument ${index + 1}`;
+  const clean = numbering
+    .split("/")
+    .map((n) => n.trim())
+    .filter(Boolean)
+    .join("/");
+  if (!clean) return `Instrument ${index + 1}`;
+  return instrument.type === "Pressurised" ? `Dispenser ${clean}` : `Pump ${clean}`;
+}
+
 function gradeStyleKey(value) {
   return String(value || "")
     .toUpperCase()
@@ -144,7 +157,7 @@ function renderHose(hose, index, instrument, dataset) {
   const section = document.createElement("section");
   section.className = "report-subsection";
   const heading = document.createElement("h4");
-  heading.textContent = `Hose ${index + 1}: ${text(hose.number, "No POS")} ${text(hose.grade, "")}`.trim();
+  heading.textContent = `${text(hose.number, "No POS")}/${text(hose.grade, "No grade")}`;
   section.append(heading);
 
   const details = document.createElement("dl");
@@ -162,8 +175,7 @@ function renderHose(hose, index, instrument, dataset) {
     ["Qmin", hose.qmin],
     ["Qmax", hose.qmax],
     ["Maximum achievable rate", hose.maxRate],
-    ["Performance code", formatPerformanceCode(pick(hose, ["measureCheck", "performanceCode"], ""))],
-    ["Compliance overall", pick(hose, ["compliance", "overall"], "")]
+    ["Performance code", formatPerformanceCode(pick(hose, ["measureCheck", "performanceCode"], ""))]
   ];
 
   rows.forEach(([label, value]) => {
@@ -281,12 +293,19 @@ function renderInstrument(instrument, index, dataset) {
   section.className = "report-section";
 
   const heading = document.createElement("h2");
-  heading.textContent = `Instrument ${index + 1}`;
+  heading.textContent = instrumentLabel(instrument, index);
   section.append(heading);
 
-  const grid = document.createElement("dl");
-  grid.className = "report-grid";
-  const rows = [
+  const columns = document.createElement("div");
+  columns.className = "instrument-columns";
+
+  const detailsColumn = document.createElement("section");
+  detailsColumn.className = "report-subsection";
+  detailsColumn.append(Object.assign(document.createElement("h3"), { textContent: "Instrument details" }));
+
+  const detailsGrid = document.createElement("dl");
+  detailsGrid.className = "report-grid";
+  [
     ["Numbering", instrument.numbering],
     ["Hose count", instrument.hoseCount],
     ["Manufacturer", instrument.manufacturer],
@@ -296,19 +315,35 @@ function renderInstrument(instrument, index, dataset) {
     ["Manufacture date", instrument.manufactureDate],
     ["NMI pattern approval", instrument.nmiPatternApproval],
     ["Products approved", instrument.productsApproved],
-    ["Type", instrument.type],
-    ...VISUAL_INSPECTION_QUESTIONS.map((question, idx) => [question, pick(instrument, ["inspection", `q${idx + 1}`], "")])
-  ];
-
-  rows.forEach(([label, value]) => {
+    ["Type", instrument.type]
+  ].forEach(([label, value]) => {
     const dt = document.createElement("dt");
     dt.textContent = label;
     const dd = document.createElement("dd");
     dd.textContent = text(value);
     decorateOutcomeElement(dd, value);
-    grid.append(dt, dd);
+    detailsGrid.append(dt, dd);
   });
-  section.append(grid);
+  detailsColumn.append(detailsGrid);
+
+  const characteristicsColumn = document.createElement("section");
+  characteristicsColumn.className = "report-subsection";
+  characteristicsColumn.append(Object.assign(document.createElement("h3"), { textContent: "General chacteristics" }));
+
+  const characteristicsGrid = document.createElement("dl");
+  characteristicsGrid.className = "report-grid";
+  VISUAL_INSPECTION_QUESTIONS.forEach((question, idx) => {
+    const dt = document.createElement("dt");
+    dt.textContent = question;
+    const dd = document.createElement("dd");
+    dd.textContent = text(pick(instrument, ["inspection", `q${idx + 1}`], ""));
+    decorateOutcomeElement(dd, dd.textContent);
+    characteristicsGrid.append(dt, dd);
+  });
+  characteristicsColumn.append(characteristicsGrid);
+
+  columns.append(detailsColumn, characteristicsColumn);
+  section.append(columns);
 
   const hosesWrapper = document.createElement("div");
   hosesWrapper.className = "report-hoses";
