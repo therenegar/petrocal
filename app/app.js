@@ -210,7 +210,8 @@ function normalizeHose(hose = {}) {
       deliveries: [emptyDelivery(), emptyDelivery(), emptyDelivery(), emptyDelivery()],
       preset: emptyDelivery(),
       gasElimination: { ...emptyDelivery(), ed: "" },
-      antiDrainMl: ""
+      antiDrainMl: "",
+      reverification: ""
     },
     compliance: { ...Object.fromEntries(COMPLIANCE_QUESTIONS.map((_, idx) => [`q${idx + 1}`, ""])), overall: "Pass" }
   };
@@ -1502,7 +1503,19 @@ function renderVerificationPanel(hose, instrumentType) {
     persistLocalDataset();
   });
 
-  meta.append(avgLabel, avgVal, antiLabel, antiInput);
+  const reverificationLabel = document.createElement("span");
+  reverificationLabel.textContent = "Existing verification mark (if reverifying)";
+  const reverificationInput = document.createElement("input");
+  reverificationInput.type = "text";
+  reverificationInput.classList.add("field-medium");
+  setSchemaNameAttr(reverificationInput, "reverification");
+  reverificationInput.value = hose.verification.reverification || "";
+  reverificationInput.addEventListener("change", () => {
+    hose.verification.reverification = reverificationInput.value;
+    persistLocalDataset();
+  });
+
+  meta.append(avgLabel, avgVal, antiLabel, antiInput, reverificationLabel, reverificationInput);
 
   wrap.append(table, meta);
   return wrap;

@@ -211,7 +211,8 @@ function renderHose(hose, index, instrument, dataset) {
     verificationMeta.className = "report-grid";
     [
       ["Average error (EAV)", averageError],
-      ["Anti-drain fuel volume (mL)", pick(hose, ["verification", "antiDrainMl"], "")]
+      ["Anti-drain fuel volume (mL)", pick(hose, ["verification", "antiDrainMl"], "")],
+      ["Existing verification mark (if reverifying)", pick(hose, ["verification", "reverification"], "")]
     ].forEach(([label, value]) => {
       const dt = document.createElement("dt");
       dt.textContent = label;
