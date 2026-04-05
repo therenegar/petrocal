@@ -66,7 +66,6 @@ hr {
   text-decoration: none;
   color: black;
   margin-bottom: 2rem;
-  float: left;
 }
 
 .launch-card h4 {
@@ -78,6 +77,14 @@ hr {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr)); 
   gap: 1rem;
+}
+
+#resumeOrStartAction {
+  display: block;
+}
+
+#resumeOrStartAction .launch-btn {
+  aspect-ratio: inherit;
 }
 
 .launch-btn {
@@ -345,6 +352,11 @@ textarea {
   display: block;
 }
 
+.report-output > section:last-child {
+  border-bottom: 0;
+  margin-bottom: 0;
+}
+
 .report-section {
   border-bottom: 3px solid var(--line);
   padding-bottom: 2rem;
@@ -373,6 +385,7 @@ textarea {
 
 .report-section > .report-section h2 {
   text-transform: none;
+  font-weight: normal;
 }
 
 
@@ -382,6 +395,7 @@ textarea {
 
 .report-subsection h3 {
   font-size: 1.25rem;
+  font-weight: normal;
 }
 
 .report-section h4 {
@@ -390,11 +404,14 @@ textarea {
 
 .report-section h4:first-child {
   margin-top: 0;
+  padding: 0.25rem 0.75rem;
 }
 
 .report-section h5 {
   font-size: 1.25rem;
-  margin: 1rem 0;
+  margin: 2rem 0;
+  border-top: 2px solid black;
+  padding-top: .5rem;
 }
 
 
@@ -437,6 +454,14 @@ textarea {
   margin: 0;
   font-size: 0.9rem;
 
+}
+
+.instrument-columns section:first-child .report-grid {
+  grid-template-columns: minmax(0px, 180px) 1fr;
+}
+
+.grade-themed + .report-grid {
+  grid-template-columns: minmax(0px, 150px) 1fr;
 }
 
 .report-table {
@@ -638,7 +663,7 @@ textarea {
 .form6-sheet {
   border: 3px solid var(--line);
   background: var(--paper);
-  padding: 1rem;
+  padding: 2rem;
 }
 
 .form6-sheet h3:first-child {
@@ -652,10 +677,12 @@ textarea {
 }
 
 .form6-block h3, .form6-table-section h3 {
-  font-size: 1.52rem;
-  margin: 1.2rem 0 0.65rem;
+  font-size: 1.25rem;
+  margin: 2rem 0;
+  font-weight: normal;
+  border-bottom: 2px solid black;
+  padding-bottom: .5rem;
 }
-
 .form6-info-row {
   display: grid;
   grid-template-columns: minmax(180px, 240px) 1fr;

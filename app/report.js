@@ -1,26 +1,26 @@
 const STORAGE_KEY = "petrocal.dataset.v3";
 const REPORT_SESSION_KEY = "petrocal.report.dataset";
 const VISUAL_INSPECTION_QUESTIONS = [
-  "Does the dispenser comply with its certificate/s of approval (CofA)?",
-  "Are all mandatory descriptive markings clearly and permanently on a data plate that is fixed to the dispenser?",
-  "Is the instrument wire sealed in line with the CofA, is there a Verifier Mark on the meter(s)?",
-  "Is the dispenser firmly fixed on its foundations?",
-  "Are all panels secure and cover windows not broken?",
-  "Do the indications of volume, unit price and total price correspond with the hose selected?",
-  "Are all indications clearly visible under all conditions, day and night?",
-  "Are the hoses in reasonable condition, e.g.: they are not badly chafed, split or worn?",
-  "Does each nozzle terminate the delivery when returned to its holsters?",
-  "Is the dispenser free from any leaks?",
-  "For self-service systems: do the dispenser number/s correspond with the console?",
-  "For continuous indicators: do the price-posting wheels line up with, and follow, the internal price-setting ranger lever?"
+  "1. Does the dispenser comply with its certificate/s of approval (CofA)?",
+  "2. Are all mandatory descriptive markings clearly and permanently on a data plate that is fixed to the dispenser?",
+  "3. Is the instrument wire sealed in line with the CofA, is there a Verifier Mark on the meter(s)?",
+  "4. Is the dispenser firmly fixed on its foundations?",
+  "5. Are all panels secure and cover windows not broken?",
+  "6. Do the indications of volume, unit price and total price correspond with the hose selected?",
+  "7. Are all indications clearly visible under all conditions, day and night?",
+  "8. Are the hoses in reasonable condition, e.g.: they are not badly chafed, split or worn?",
+  "9. Does each nozzle terminate the delivery when returned to its holsters?",
+  "10. Is the dispenser free from any leaks?",
+  "11. For self-service systems: do the dispenser number/s correspond with the console?",
+  "12. For continuous indicators: do the price-posting wheels line up with, and follow, the internal price-setting ranger lever?"
 ];
 const COMPLIANCE_QUESTIONS = [
-  "Checking facility for indicating devices",
-  "Zero setting",
-  "Price computing",
-  "Nozzle cut-off",
-  "Interlock",
-  "Pre-set indications"
+  "Checking facility for indicating devices (clause 3.2)",
+  "Zero setting (clause 3.3)",
+  "Price computing (clause 3.4)",
+  "Nozzle cut-off (clause 3.5)",
+  "Interlock (clause 3.6)",
+  "Pre-set indications (clause 3.11)"
 ];
 const PERFORMANCE_CODE_LABELS = {
   A: "A- new instrument",
@@ -99,7 +99,7 @@ function renderMeasure(measure, index) {
   grid.className = "report-grid";
   [
     ["Type", measure.type],
-    ["Sightglass", measure.sightglass],
+    ["Sightglass?", measure.sightglass],
     ["Serial number", measure.serialNumber],
     ["Volume (L)", measure.volume],
     ["Certificate number", measure.certificateNumber],
@@ -175,7 +175,7 @@ function renderHose(hose, index, instrument, dataset) {
     ["End tote", hose.endTote],
     ["Qmin", hose.qmin],
     ["Qmax", hose.qmax],
-    ["Maximum achievable rate", hose.maxRate],
+    ["Maximum achievable rate (clause 3.8)", hose.maxRate],
     ["Performance code", formatPerformanceCode(pick(hose, ["measureCheck", "performanceCode"], ""))]
   ];
 
@@ -218,8 +218,8 @@ function renderHose(hose, index, instrument, dataset) {
     const verificationMeta = document.createElement("dl");
     verificationMeta.className = "report-grid";
     [
-      ["Average error (EAV)", averageError],
-      ["Anti-drain fuel volume (mL)", pick(hose, ["verification", "antiDrainMl"], "")],
+      ["Average error (EAV) (Clause 3.12)", averageError],
+      ["Anti-drain/Hose-dilation fuel volume (mL) (Clause 3.13)", pick(hose, ["verification", "antiDrainMl"], "")],
       ["Existing verification mark (if reverifying)", pick(hose, ["verification", "reverification"], "")]
     ].forEach(([label, value]) => {
       const dt = document.createElement("dt");
@@ -302,7 +302,7 @@ function renderInstrument(instrument, index, dataset) {
   const detailsGrid = document.createElement("dl");
   detailsGrid.className = "report-grid";
   [
-    ["Numbering", instrument.numbering],
+    ["POS Number", instrument.numbering],
     ["Hose count", instrument.hoseCount],
     ["Manufacturer", instrument.manufacturer],
     ["Make", instrument.make],
@@ -311,7 +311,7 @@ function renderInstrument(instrument, index, dataset) {
     ["Manufacture date", instrument.manufactureDate],
     ["NMI pattern approval", instrument.nmiPatternApproval],
     ["Products approved", instrument.productsApproved],
-    ["Type", instrument.type]
+    ["Type of system", instrument.type]
   ].forEach(([label, value]) => {
     const dt = document.createElement("dt");
     dt.textContent = label;
@@ -369,14 +369,14 @@ function renderReport() {
 
   root.replaceChildren(
     renderKeyValueGrid("Test Details", [
-      ["Date", pick(dataset, ["testDetails", "date"], "")],
+      ["Date of test", pick(dataset, ["testDetails", "date"], "")],
       ["Job number", pick(dataset, ["testDetails", "jobNumber"], "")],
       ["Type", pick(dataset, ["testDetails", "type"], "")],
       ["Verifier's name", pick(dataset, ["testDetails", "verifierName"], "")],
       ["Registration number", pick(dataset, ["testDetails", "registrationNumber"], "")],
       ["Verification mark", pick(dataset, ["testDetails", "verificationMark"], "")],
       ["Operator", pick(dataset, ["testDetails", "operator"], "")],
-      ["Maximum permissible error", pick(dataset, ["testDetails", "mpe"], "")],
+      ["Maximum permissible error (MPE)", pick(dataset, ["testDetails", "mpe"], "")],
       ["Site name", pick(dataset, ["testDetails", "siteName"], "")],
       ["Site number", pick(dataset, ["testDetails", "siteNumber"], "")],
       ["Contact on site", pick(dataset, ["testDetails", "contactOnSite"], "")],

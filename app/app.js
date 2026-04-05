@@ -26,12 +26,12 @@ const VISUAL_INSPECTION_QUESTIONS = [
 ];
 
 const COMPLIANCE_QUESTIONS = [
-  "Checking facility for indicating devices (clause 4.1)",
-  "Zero setting (clause 4.2)",
-  "Price computing (clause 4.3)",
-  "Nozzle cut-off (clause 4.4)",
-  "Interlock (clause 4.5)",
-  "Pre-set indications (clause 4.6)"
+  "Checking facility for indicating devices (clause 3.2)",
+  "Zero setting (clause 3.3)",
+  "Price computing (clause 3.4)",
+  "Nozzle cut-off (clause 3.5)",
+  "Interlock (clause 3.6)",
+  "Pre-set indications (clause 3.11)"
 ];
 
 const PERFORMANCE_CODES = [
@@ -848,7 +848,7 @@ function renderMeasures() {
   form.append(typeSpan, typeSelect);
 
   const sightglassSpan = document.createElement("span");
-  sightglassSpan.textContent = "Sightglass?";
+  sightglassSpan.textContent = "Has sightglass?";
   const sightglassSelect = document.createElement("select");
   sightglassSelect.classList.add("field-small");
   setSchemaNameAttr(sightglassSelect, "sightglass");
@@ -1021,7 +1021,7 @@ function renderInstruments() {
   card.append(form, document.createElement("hr"));
 
   const inspectionTitle = document.createElement("h4");
-  inspectionTitle.textContent = "General Characteristics (clause 3.1)";
+  inspectionTitle.textContent = "Visual Inspection (clause 3.1)";
   const inspection = document.createElement("div");
   inspection.className = "form-grid inspection-grid";
 
@@ -1166,7 +1166,7 @@ function renderHoses() {
     ["End tote", "endTote", "number"],
     ["Qmin (L/min)", "qmin", "number"],
     ["Qmax (L/min)", "qmax", "number"],
-    ["Maximum achievable rate (clause 4.7)", "maxRate", "number"]
+    ["Maximum achievable rate (clause 3.8)", "maxRate", "number"]
   ];
 
   basicFields.forEach(([label, key, type]) => {
@@ -1338,7 +1338,7 @@ function renderMeasureCheckPanel(hose) {
   const wrap = document.createElement("div");
   const table = document.createElement("table");
   table.className = "data-table";
-  table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th>EFD (%)<br>Accuracy<br/>(clause 4.8)</th></tr></thead>";
+  table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th>EFD (%)<br>Accuracy<br/>(clause 3.9)</th></tr></thead>";
   const body = document.createElement("tbody");
 
   hose.measureCheck.checks.forEach((check, idx) => {
@@ -1402,8 +1402,8 @@ function verificationRows(hose) {
     ["Delivery #2 (regular flow)", hose.verification.deliveries[1]],
     ["Delivery #3 (regular flow)", hose.verification.deliveries[2]],
     ["Delivery #4 (slow flow)", hose.verification.deliveries[3]],
-    ["Preset Delivery (clause 4.9)", hose.verification.preset],
-    ["Gas Elimination Delivery (clause 4.10)", hose.verification.gasElimination]
+    ["Preset Delivery (clause 3.10)", hose.verification.preset],
+    ["Gas Elimination Delivery (clause 3.12)", hose.verification.gasElimination]
   ];
 }
 
@@ -1411,7 +1411,7 @@ function renderVerificationPanel(hose, instrumentType) {
   const wrap = document.createElement("div");
   const table = document.createElement("table");
   table.className = "data-table";
-  table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th>EFD (%)<br/>Accuracy<br/>(clause 4.8)</th><th>ED (%)</th></tr></thead>";
+  table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th>EFD (%)<br/>Accuracy<br/>(clause 3.9)</th><th>ED (%)</th></tr></thead>";
   const body = document.createElement("tbody");
   const isSuctionSystem = String(instrumentType || "").trim().toLowerCase() === "suction";
 
@@ -1492,12 +1492,12 @@ function renderVerificationPanel(hose, instrumentType) {
   meta.className = "form-grid top-gap";
 
   const avgLabel = document.createElement("span");
-  avgLabel.textContent = "Average error (EAV) (clause 4.0)";
+  avgLabel.textContent = "Average error (EAV) (clause 3.12)";
   const avgVal = document.createElement("strong");
   avgVal.textContent = avgError === "" ? "" : avgError;
 
   const antiLabel = document.createElement("span");
-  antiLabel.textContent = "Anti-drain volume of drained fuel (clause 4.11)";
+  antiLabel.textContent = "Anti-drain/Hose dilation vol. of drained fuel (clause 3.13)";
   const antiInput = document.createElement("input");
   antiInput.type = "number";
   antiInput.classList.add("field-small");
