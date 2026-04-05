@@ -439,6 +439,9 @@ function renderHose(hose, index, instrument, dataset) {
     ["Max achievable rate (L/min) (clause 3.8)", hose.maxRate],
     ["Performance code", pick(hose, ["measureCheck", "performanceCode"], "")]
   ];
+  if ((pick(hose, ["measureCheck", "performanceCode"], "") || "").toUpperCase() === "H") {
+    rows.push(["Comments", pick(hose, ["measureCheck", "comments"], "")]);
+  }
 
   rows.forEach(([label, value]) => {
     const dt = document.createElement("dt");

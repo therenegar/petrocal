@@ -217,6 +217,7 @@ function normalizeHose(hose = {}) {
     maxRate: "",
     measureCheck: {
       performanceCode: "",
+      comments: "",
       deliveries: [emptyDelivery(), emptyDelivery(), emptyDelivery(), emptyDelivery()],
       preset: emptyDelivery(),
       gasElimination: { ...emptyDelivery(), ed: "" },
@@ -1327,6 +1328,20 @@ function renderHoses() {
     renderHoses();
   });
   grid.append(perfSpan, perf);
+
+  if ((hose.measureCheck.performanceCode || "").toUpperCase() === "H") {
+    const commentsLabel = document.createElement("span");
+    commentsLabel.textContent = "Comments";
+    const commentsInput = document.createElement("textarea");
+    commentsInput.classList.add("field-large");
+    setSchemaNameAttr(commentsInput, "comments");
+    commentsInput.value = hose.measureCheck.comments || "";
+    commentsInput.addEventListener("change", () => {
+      hose.measureCheck.comments = commentsInput.value;
+      persistLocalDataset();
+    });
+    grid.append(commentsLabel, commentsInput);
+  }
 
   const volumeSpan = document.createElement("span");
   volumeSpan.textContent = "Volume used for testing";
