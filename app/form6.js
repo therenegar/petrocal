@@ -61,7 +61,7 @@ async function exportForm6Spreadsheet() {
       } catch {
         // use raw response text
       }
-      throw new Error(message);
+      thrhttp://localhost:8080/petrocal/report.htmlow new Error(message);
     }
 
     const blob = await response.blob();
