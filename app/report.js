@@ -1,6 +1,5 @@
-const STORAGE_KEY = "petrocal.dataset.v2";
+const STORAGE_KEY = "petrocal.dataset.v3";
 const REPORT_SESSION_KEY = "petrocal.report.dataset";
-const LEGACY_STORAGE_KEY = "petrocal.dataset.v1";
 const VISUAL_INSPECTION_QUESTIONS = [
   "Does the dispenser comply with its certificate/s of approval (CofA)?",
   "Are all mandatory descriptive markings clearly and permanently on a data plate that is fixed to the dispenser?",
@@ -37,8 +36,7 @@ const PERFORMANCE_CODE_LABELS = {
 function loadDataset() {
   const raw =
     sessionStorage.getItem(REPORT_SESSION_KEY) ||
-    localStorage.getItem(STORAGE_KEY) ||
-    localStorage.getItem(LEGACY_STORAGE_KEY);
+    localStorage.getItem(STORAGE_KEY);
   if (!raw) return null;
   try {
     return JSON.parse(raw);
@@ -213,7 +211,8 @@ function renderHose(hose, index, instrument, dataset) {
     verificationMeta.className = "report-grid";
     [
       ["Average error (EAV)", averageError],
-      ["Anti-drain fuel volume (mL)", pick(hose, ["verification", "antiDrainMl"], "")]
+      ["Anti-drain fuel volume (mL)", pick(hose, ["verification", "antiDrainMl"], "")],
+      ["Existing verification mark (if reverifying)", pick(hose, ["verification", "reverification"], "")]
     ].forEach(([label, value]) => {
       const dt = document.createElement("dt");
       dt.textContent = label;
@@ -354,7 +353,11 @@ function renderReport() {
       ["Site name", pick(dataset, ["testDetails", "siteName"], "")],
       ["Site number", pick(dataset, ["testDetails", "siteNumber"], "")],
       ["Contact on site", pick(dataset, ["testDetails", "contactOnSite"], "")],
-      ["Address", pick(dataset, ["testDetails", "address"], "")]
+      ["Street Address", pick(dataset, ["testDetails", "streetAddress"], "")],
+      ["Suburb", pick(dataset, ["testDetails", "suburb"], "")],
+      ["State", pick(dataset, ["testDetails", "state"], "")],
+      ["Post Code", pick(dataset, ["testDetails", "postCode"], "")],
+      ["Comments", pick(dataset, ["testDetails", "comments"], "")]
     ])
   );
 
