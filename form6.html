@@ -14,7 +14,8 @@
       <div class="dataset-actions">
         <a class="btn nav-link-btn" href="app.html">← Back to Test</a>
         <span class="separator">|</span>
-        <a class="btn nav-link-btn" href="tools/form6_generate_spreadsheet.php">Generate Spreadsheet/s</a>
+        <button id="generateForm6Btn" class="btn nav-link-btn" type="button">Generate Spreadsheet/s</button>
+        <span id="form6ExportStatus" class="export-status" role="status" aria-live="polite"></span>
       </div>
       <div class="header-right"></div>
     </header>
@@ -29,6 +30,9 @@
       <p>&copy; Copyright 2026 Ben Renegar</p>
     </footer>
 
+    <script>
+      window.PETROCAL_FORM6_ENDPOINT = "http://localhost:8080/petrocal/tools/form6_generate_spreadsheet.php";
+    </script>
     <script src="app/form6.js"></script>
   </body>
 </html>
