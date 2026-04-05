@@ -31,6 +31,14 @@ header, .brand-bar, .top-bar, footer {
   margin: none;
 }
 
+.report-print-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
 .tab-panel {
   border: none;
   padding: 0;

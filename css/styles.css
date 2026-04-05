@@ -413,6 +413,16 @@ textarea {
   margin: 0 auto;
 }
 
+.report-print-header {
+  display: none;
+}
+
+.report-operator-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
 .report-output {
   display: block;
 }

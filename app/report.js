@@ -32,6 +32,16 @@ const PERFORMANCE_CODE_LABELS = {
   G: "G- modified/upgraded",
   H: "H- mark removed and not re-verified"
 };
+const OPERATOR_LOGOS = [
+  ["ampol", "res/logos/icon-ampol.svg"],
+  ["bp", "res/logos/icon-bp.svg"],
+  ["caltex", "res/logos/icon-caltex.svg"],
+  ["eg", "res/logos/icon-eg.svg"],
+  ["liberty", "res/logos/icon-liberty.svg"],
+  ["mobil", "res/logos/icon-mobil.svg"],
+  ["shell", "res/logos/icon-shell.svg"],
+  ["united", "res/logos/icon-united.svg"]
+];
 
 const DEFAULT_EXPORT_BASE_URL = "http://localhost:8080/petrocal/tools";
 const EXPORT_BASE_URL_STORAGE_KEY = "petrocal.report.exportBaseUrl";
@@ -172,6 +182,12 @@ function text(value, fallback = "—") {
   return String(value);
 }
 
+function getOperatorLogoPath(operatorName) {
+  const value = String(operatorName || "").toLowerCase();
+  const match = OPERATOR_LOGOS.find(([needle]) => value.includes(needle));
+  return match ? match[1] : "";
+}
+
 function pick(obj, path, fallback = undefined) {
   let current = obj;
   for (let i = 0; i < path.length; i += 1) {
@@ -179,6 +195,21 @@ function pick(obj, path, fallback = undefined) {
     current = current[path[i]];
   }
   return current === undefined ? fallback : current;
+}
+
+function syncPrintOperatorLogo(dataset) {
+  const logo = document.getElementById("operatorPrintLogo");
+  if (!logo) return;
+
+  const operatorName = pick(dataset, ["testDetails", "operator"], "");
+  const logoPath = getOperatorLogoPath(operatorName);
+  logo.hidden = !logoPath;
+
+  if (logoPath) {
+    logo.src = logoPath;
+  } else {
+    logo.removeAttribute("src");
+  }
 }
 
 function decorateOutcomeElement(element, value) {
@@ -531,9 +562,12 @@ function renderReport() {
   const dataset = loadDataset();
 
   if (!dataset) {
+    syncPrintOperatorLogo(null);
     root.innerHTML = "<p>No local dataset found. Open the app and load or enter data first.</p>";
     return;
   }
+
+  syncPrintOperatorLogo(dataset);
 
   root.replaceChildren(
     renderTwoColumnKeyValueGrid("Test Details", [
