@@ -1416,9 +1416,11 @@ function renderMeasureCheckPanel(hose) {
 function verificationMarkWithDateCode() {
   const baseMark = String(dataset?.testDetails?.verificationMark || "").trim();
   if (!baseMark) return "";
-  const now = new Date();
-  const monthCode = String.fromCharCode(65 + now.getMonth());
-  const yearCode = String(now.getFullYear()).slice(-1);
+  const testDateValue = String(dataset?.testDetails?.date || "").trim();
+  const parsedDate = parseDateDdMmYyyy(toDisplayDate(testDateValue));
+  const dateSource = parsedDate || new Date();
+  const monthCode = String.fromCharCode(65 + dateSource.getMonth());
+  const yearCode = String(dateSource.getFullYear()).slice(-1);
   return `${baseMark}${monthCode}${yearCode}`;
 }
 

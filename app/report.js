@@ -229,10 +229,39 @@ function decorateOutcomeElement(element, value) {
 function verificationMarkWithDateCode(dataset) {
   const baseMark = String(pick(dataset, ["testDetails", "verificationMark"], "") || "").trim();
   if (!baseMark) return "";
-  const now = new Date();
-  const monthCode = String.fromCharCode(65 + now.getMonth());
-  const yearCode = String(now.getFullYear()).slice(-1);
+  const dateSource = parseTestDetailsDateForVerificationCode(dataset) || new Date();
+  const monthCode = String.fromCharCode(65 + dateSource.getMonth());
+  const yearCode = String(dateSource.getFullYear()).slice(-1);
   return `${baseMark}${monthCode}${yearCode}`;
+}
+
+function parseTestDetailsDateForVerificationCode(dataset) {
+  const raw = String(pick(dataset, ["testDetails", "date"], "") || "").trim();
+  if (!raw) return null;
+
+  const ddMmYyyyMatch = raw.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+  if (ddMmYyyyMatch) {
+    const [, day, month, year] = ddMmYyyyMatch;
+    const date = new Date(Number(year), Number(month) - 1, Number(day));
+    if (
+      date.getFullYear() === Number(year) &&
+      date.getMonth() === Number(month) - 1 &&
+      date.getDate() === Number(day)
+    ) return date;
+  }
+
+  const isoMatch = raw.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoMatch) {
+    const [, year, month, day] = isoMatch;
+    const date = new Date(Number(year), Number(month) - 1, Number(day));
+    if (
+      date.getFullYear() === Number(year) &&
+      date.getMonth() === Number(month) - 1 &&
+      date.getDate() === Number(day)
+    ) return date;
+  }
+
+  return null;
 }
 
 function exceedsMpe(dataset, value) {
