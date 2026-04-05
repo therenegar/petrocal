@@ -52,8 +52,10 @@ async function exportForm6Spreadsheet() {
       body: JSON.stringify({ dataset })
     });
 
+    const responseClone = response.clone();
+
     if (!response.ok) {
-      const detail = await response.text();
+      const detail = await responseClone.text();
       let message = detail || `Request failed (${response.status})`;
       try {
         const parsed = JSON.parse(detail);
@@ -61,7 +63,15 @@ async function exportForm6Spreadsheet() {
       } catch {
         // use raw response text
       }
-      thrhttp://localhost:8080/petrocal/report.htmlow new Error(message);
+      throw new Error(message);
+    }
+
+    const contentType = String(response.headers.get("content-type") || "").toLowerCase();
+    if (contentType.includes("application/json")) {
+      const payload = await responseClone.json().catch(() => null);
+      if (payload && payload.ok === false) {
+        throw new Error(payload.error || "Spreadsheet export failed.");
+      }
     }
 
     const blob = await response.blob();
