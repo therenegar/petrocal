@@ -33,7 +33,7 @@ footer {
   margin-top: 2rem;
 }
 footer hr {
-  margin: 0 1.5rem;
+  display: none;
 }
 footer p {
   text-align: center;
