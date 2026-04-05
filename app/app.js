@@ -1159,7 +1159,7 @@ function renderHoses() {
   const hoseSerialWrap = document.createElement("div");
   hoseSerialWrap.className = "serial-prefix-wrap";
   const prefix = document.createElement("strong");
-  prefix.textContent = baseSerial ? `${baseSerial}-` : "";
+  prefix.textContent = baseSerial ? `${baseSerial}` : "";
   const suffix = document.createElement("input");
   suffix.type = "text";
   suffix.classList.add("field-tiny");
@@ -1364,7 +1364,7 @@ function renderMeasureCheckPanel(hose) {
   hose.measureCheck.checks.forEach((check, idx) => {
     const tr = document.createElement("tr");
     const label = document.createElement("td");
-    label.textContent = idx === 2 ? "Check #3 (slow flow)" : `Check #${idx + 1} (regular flow)`;
+    label.textContent = idx === 2 ? "Check #3 (min flow)" : `Check #${idx + 1} (max flow)`;
 
     const measureCell = document.createElement("td");
     const measureWrap = document.createElement("div");
@@ -1418,10 +1418,10 @@ function renderMeasureCheckPanel(hose) {
 
 function verificationRows(hose) {
   return [
-    ["Delivery #1 (regular flow)", hose.verification.deliveries[0]],
-    ["Delivery #2 (regular flow)", hose.verification.deliveries[1]],
-    ["Delivery #3 (regular flow)", hose.verification.deliveries[2]],
-    ["Delivery #4 (slow flow)", hose.verification.deliveries[3]],
+    ["Delivery #1 (max flow)", hose.verification.deliveries[0]],
+    ["Delivery #2 (max flow)", hose.verification.deliveries[1]],
+    ["Delivery #3 (max flow)", hose.verification.deliveries[2]],
+    ["Delivery #4 (min flow)", hose.verification.deliveries[3]],
     ["Preset Delivery (clause 3.10)", hose.verification.preset],
     ["Gas Elimination Delivery (clause 3.12)", hose.verification.gasElimination]
   ];

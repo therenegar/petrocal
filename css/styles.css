@@ -445,6 +445,14 @@ textarea {
   margin-bottom: 0.8rem;
 }
 
+.instrument-columns > section + section.report-subsection .report-grid {
+  grid-template-columns: minmax(160px, 440px) 1fr;
+}
+
+.instrument-columns > section + section.report-subsection .report-grid dd { 
+  text-align: center;
+}
+
 @media (max-width: 900px) {
   .instrument-columns {
     grid-template-columns: 1fr;
@@ -459,14 +467,14 @@ textarea {
 
 .report-grid {
   display: grid;
-  grid-template-columns: minmax(220px, 380px) 1fr;
+  grid-template-columns: minmax(160px, 240px) 1fr;
   gap: 0.35rem 0.8rem;
   margin: 0;
 }
 
 .report-two-column-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  grid-template-columns: repeat(2, minmax(380px, 1fr));
   gap: 0.8rem;
 }
 
