@@ -22,8 +22,21 @@ header, .brand-bar, .top-bar, footer {
   padding-bottom: 1rem;
 }
 
-#appMain h1::after {
-  content: " for Fuel Dispensers";
+#appMain h1.header-licensee {
+  border: none;
+  padding: none;
+  display: block;
+  margin-bottom: 0;
+  font-size: 2.8rem;
+}
+
+#appMain h1.header-licensee + h1 {
+  margin-top: 0;
+  font-weight: normal;
+}
+
+#appMain h1.header-licensee + h1::after {
+  content: " for Fuel Dispensers (other than LPG)";
 }
 
 .report-page {

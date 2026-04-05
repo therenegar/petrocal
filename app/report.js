@@ -199,7 +199,7 @@ function pick(obj, path, fallback = undefined) {
 
 
 function syncPrintBusinessName(dataset) {
-  const heading = document.querySelector(".report-print-header h1");
+  const heading = document.querySelector("h1.header-licensee");
   if (!heading) return;
 
   heading.textContent = text(pick(dataset, ["form6Details", "businessName"], ""), "");
