@@ -1,0 +1,40 @@
+  
+body {
+  zoom: 75%; /* Scales the entire page to 75% of its original size */
+  background-image: none;
+  background: none;
+}
+header, .brand-bar, .top-bar, footer { 
+  display: none; 
+}
+
+#appMain { 
+  width: 100%; 
+  padding: 0;
+}  
+
+.report-page {
+  max-width: none;
+  margin: none;
+}
+
+.tab-panel {
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  background: none;
+}
+
+.report-section { 
+  border-bottom: none 
+}
+
+@media (max-width: 900px) {
+  .instrument-columns {
+    grid-template-columns: repeat(2, minmax(280px, 1fr));
+  }
+}
+@media (max-width: 900px) {
+  .report-two-column-grid {
+    grid-template-columns: repeat(2, minmax(380px, 1fr));
+}
