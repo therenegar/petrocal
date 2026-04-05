@@ -3,24 +3,34 @@ const REPORT_SESSION_KEY = "petrocal.report.dataset";
 
 const form6Main = document.getElementById("form6Main");
 let dataset = normalizeDataset(loadDataset() || {});
-
-
-const DEFAULT_FORM6_ENDPOINT = "http://localhost:8080/petrocal/tools/form6_generate_spreadsheet.php";
-const FORM6_ENDPOINT_STORAGE_KEY = "petrocal.form6.endpoint";
-
-function resolveForm6Endpoint() {
-  const params = new URLSearchParams(window.location.search);
-  const query = (params.get("form6Endpoint") || "").trim();
-  if (query) return query;
-
-  const winValue = String(window.PETROCAL_FORM6_ENDPOINT || "").trim();
-  if (winValue) return winValue;
-
-  const stored = String(localStorage.getItem(FORM6_ENDPOINT_STORAGE_KEY) || "").trim();
-  if (stored) return stored;
-
-  return DEFAULT_FORM6_ENDPOINT;
-}
+const FORM6_TEMPLATE_URL = "ref/form-6-verification-notification-template.xlsx";
+const FORM6_SHEET_NAME = "Form 6";
+const FORM6_DATA_CELLS = {
+  B3: ["testDetails", "operator"],
+  B4: ["testDetails", "streetAddress"],
+  B5: ["testDetails", "suburb"],
+  B6: ["testDetails", "state"],
+  B7: ["testDetails", "postCode"],
+  B8: ["form6Details", "licenceNumber"],
+  B9: ["form6Details", "businessName"],
+  B10: ["form6Details", "abnNumber"],
+  B11: ["testDetails", "registrationNumber"],
+  B12: ["testDetails", "verifierName"],
+  B13: ["testDetails", "verificationMark"],
+};
+const FORM6_HOSE_TABLE = {
+  startRow: 16,
+  columns: {
+    location: "A",
+    verificationDate: "B",
+    make: "C",
+    model: "D",
+    serialNumber: "E",
+    nmiPattern: "F",
+    capacity: "G",
+    performanceCode: "H",
+  },
+};
 
 function setExportStatus(message, isError = false) {
   const status = document.getElementById("form6ExportStatus");
@@ -37,53 +47,81 @@ function buildSpreadsheetFilename() {
     new Date().toISOString().slice(0, 10)
   ].filter(Boolean);
 
-  return `${parts.join("-")}.xls`;
+  return `${parts.join("-")}.xlsx`;
 }
 
 async function exportForm6Spreadsheet() {
+  if (!window.ExcelJS) {
+    setExportStatus("Spreadsheet export failed: ExcelJS is not available.", true);
+    return;
+  }
+
   setExportStatus("Generating spreadsheet...");
 
   try {
-    const response = await fetch(resolveForm6Endpoint(), {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
+    const workbook = await loadTemplateWorkbook();
+    const worksheet = workbook.getWorksheet(FORM6_SHEET_NAME) || workbook.worksheets[0];
+    if (!worksheet) {
+      throw new Error("Template workbook did not contain any worksheets.");
+    }
+
+    applyForm6FieldCells(worksheet);
+    applyForm6HoseTable(worksheet, hoseRows());
+
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob(
+      [buffer],
+      {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       },
-      body: JSON.stringify({ dataset })
-    });
-
-    const responseClone = response.clone();
-
-    if (!response.ok) {
-      const detail = await responseClone.text();
-      let message = detail || `Request failed (${response.status})`;
-      try {
-        const parsed = JSON.parse(detail);
-        if (parsed && parsed.error) message = parsed.error;
-      } catch {
-        // use raw response text
-      }
-      throw new Error(message);
-    }
-
-    const contentType = String(response.headers.get("content-type") || "").toLowerCase();
-    if (contentType.includes("application/json")) {
-      const payload = await responseClone.json().catch(() => null);
-      if (payload && payload.ok === false) {
-        throw new Error(payload.error || "Spreadsheet export failed.");
-      }
-    }
-
-    const blob = await response.blob();
-    if (!blob || blob.size === 0) {
-      throw new Error("The server returned an empty spreadsheet file.");
-    }
+    );
 
     downloadBlob(blob, buildSpreadsheetFilename());
     setExportStatus("Spreadsheet downloaded.");
   } catch (error) {
     setExportStatus(`Spreadsheet export failed: ${error.message || "unknown error"}`, true);
   }
+}
+
+async function loadTemplateWorkbook() {
+  const response = await fetch(FORM6_TEMPLATE_URL, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(
+      `Unable to load Form 6 template at "${FORM6_TEMPLATE_URL}" (${response.status}). ` +
+      "Please add the converted .xlsx template to ref/ before exporting.",
+    );
+  }
+
+  const arrayBuffer = await response.arrayBuffer();
+  if (!arrayBuffer.byteLength) {
+    throw new Error("Template workbook is empty.");
+  }
+
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(arrayBuffer);
+  return workbook;
+}
+
+function getAtPath(source, path) {
+  return path.reduce((current, key) => {
+    if (!current || typeof current !== "object") return undefined;
+    return current[key];
+  }, source);
+}
+
+function applyForm6FieldCells(worksheet) {
+  Object.entries(FORM6_DATA_CELLS).forEach(([cellRef, datasetPath]) => {
+    worksheet.getCell(cellRef).value = text(getAtPath(dataset, datasetPath));
+  });
+}
+
+function applyForm6HoseTable(worksheet, rows) {
+  rows.forEach((row, index) => {
+    const targetRow = FORM6_HOSE_TABLE.startRow + index;
+    Object.entries(FORM6_HOSE_TABLE.columns).forEach(([key, column]) => {
+      worksheet.getCell(`${column}${targetRow}`).value = text(row[key]);
+    });
+  });
 }
 
 function bindExportButton() {
