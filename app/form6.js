@@ -355,8 +355,9 @@ function renderForm6() {
   const root = document.createElement("section");
   root.className = "form6-sheet";
 
-  
-  
+  const intro = document.createElement("p");
+  intro.className = "form6-preview-note";
+  intro.textContent = "A preview of the Form 6 data is shown below. Confirm the details and then click the Generate Form 6 button to create and download the Form 6 spreadsheet (Excel format).";
 
   const columns = document.createElement("div");
   columns.className = "form6-columns";
@@ -365,7 +366,7 @@ function renderForm6() {
   left.className = "form6-block";
   left.append(
     Object.assign(document.createElement("h3"), { textContent: "Instrument Owner/User Details" }),
-    labelledField("Trader's name", text(dataset.testDetails.operator)),
+    labelledField("Business name", buildBusinessName()),
     labelledField("Business type", "Fuel Retail"),
     Object.assign(document.createElement("h3"), { textContent: "Instrument Location Details" }),
     labelledField("Street address", text(dataset.testDetails.streetAddress)),
@@ -441,6 +442,6 @@ function renderForm6() {
   }
 
   tableSection.append(table);
-  root.append(columns, tableSection);
+  root.append(intro, columns, tableSection);
   form6Main.replaceChildren(root);
 }
