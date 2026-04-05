@@ -284,7 +284,7 @@ function persistLocalDataset({ markDirty = true } = {}) {
     // no-op
   }
   if (markDirty) setSaveButtonState(SAVE_BUTTON_STATE.pending);
-  saveStatus.textContent = `Locally saved @ ${formatNowDdMmYyyyHhMmSs()}`;
+  saveStatus.textContent = `Last change @ ${formatNowDdMmYyyyHhMmSs()}`;
 }
 
 function updateAt(path, value) {
