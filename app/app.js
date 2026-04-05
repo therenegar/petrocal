@@ -589,6 +589,20 @@ function applyGradeStyle(element, gradeValue) {
   else delete element.dataset.grade;
 }
 
+
+function applyButtonIcon(button, iconPath, labelText) {
+  button.classList.add("btn-with-icon");
+  button.textContent = "";
+  const icon = document.createElement("img");
+  icon.className = "btn-icon";
+  icon.src = iconPath;
+  icon.alt = "";
+  icon.setAttribute("aria-hidden", "true");
+  const label = document.createElement("span");
+  label.textContent = labelText;
+  button.append(icon, label);
+}
+
 function renderTabbedHeader(tabs, activeIndex, onChange, options = {}) {
   const { addAction = null, removeAction = null, extraActions = [] } = options;
   const row = document.createElement("div");
@@ -612,7 +626,7 @@ function renderTabbedHeader(tabs, activeIndex, onChange, options = {}) {
   if (addAction) {
     const add = document.createElement("button");
     add.className = "btn small-btn";
-    add.textContent = "Add another";
+    applyButtonIcon(add, "res/icon-add.svg", "Add another");
     add.addEventListener("click", addAction);
     actionsWrap.append(add);
   }
@@ -620,16 +634,17 @@ function renderTabbedHeader(tabs, activeIndex, onChange, options = {}) {
   if (removeAction) {
     const remove = document.createElement("button");
     remove.className = "btn small-btn";
-    remove.textContent = "Remove";
+    applyButtonIcon(remove, "res/icon-remove.svg", "Remove");
     remove.addEventListener("click", removeAction);
     actionsWrap.append(remove);
   }
 
-  extraActions.forEach(({ label, onClick }) => {
+  extraActions.forEach(({ label, onClick, icon = "" }) => {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "btn small-btn";
-    button.textContent = label;
+    if (icon) applyButtonIcon(button, icon, label);
+    else button.textContent = label;
     button.addEventListener("click", onClick);
     actionsWrap.append(button);
   });
@@ -646,11 +661,11 @@ function renderMoveControls(onLeft, onRight) {
   wrap.className = "move-controls";
   const left = document.createElement("button");
   left.className = "btn small-btn";
-  left.textContent = "←";
+  applyButtonIcon(left, "res/icon-move-left.svg", "Move left");
   left.addEventListener("click", onLeft);
   const right = document.createElement("button");
   right.className = "btn small-btn";
-  right.textContent = "→";
+  applyButtonIcon(right, "res/icon-move-right.svg", "Move right");
   right.addEventListener("click", onRight);
   wrap.append(left, right);
   return wrap;
@@ -924,8 +939,8 @@ function renderInstruments() {
         addAction: addInstrument,
         removeAction: () => removeInstrument(VIEW_STATE.instrumentsTab),
         extraActions: [
-          { label: "←", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, -1) },
-          { label: "→", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, 1) }
+          { label: "Move left", icon: "res/icon-move-left.svg", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, -1) },
+          { label: "Move right", icon: "res/icon-move-right.svg", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, 1) }
         ]
       }
     )
@@ -1086,8 +1101,8 @@ function renderHoses() {
       },
       {
         extraActions: [
-          { label: "←", onClick: () => moveHose(instrument, hoseKey, -1) },
-          { label: "→", onClick: () => moveHose(instrument, hoseKey, 1) }
+          { label: "Move left", icon: "res/icon-move-left.svg", onClick: () => moveHose(instrument, hoseKey, -1) },
+          { label: "Move right", icon: "res/icon-move-right.svg", onClick: () => moveHose(instrument, hoseKey, 1) }
         ]
       }
     )

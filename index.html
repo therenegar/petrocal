@@ -27,11 +27,11 @@
       <p>
       <h4>Get started</h4>
       <div class="launch-actions">
-        <a id="launchNewDataset" class="btn launch-btn" href="app.html?start=new">Start new worksheet</a>
-        <a id="launchLoadDataset" class="btn launch-btn" href="app.html?start=load">Load existing worksheet</a>
-        <a class="btn launch-btn" href="app.html?load=sample">Load sample worksheet</a>
-        <a class="btn launch-btn" href="help.html">Get Help</a>
-        <a class="btn launch-btn" href="info.html">App Info</a>
+        <a id="launchNewDataset" class="btn launch-btn btn-with-icon" href="app.html?start=new"><img class="btn-icon" src="res/icon-new.svg" alt="" aria-hidden="true" /><span>Start new worksheet</span></a>
+        <a id="launchLoadDataset" class="btn launch-btn btn-with-icon" href="app.html?start=load"><img class="btn-icon" src="res/icon-load.svg" alt="" aria-hidden="true" /><span>Load existing worksheet</span></a>
+        <a class="btn launch-btn btn-with-icon" href="app.html?load=sample"><img class="btn-icon" src="res/icon-sample.svg" alt="" aria-hidden="true" /><span>Load sample worksheet</span></a>
+        <a class="btn launch-btn btn-with-icon" href="help.html"><img class="btn-icon" src="res/icon-help.svg" alt="" aria-hidden="true" /><span>Get Help</span></a>
+        <a class="btn launch-btn btn-with-icon" href="info.html"><img class="btn-icon" src="res/icon-info.svg" alt="" aria-hidden="true" /><span>App Info</span></a>
         <input id="launchDatasetFileInput" type="file" accept=".cal,.json,application/json" data-schema-name="datasetFile" hidden />
       </div>
     </main>
@@ -79,14 +79,22 @@
 
         if (resumeOrStartAction) {
           const primaryAction = document.createElement("a");
-          primaryAction.className = "btn launch-btn";
+          primaryAction.className = "btn launch-btn btn-with-icon";
+          const primaryIcon = document.createElement("img");
+          primaryIcon.className = "btn-icon";
+          primaryIcon.alt = "";
+          primaryIcon.setAttribute("aria-hidden", "true");
+          const primaryText = document.createElement("span");
           if (hasExistingDataset()) {
             primaryAction.href = "app.html";
-            primaryAction.textContent = "Continue where you left off ...";
+            primaryIcon.src = "res/icon-resume.svg";
+            primaryText.textContent = "Continue where you left off...";
           } else {
             primaryAction.href = "app.html?start=new";
-            primaryAction.textContent = "Begin a new worksheet";
+            primaryIcon.src = "res/icon-new.svg";
+            primaryText.textContent = "Begin a new worksheet";
           }
+          primaryAction.append(primaryIcon, primaryText);
           resumeOrStartAction.append(primaryAction);
         }
 
