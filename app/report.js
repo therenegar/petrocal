@@ -198,16 +198,16 @@ function renderHose(hose, index, instrument, dataset) {
   if (visibleSections.includes("measureCheck")) {
     const measureCheckTitle = document.createElement("h5");
     measureCheckTitle.textContent = "Measure Check";
-    section.append(measureCheckTitle, renderRunsTable(pick(hose, ["measureCheck", "checks"], []), "Check", false, dataset));
+    section.append(measureCheckTitle, renderRunsTable(pick(hose, ["measureCheck", "checks"], []), (_, idx) => String(idx + 1), false, dataset));
   }
 
   if (visibleSections.includes("verification")) {
     const verificationRows = [
-      ...pick(hose, ["verification", "deliveries"], []).map(function(row, idx) { return ({ label: `Delivery #${idx + 1}`, ...row }); }),
-      { label: "Preset Delivery", ...pick(hose, ["verification", "preset"], {}) }
+      ...pick(hose, ["verification", "deliveries"], []).map(function(row, idx) { return ({ label: String(idx + 1), ...row }); }),
+      { label: "Preset", ...pick(hose, ["verification", "preset"], {}) }
     ];
     if ((pick(instrument, ["type"], "") || "") === "Suction") {
-      verificationRows.push({ label: "Gas Elimination Delivery", ...pick(hose, ["verification", "gasElimination"], {}) });
+      verificationRows.push({ label: "Gas Elim.", ...pick(hose, ["verification", "gasElimination"], {}) });
     }
 
     const verificationTitle = document.createElement("h5");
@@ -258,11 +258,11 @@ function renderHose(hose, index, instrument, dataset) {
   return section;
 }
 
-function renderRunsTable(rows, rowPrefix = "Run", includeEd = false, dataset = null) {
+function renderRunsTable(rows, runLabel = null, includeEd = false, dataset = null) {
   const table = document.createElement("table");
   table.className = "report-table";
   const header = document.createElement("thead");
-  header.innerHTML = `<tr><th>${rowPrefix ? "" : "Run"}</th><th>Measure</th><th>VFD</th><th>VREF</th><th>EFD (%)</th>${includeEd ? "<th>ED (%)</th>" : ""}</tr>`;
+  header.innerHTML = `<tr><th>Run</th><th>Measure</th><th>VFD</th><th>VREF</th><th>EFD (%)</th>${includeEd ? "<th>ED (%)</th>" : ""}</tr>`;
   table.append(header);
 
   const body = document.createElement("tbody");
@@ -273,7 +273,7 @@ function renderRunsTable(rows, rowPrefix = "Run", includeEd = false, dataset = n
     if (Number.isFinite(mpe) && Number.isFinite(efdValue) && Math.abs(efdValue) > Math.abs(mpe)) {
       tr.classList.add("row-error");
     }
-    const label = rowPrefix ? `${rowPrefix} ${idx + 1}` : text(row.label, `Run ${idx + 1}`);
+    const label = runLabel ? runLabel(row, idx) : text(row.label, String(idx + 1));
     tr.innerHTML = `<td>${label}</td><td>${measureVolumeLabel(row.measureId, dataset)}</td><td>${text(row.vfd)}</td><td>${text(row.vref)}</td><td>${text(row.efd)}</td>${includeEd ? `<td>${text(row.ed)}</td>` : ""}`;
     [...tr.children].forEach((cell) => decorateOutcomeElement(cell, cell.textContent));
     body.append(tr);
@@ -347,10 +347,6 @@ function renderInstrument(instrument, index, dataset) {
 
   const hosesWrapper = document.createElement("div");
   hosesWrapper.className = "report-hoses";
-  const hoseTitle = document.createElement("h3");
-  hoseTitle.textContent = "Hoses";
-  hosesWrapper.append(hoseTitle);
-
   if (!instrument.hoses || instrument.hoses.length === 0) {
     const none = document.createElement("p");
     none.textContent = "No hoses.";
