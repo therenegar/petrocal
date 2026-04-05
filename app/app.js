@@ -1427,8 +1427,21 @@ function verificationRows(hose) {
   ];
 }
 
+function verificationMarkWithDateCode() {
+  const baseMark = String(dataset?.testDetails?.verificationMark || "").trim();
+  if (!baseMark) return "";
+  const now = new Date();
+  const monthCode = String.fromCharCode(65 + now.getMonth());
+  const yearCode = String(now.getFullYear()).slice(-1);
+  return `${baseMark}${monthCode}${yearCode}`;
+}
+
 function renderVerificationPanel(hose, instrumentType) {
   const wrap = document.createElement("div");
+  const verificationMark = document.createElement("div");
+  verificationMark.className = "verification-mark";
+  verificationMark.title = "Verification mark";
+  verificationMark.textContent = verificationMarkWithDateCode();
   const table = document.createElement("table");
   table.className = "data-table";
   table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th>EFD (%)<br/>Accuracy<br/>(clause 3.9)</th><th>ED (%)</th></tr></thead>";
@@ -1542,7 +1555,7 @@ function renderVerificationPanel(hose, instrumentType) {
 
   meta.append(avgLabel, avgVal, antiLabel, antiInput, reverificationLabel, reverificationInput);
 
-  wrap.append(table, meta);
+  wrap.append(verificationMark, table, meta);
   return wrap;
 }
 
