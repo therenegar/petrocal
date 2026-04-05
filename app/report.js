@@ -376,7 +376,7 @@ function renderMeasure(measure, index) {
     dt.textContent = label;
     const dd = document.createElement("dd");
     dd.textContent = text(value);
-    if (label !== "Sightglass") decorateOutcomeElement(dd, value);
+    if (!label.toLowerCase().startsWith("sightglass")) decorateOutcomeElement(dd, value);
     grid.append(dt, dd);
   });
   section.append(grid);

@@ -580,8 +580,10 @@ function validateField(input) {
 }
 
 function applySelectOutcomeStyle(select) {
-  const value = String(select.value || "").trim().toLowerCase();
   select.classList.remove("select-good", "select-bad");
+  if (select.dataset.skipOutcomeStyle === "true") return;
+
+  const value = String(select.value || "").trim().toLowerCase();
   if (value === "yes" || value === "pass") {
     select.classList.add("select-good");
     return;
@@ -1008,6 +1010,7 @@ function renderMeasures() {
   sightglassSelect.append(new Option("", ""));
   sightglassSelect.append(new Option("Yes", "yes"));
   sightglassSelect.append(new Option("No", "no"));
+  sightglassSelect.dataset.skipOutcomeStyle = "true";
   sightglassSelect.value = current.sightglass || "no";
   sightglassSelect.addEventListener("change", () => {
     updateAt(["measures", VIEW_STATE.measuresTab, "sightglass"], sightglassSelect.value || "no");
