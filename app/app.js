@@ -209,7 +209,10 @@ function normalizeHose(hose = {}) {
     maxRate: "",
     measureCheck: {
       performanceCode: "",
-      checks: [emptyCheck(), emptyCheck(), emptyCheck()]
+      deliveries: [emptyDelivery(), emptyDelivery(), emptyDelivery(), emptyDelivery()],
+      preset: emptyDelivery(),
+      gasElimination: { ...emptyDelivery(), ed: "" },
+      antiDrainMl: ""
     },
     verification: {
       deliveries: [emptyDelivery(), emptyDelivery(), emptyDelivery(), emptyDelivery()],
@@ -227,10 +230,11 @@ function normalizeHose(hose = {}) {
     measureCheck: {
       ...base.measureCheck,
       ...(hose.measureCheck || {}),
-      checks: (hose.measureCheck?.checks || base.measureCheck.checks).map((item, idx) => ({
-        ...base.measureCheck.checks[idx % 3],
-        ...item
-      }))
+      deliveries: (hose.measureCheck?.deliveries || base.measureCheck.deliveries)
+        .slice(0, 4)
+        .map((item, idx) => ({ ...base.measureCheck.deliveries[idx], ...item })),
+      preset: { ...base.measureCheck.preset, ...(hose.measureCheck?.preset || {}) },
+      gasElimination: { ...base.measureCheck.gasElimination, ...(hose.measureCheck?.gasElimination || {}) }
     },
     verification: {
       ...base.verification,
@@ -247,7 +251,13 @@ function normalizeHose(hose = {}) {
     }
   };
 
-  while (merged.measureCheck.checks.length < 3) merged.measureCheck.checks.push(emptyCheck());
+  if ((!hose.measureCheck?.deliveries || !hose.measureCheck?.deliveries.length) && Array.isArray(hose.measureCheck?.checks)) {
+    merged.measureCheck.deliveries = [0, 1, 2, 3].map((idx) => ({
+      ...base.measureCheck.deliveries[idx],
+      ...(idx < 3 ? hose.measureCheck.checks[idx] || {} : {})
+    }));
+  }
+  while (merged.measureCheck.deliveries.length < 4) merged.measureCheck.deliveries.push(emptyDelivery());
   while (merged.verification.deliveries.length < 4) merged.verification.deliveries.push(emptyDelivery());
   return merged;
 }
@@ -1400,76 +1410,7 @@ function exceedsMpe(efd) {
 }
 
 function renderMeasureCheckPanel(hose) {
-  const wrap = document.createElement("div");
-  const table = document.createElement("table");
-  table.className = "data-table";
-  table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th>EFD (%)<br>Accuracy<br/>(clause 3.9)</th></tr></thead>";
-  const body = document.createElement("tbody");
-
-  hose.measureCheck.checks.forEach((check, idx) => {
-    const tr = document.createElement("tr");
-    const label = document.createElement("td");
-    label.textContent = idx === 2 ? "Check #3 (min flow)" : `Check #${idx + 1} (max flow)`;
-
-    const measureCell = document.createElement("td");
-    const measureWrap = document.createElement("div");
-    measureCell.append(measureWrap);
-    measureWrap.append(
-      renderMeasureSelect(check.measureId, (id) => {
-        check.measureId = id;
-        sightglassDefaults(check, id);
-        persistLocalDataset();
-        renderHoses();
-      })
-    );
-    const selectedMeasure = findMeasure(check.measureId);
-    const sizeError = validateMeasureSize(hose, selectedMeasure, { section: "measureCheck", rowIndex: idx });
-    if (isMeasureExpired(selectedMeasure)) {
-      const expired = document.createElement("div");
-      expired.className = "field-error";
-      expired.textContent = "Measure expired";
-      measureWrap.append(expired);
-    }
-    if (sizeError) {
-      const invalid = document.createElement("div");
-      invalid.className = "field-error";
-      invalid.textContent = sizeError;
-      measureWrap.append(invalid);
-    }
-
-    const sightglassYes = (selectedMeasure?.sightglass || "no") === "yes";
-    if (sightglassYes && selectedMeasure) check.vfd = selectedMeasure.volume || "";
-    if (!sightglassYes && selectedMeasure) check.vref = selectedMeasure.volume || "";
-
-    const vfd = numericTableInput(check, "vfd", () => {
-      check.efd = calculateEfd(check.vfd, check.vref);
-    }, sightglassYes);
-    const vref = numericTableInput(check, "vref", () => {
-      check.efd = calculateEfd(check.vfd, check.vref);
-    }, !sightglassYes && !!selectedMeasure);
-
-    const efd = document.createElement("td");
-    efd.textContent = check.efd || "";
-
-    tr.append(label, measureCell, vfd, vref, efd);
-    if (exceedsMpe(check.efd)) tr.classList.add("row-error");
-    body.append(tr);
-  });
-
-  table.append(body);
-  wrap.append(table);
-  return wrap;
-}
-
-function verificationRows(hose) {
-  return [
-    ["Delivery #1 (max flow)", hose.verification.deliveries[0]],
-    ["Delivery #2 (max flow)", hose.verification.deliveries[1]],
-    ["Delivery #3 (max flow)", hose.verification.deliveries[2]],
-    ["Delivery #4 (min flow)", hose.verification.deliveries[3]],
-    ["Preset Delivery (clause 3.10)", hose.verification.preset],
-    ["Gas Elimination Delivery (clause 3.12)", hose.verification.gasElimination]
-  ];
+  return renderDeliveryPanel(hose, "measureCheck");
 }
 
 function verificationMarkWithDateCode() {
@@ -1482,18 +1423,39 @@ function verificationMarkWithDateCode() {
 }
 
 function renderVerificationPanel(hose, instrumentType) {
+  return renderDeliveryPanel(hose, "verification", instrumentType);
+}
+
+function deliveryRows(hose, sectionKey) {
+  return [
+    ["Delivery #1 (max flow)", hose[sectionKey].deliveries[0]],
+    ["Delivery #2 (max flow)", hose[sectionKey].deliveries[1]],
+    ["Delivery #3 (max flow)", hose[sectionKey].deliveries[2]],
+    ["Delivery #4 (min flow)", hose[sectionKey].deliveries[3]],
+    ["Preset Delivery (clause 3.10)", hose[sectionKey].preset],
+    ["Gas Elimination Delivery (clause 3.12)", hose[sectionKey].gasElimination]
+  ];
+}
+
+function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
+  const isVerification = sectionKey === "verification";
   const wrap = document.createElement("div");
-  const verificationMark = document.createElement("div");
-  verificationMark.className = "verification-mark";
-  verificationMark.title = "Verification mark";
-  verificationMark.textContent = verificationMarkWithDateCode();
+  const data = hose[sectionKey];
+  if (isVerification) {
+    const verificationMark = document.createElement("div");
+    verificationMark.className = "verification-mark";
+    verificationMark.title = "Verification mark";
+    verificationMark.textContent = verificationMarkWithDateCode();
+    wrap.append(verificationMark);
+  }
+
   const table = document.createElement("table");
   table.className = "data-table";
   table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th>EFD (%)<br/>Accuracy<br/>(clause 3.9)</th><th>ED (%)</th></tr></thead>";
   const body = document.createElement("tbody");
   const isSuctionSystem = String(instrumentType || "").trim().toLowerCase() === "suction";
 
-  verificationRows(hose).forEach(([labelText, rowObj], rowIndex) => {
+  deliveryRows(hose, sectionKey).forEach(([labelText, rowObj], rowIndex) => {
     if (labelText.startsWith("Gas Elimination Delivery") && !isSuctionSystem) return;
     const tr = document.createElement("tr");
     const label = document.createElement("td");
@@ -1511,7 +1473,7 @@ function renderVerificationPanel(hose, instrumentType) {
       })
     );
     const selectedMeasure = findMeasure(rowObj.measureId);
-    const sizeError = validateMeasureSize(hose, selectedMeasure, { section: "verification", rowIndex });
+    const sizeError = validateMeasureSize(hose, selectedMeasure, { section: sectionKey, rowIndex });
     if (isMeasureExpired(selectedMeasure)) {
       const expired = document.createElement("div");
       expired.className = "field-error";
@@ -1561,9 +1523,9 @@ function renderVerificationPanel(hose, instrumentType) {
   table.append(body);
 
   const avgError = average([
-    hose.verification.deliveries[0].efd,
-    hose.verification.deliveries[1].efd,
-    hose.verification.deliveries[2].efd
+    data.deliveries[0].efd,
+    data.deliveries[1].efd,
+    data.deliveries[2].efd
   ]);
 
   const meta = document.createElement("div");
@@ -1573,6 +1535,7 @@ function renderVerificationPanel(hose, instrumentType) {
   avgLabel.textContent = "Average error (EAV) (clause 3.12)";
   const avgVal = document.createElement("strong");
   avgVal.textContent = avgError === "" ? "" : avgError;
+  if (exceedsMpe(avgError)) avgVal.classList.add("value-bad");
 
   const antiLabel = document.createElement("span");
   antiLabel.textContent = "Anti-drain/Hose dilation vol. of drained fuel (mL) (clause 3.13)";
@@ -1580,27 +1543,29 @@ function renderVerificationPanel(hose, instrumentType) {
   antiInput.type = "number";
   antiInput.classList.add("field-small");
   setSchemaNameAttr(antiInput, "antiDrainMl");
-  antiInput.value = hose.verification.antiDrainMl || "";
+  antiInput.value = data.antiDrainMl || "";
   antiInput.addEventListener("change", () => {
-    hose.verification.antiDrainMl = antiInput.value;
+    data.antiDrainMl = antiInput.value;
     persistLocalDataset();
   });
 
-  const reverificationLabel = document.createElement("span");
-  reverificationLabel.textContent = "Existing verification mark (if reverifying)";
-  const reverificationInput = document.createElement("input");
-  reverificationInput.type = "text";
-  reverificationInput.classList.add("field-medium");
-  setSchemaNameAttr(reverificationInput, "reverification");
-  reverificationInput.value = hose.verification.reverification || "";
-  reverificationInput.addEventListener("change", () => {
-    hose.verification.reverification = reverificationInput.value;
-    persistLocalDataset();
-  });
+  meta.append(avgLabel, avgVal, antiLabel, antiInput);
+  if (isVerification) {
+    const reverificationLabel = document.createElement("span");
+    reverificationLabel.textContent = "Existing verification mark (if reverifying)";
+    const reverificationInput = document.createElement("input");
+    reverificationInput.type = "text";
+    reverificationInput.classList.add("field-medium");
+    setSchemaNameAttr(reverificationInput, "reverification");
+    reverificationInput.value = hose.verification.reverification || "";
+    reverificationInput.addEventListener("change", () => {
+      hose.verification.reverification = reverificationInput.value;
+      persistLocalDataset();
+    });
+    meta.append(reverificationLabel, reverificationInput);
+  }
 
-  meta.append(avgLabel, avgVal, antiLabel, antiInput, reverificationLabel, reverificationInput);
-
-  wrap.append(verificationMark, table, meta);
+  wrap.append(table, meta);
   return wrap;
 }
 

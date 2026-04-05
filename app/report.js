@@ -218,6 +218,36 @@ function decorateOutcomeElement(element, value) {
   if (["no", "fail"].includes(val)) element.classList.add("value-bad");
 }
 
+function verificationMarkWithDateCode(dataset) {
+  const baseMark = String(pick(dataset, ["testDetails", "verificationMark"], "") || "").trim();
+  if (!baseMark) return "";
+  const now = new Date();
+  const monthCode = String.fromCharCode(65 + now.getMonth());
+  const yearCode = String(now.getFullYear()).slice(-1);
+  return `${baseMark}${monthCode}${yearCode}`;
+}
+
+function exceedsMpe(dataset, value) {
+  const mpe = Number(pick(dataset, ["testDetails", "mpe"], ""));
+  const numeric = Number(value);
+  if (!Number.isFinite(mpe) || !Number.isFinite(numeric)) return false;
+  return Math.abs(numeric) > Math.abs(mpe);
+}
+
+function hoseDeliveryRows(hose, sectionKey, instrumentType) {
+  const rows = [
+    { label: "Delivery #1 (max flow)", ...pick(hose, [sectionKey, "deliveries", 0], {}) },
+    { label: "Delivery #2 (max flow)", ...pick(hose, [sectionKey, "deliveries", 1], {}) },
+    { label: "Delivery #3 (max flow)", ...pick(hose, [sectionKey, "deliveries", 2], {}) },
+    { label: "Delivery #4 (min flow)", ...pick(hose, [sectionKey, "deliveries", 3], {}) },
+    { label: "Preset Delivery (clause 3.10)", ...pick(hose, [sectionKey, "preset"], {}) }
+  ];
+  if (String(instrumentType || "").trim().toLowerCase() === "suction") {
+    rows.push({ label: "Gas Elimination Delivery (clause 3.12)", ...pick(hose, [sectionKey, "gasElimination"], {}) });
+  }
+  return rows;
+}
+
 function renderKeyValueGrid(title, rows) {
   const section = document.createElement("section");
   section.className = "report-section";
@@ -395,21 +425,40 @@ function renderHose(hose, index, instrument, dataset) {
   if (visibleSections.includes("measureCheck")) {
     const measureCheckTitle = document.createElement("h5");
     measureCheckTitle.textContent = "Measure Check";
-    section.append(measureCheckTitle, renderRunsTable(pick(hose, ["measureCheck", "checks"], []), (_, idx) => String(idx + 1), false, dataset));
+    section.append(measureCheckTitle, renderRunsTable(hoseDeliveryRows(hose, "measureCheck", instrument.type), null, true, dataset));
+
+    const measureCheckAverage = average([
+      pick(hose, ["measureCheck", "deliveries", 0, "efd"], ""),
+      pick(hose, ["measureCheck", "deliveries", 1, "efd"], ""),
+      pick(hose, ["measureCheck", "deliveries", 2, "efd"], "")
+    ]);
+    const measureCheckMeta = document.createElement("dl");
+    measureCheckMeta.className = "report-grid";
+    [
+      ["Average error (EAV) (Clause 3.12)", measureCheckAverage],
+      ["Anti-drain/Hose-dilation fuel volume (mL) (Clause 3.13)", pick(hose, ["measureCheck", "antiDrainMl"], "")]
+    ].forEach(([label, value]) => {
+      const dt = document.createElement("dt");
+      dt.textContent = label;
+      const dd = document.createElement("dd");
+      dd.textContent = text(value);
+      if (label.startsWith("Average error") && exceedsMpe(dataset, value)) dd.classList.add("value-bad");
+      decorateOutcomeElement(dd, value);
+      measureCheckMeta.append(dt, dd);
+    });
+    section.append(measureCheckMeta);
   }
 
   if (visibleSections.includes("verification")) {
-    const verificationRows = [
-      ...pick(hose, ["verification", "deliveries"], []).map(function(row, idx) { return ({ label: String(idx + 1), ...row }); }),
-      { label: "Preset", ...pick(hose, ["verification", "preset"], {}) }
-    ];
-    if ((pick(instrument, ["type"], "") || "") === "Suction") {
-      verificationRows.push({ label: "Gas Elim.", ...pick(hose, ["verification", "gasElimination"], {}) });
-    }
-
     const verificationTitle = document.createElement("h5");
     verificationTitle.textContent = "Verification";
-    section.append(verificationTitle, renderRunsTable(verificationRows, null, true, dataset));
+    section.append(verificationTitle);
+
+    const verificationMark = document.createElement("div");
+    verificationMark.className = "verification-mark";
+    verificationMark.title = "Verification mark";
+    verificationMark.textContent = verificationMarkWithDateCode(dataset);
+    section.append(verificationMark, renderRunsTable(hoseDeliveryRows(hose, "verification", instrument.type), null, true, dataset));
 
     const averageError = average([
       pick(hose, ["verification", "deliveries", 0, "efd"], ""),
@@ -427,6 +476,7 @@ function renderHose(hose, index, instrument, dataset) {
       dt.textContent = label;
       const dd = document.createElement("dd");
       dd.textContent = text(value);
+      if (label.startsWith("Average error") && exceedsMpe(dataset, value)) dd.classList.add("value-bad");
       decorateOutcomeElement(dd, value);
       verificationMeta.append(dt, dd);
     });
@@ -465,9 +515,7 @@ function renderRunsTable(rows, runLabel = null, includeEd = false, dataset = nul
   const body = document.createElement("tbody");
   rows.forEach((row, idx) => {
     const tr = document.createElement("tr");
-    const mpe = Number(pick(dataset, ["testDetails", "mpe"], ""));
-    const efdValue = Number(row.efd);
-    if (Number.isFinite(mpe) && Number.isFinite(efdValue) && Math.abs(efdValue) > Math.abs(mpe)) {
+    if (exceedsMpe(dataset, row.efd)) {
       tr.classList.add("row-error");
     }
     const label = runLabel ? runLabel(row, idx) : text(row.label, String(idx + 1));
