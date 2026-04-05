@@ -349,6 +349,18 @@ input[disabled] {
 .field-large { width: 20rem; }
 .field-xlarge { width: 28rem; }
 
+.operator-control-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.operator-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
 input[type='date'] {
   width: 11rem;
 }
@@ -1024,4 +1036,3 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
-
