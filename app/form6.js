@@ -5,20 +5,29 @@ const form6Main = document.getElementById("form6Main");
 let dataset = normalizeDataset(loadDataset() || {});
 const FORM6_TEMPLATE_URL = "ref/form-6-verification-notification-template.xlsx";
 const FORM6_SHEET_NAME = "Form 6";
+const MAX_HOSE_ROWS_PER_SPREADSHEET = 32;
+const PERFORMANCE_CODE_LABELS = {
+  A: "A- new instrument",
+  B: "B- routine inspection or contract requirement (without recalibration or repair)",
+  C: "C- routine inspection or contract requirement (within MPE but recalibrated)",
+  D: "D- outside MPE and recalibrated",
+  E: "E- instrument repaired",
+  F: "F- removed from trade",
+  G: "G- modified/upgraded",
+  H: "H- mark removed and not re-verified",
+};
 const FORM6_DATA_CELLS = {
-  B10: ["testDetails", "operator"],
-  C12: ["testDetails", "streetAddress"],
-  D12: ["testDetails", "suburb"],
-  E12: ["testDetails", "postCode"],
-  B14: ["form6Details", "licenceNumber"],
-  C14: ["form6Details", "businessName"],
-  D14: ["form6Details", "abnNumber"],
-  B16: ["testDetails", "registrationNumber"],
-  C16: ["testDetails", "verifierName"],
-  D16: ["testDetails", "verificationMark"],
+  B3: ["testDetails", "operator"],
+  B5: ["testDetails", "suburb"],
+  B6: ["testDetails", "state"],
+  B7: ["testDetails", "postCode"],
+  B8: ["form6Details", "licenceNumber"],
+  B9: ["form6Details", "businessName"],
+  B11: ["testDetails", "registrationNumber"],
+  B13: ["testDetails", "verificationMark"],
 };
 const FORM6_HOSE_TABLE = {
-  startRow: 18,
+  startRow: 16,
   columns: {
     location: "A",
     verificationDate: "B",
@@ -38,13 +47,17 @@ function setExportStatus(message, isError = false) {
   status.classList.toggle("error", isError);
 }
 
-function buildSpreadsheetFilename() {
+function buildSpreadsheetFilename(partIndex = 0, totalParts = 1) {
   const parts = [
     "form6",
     text(dataset.testDetails?.jobNumber),
     text(dataset.testDetails?.siteName),
     new Date().toISOString().slice(0, 10)
   ].filter(Boolean);
+
+  if (totalParts > 1) {
+    parts.push(`part-${partIndex + 1}`);
+  }
 
   return `${parts.join("-")}.xlsx`;
 }
@@ -58,25 +71,35 @@ async function exportForm6Spreadsheet() {
   setExportStatus("Generating spreadsheet...");
 
   try {
-    const workbook = await loadTemplateWorkbook();
-    const worksheet = workbook.getWorksheet(FORM6_SHEET_NAME) || workbook.worksheets[0];
-    if (!worksheet) {
-      throw new Error("Template workbook did not contain any worksheets.");
+    const tableRows = hoseRows();
+    const rowChunks = chunkRows(tableRows, MAX_HOSE_ROWS_PER_SPREADSHEET);
+
+    for (let index = 0; index < rowChunks.length; index += 1) {
+      const workbook = await loadTemplateWorkbook();
+      const worksheet = workbook.getWorksheet(FORM6_SHEET_NAME) || workbook.worksheets[0];
+      if (!worksheet) {
+        throw new Error("Template workbook did not contain any worksheets.");
+      }
+
+      applyForm6FieldCells(worksheet);
+      applyForm6HoseTable(worksheet, rowChunks[index]);
+
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob(
+        [buffer],
+        {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        },
+      );
+
+      downloadBlob(blob, buildSpreadsheetFilename(index, rowChunks.length));
     }
 
-    applyForm6FieldCells(worksheet);
-    applyForm6HoseTable(worksheet, hoseRows());
-
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob(
-      [buffer],
-      {
-        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      },
+    setExportStatus(
+      rowChunks.length > 1
+        ? `Downloaded ${rowChunks.length} spreadsheets.`
+        : "Spreadsheet downloaded.",
     );
-
-    downloadBlob(blob, buildSpreadsheetFilename());
-    setExportStatus("Spreadsheet downloaded.");
   } catch (error) {
     setExportStatus(`Spreadsheet export failed: ${error.message || "unknown error"}`, true);
   }
@@ -108,10 +131,56 @@ function getAtPath(source, path) {
   }, source);
 }
 
+function splitStreetAddress(fullAddress) {
+  const value = text(fullAddress).trim();
+  if (!value) return { streetNumber: "", streetName: "" };
+
+  const match = value.match(/^(\d+[A-Za-z0-9/-]*)\s*(.*)$/);
+  if (!match) {
+    return { streetNumber: "", streetName: value };
+  }
+
+  return {
+    streetNumber: text(match[1]).trim(),
+    streetName: text(match[2]).trim(),
+  };
+}
+
+function chunkRows(rows, chunkSize) {
+  if (!rows.length) return [[]];
+
+  const chunks = [];
+  for (let index = 0; index < rows.length; index += chunkSize) {
+    chunks.push(rows.slice(index, index + chunkSize));
+  }
+  return chunks;
+}
+
+function formatPerformanceCode(value) {
+  const code = String(value || "").trim().toUpperCase();
+  return PERFORMANCE_CODE_LABELS[code] || text(value);
+}
+
+function buildBusinessName() {
+  return [
+    text(dataset.testDetails?.operator),
+    text(dataset.testDetails?.siteName),
+    text(dataset.testDetails?.siteNumber),
+  ].filter(Boolean).join(" - ");
+}
+
 function applyForm6FieldCells(worksheet) {
   Object.entries(FORM6_DATA_CELLS).forEach(([cellRef, datasetPath]) => {
     worksheet.getCell(cellRef).value = text(getAtPath(dataset, datasetPath));
   });
+
+  worksheet.getCell("B10").value = buildBusinessName();
+  worksheet.getCell("G10").value = "Fuel Retail";
+
+  const { streetNumber, streetName } = splitStreetAddress(dataset.testDetails?.streetAddress);
+  worksheet.getCell("B12").value = streetNumber;
+  worksheet.getCell("C12").value = streetName;
+  worksheet.getCell("G12").value = "N";
 }
 
 function applyForm6HoseTable(worksheet, rows) {
@@ -240,7 +309,7 @@ function hoseRows() {
         serialNumber: hoseSerial,
         nmiPattern: text(instrument.nmiPatternApproval),
         capacity: text(hose.qmax),
-        performanceCode: text(hose.measureCheck?.performanceCode)
+        performanceCode: formatPerformanceCode(hose.measureCheck?.performanceCode),
       });
     });
   });
