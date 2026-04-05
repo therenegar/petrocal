@@ -126,7 +126,7 @@ document.querySelectorAll('a[href="report.html"], a[href="form6.html"]').forEach
 });
 
 document.getElementById("clearDatasetBtn").addEventListener("click", () => {
-  const confirmed = window.confirm("Start a new worksheet? This clears all locally saved Petrocal data in this browser.");
+  const confirmed = window.confirm("Start a new worksheet?\nWARNING: You will loose everything in the current worksheet, unless you've clicked Save to download the data file.");
   if (!confirmed) return;
   clearDatasetAndResetUi();
 });

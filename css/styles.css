@@ -313,6 +313,11 @@ textarea {
   cursor: pointer;
 }
 
+select option {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 1rem;
+}
+
 input:focus, select:focus, textarea:focus {
   outline: 2px solid gold;
 }
