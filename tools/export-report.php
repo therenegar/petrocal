@@ -69,8 +69,32 @@ function outputExcelWorkbook(string $html, string $filename): void
     exit;
 }
 
+
+function loadDompdfAutoloader(): void
+{
+    if (class_exists('Dompdf\Dompdf')) {
+        return;
+    }
+
+    $autoloadCandidates = [
+        __DIR__ . '/vendor/autoload.php',
+        dirname(__DIR__) . '/vendor/autoload.php',
+    ];
+
+    foreach ($autoloadCandidates as $autoloadFile) {
+        if (is_file($autoloadFile)) {
+            require_once $autoloadFile;
+            if (class_exists('Dompdf\Dompdf')) {
+                return;
+            }
+        }
+    }
+}
+
 function outputPdfDocument(string $html, string $filename): void
 {
+    loadDompdfAutoloader();
+
     if (!class_exists('Dompdf\\Dompdf')) {
         sendJsonError('PDF export requires Dompdf to be installed on the PHP host.', 501);
     }
