@@ -701,7 +701,36 @@ function renderTestDetails() {
     ["Verifier's name", "verifierName", "text", null, "field-medium"],
     ["Registration number", "registrationNumber", "text", null, "field-small"],
     ["Verification mark", "verificationMark", "text", null, "field-small"],
-    ["Operator/owner", "operator", "select", ["ampol", "bp", "shell", "liberty", "united", "other"], "field-medium"],
+    [
+      "Operator/owner",
+      "operator",
+      "select",
+      [
+        "Ampol",
+        "BP",
+        "Caltex (Chevron)",
+        "EG Fuel",
+        "Mobil (7-Eleven)",
+        "Shell (VIVA)",
+        "OTR (VIVA)",
+        "Liberty Oil",
+        "United",
+        "Astron",
+        "APCO",
+        "Costco",
+        "Freedom",
+        "Gull",
+        "IOR",
+        "Matilda",
+        "Metro Fuel",
+        "Pacific Petroleum",
+        "Pearl Energy",
+        "Sinopec",
+        "Speedway",
+        "X-Convenience"
+      ],
+      "field-medium"
+    ],
     ["Maximum permissible error (MPE)", "mpe", "number", null, "field-small"],
     ["Site name", "siteName", "text", null, "field-medium"],
     ["Site number", "siteNumber", "text", null, "field-small"],
@@ -996,7 +1025,7 @@ function renderInstruments() {
     span.textContent = question;
     const select = document.createElement("select");
     select.classList.add("field-small");
-    ["", "yes", "no", "N/A"].forEach((value) => select.append(new Option(value, value)));
+    ["", "Yes", "No", "N/A"].forEach((value) => select.append(new Option(value, value)));
     select.value = instrument.inspection?.[key] || "";
     bindInput(select, ["instruments", index, "inspection", key]);
     inspection.append(span, select);
@@ -1496,7 +1525,7 @@ function renderCompliancePanel(hose) {
     const select = document.createElement("select");
     select.classList.add("field-small");
     setSchemaNameAttr(select, key);
-    ["", "pass", "fail", "N/A"].forEach((option) => select.append(new Option(option, option)));
+    ["", "Pass", "Fail", "N/A"].forEach((option) => select.append(new Option(option, option)));
     select.value = hose.compliance[key] || "";
     select.addEventListener("change", () => {
       hose.compliance[key] = select.value;
