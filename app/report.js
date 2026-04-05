@@ -158,13 +158,14 @@ function renderHose(hose, index, instrument, dataset) {
   section.className = "report-subsection";
   const heading = document.createElement("h4");
   heading.textContent = `${text(hose.number, "No POS")}/${text(hose.grade, "No grade")}`;
+  heading.classList.add("grade-themed");
+  const headingGradeKey = gradeStyleKey(hose.grade);
+  if (headingGradeKey) heading.dataset.grade = headingGradeKey;
   section.append(heading);
 
   const details = document.createElement("dl");
   details.className = "report-grid";
   const rows = [
-    ["POS Number", hose.number],
-    ["Grade", hose.grade],
     [
       "Hose serial",
       `${text(instrument.serialNumber, "")}${instrument.serialNumber && hose.hoseSerialSuffix ? "-" : ""}${text(hose.hoseSerialSuffix, "")}` || "—"
@@ -183,11 +184,6 @@ function renderHose(hose, index, instrument, dataset) {
     dt.textContent = label;
     const dd = document.createElement("dd");
     dd.textContent = text(value);
-    if (label === "Grade") {
-      dd.classList.add("grade-themed");
-      const key = gradeStyleKey(value);
-      if (key) dd.dataset.grade = key;
-    }
     decorateOutcomeElement(dd, value);
     details.append(dt, dd);
   });
