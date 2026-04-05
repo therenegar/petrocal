@@ -6,20 +6,19 @@ let dataset = normalizeDataset(loadDataset() || {});
 const FORM6_TEMPLATE_URL = "ref/form-6-verification-notification-template.xlsx";
 const FORM6_SHEET_NAME = "Form 6";
 const FORM6_DATA_CELLS = {
-  B3: ["testDetails", "operator"],
-  B4: ["testDetails", "streetAddress"],
-  B5: ["testDetails", "suburb"],
-  B6: ["testDetails", "state"],
-  B7: ["testDetails", "postCode"],
-  B8: ["form6Details", "licenceNumber"],
-  B9: ["form6Details", "businessName"],
-  B10: ["form6Details", "abnNumber"],
-  B11: ["testDetails", "registrationNumber"],
-  B12: ["testDetails", "verifierName"],
-  B13: ["testDetails", "verificationMark"],
+  B10: ["testDetails", "operator"],
+  C12: ["testDetails", "streetAddress"],
+  D12: ["testDetails", "suburb"],
+  E12: ["testDetails", "postCode"],
+  B14: ["form6Details", "licenceNumber"],
+  C14: ["form6Details", "businessName"],
+  D14: ["form6Details", "abnNumber"],
+  B16: ["testDetails", "registrationNumber"],
+  C16: ["testDetails", "verifierName"],
+  D16: ["testDetails", "verificationMark"],
 };
 const FORM6_HOSE_TABLE = {
-  startRow: 16,
+  startRow: 18,
   columns: {
     location: "A",
     verificationDate: "B",
