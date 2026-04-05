@@ -7,6 +7,7 @@
   --paper: #fffef7;
   --active-tab: #ff9f1c;
   --accent: #00d1ff;
+  --heading: #a985ff;
   --good: #8eff78;
   --bad: #ff8b8b;
   --shadow: 6px 6px 0 var(--line);
@@ -70,10 +71,24 @@ hr {
   margin-bottom: 2rem;
 }
 
+.launch-card h2 {
+  background: var(--active-tab);
+  padding: .5rem 1rem;
+  margin-top: 2rem;
+  border: 6px double var(--line);
+}
+
+.launch-card h2:first-child {
+  margin-top: 0;
+}
+
 .launch-card h4 {
   clear: both;
 }
 
+.launch-card .intro p {
+  margin-bottom: 2rem;
+}
 
 .launch-actions {
   display: grid;
