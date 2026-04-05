@@ -15,9 +15,10 @@
         <a class="btn nav-link-btn" href="app.html">← Back to Test</a>
         <span class="separator">|</span>
         <button class="btn nav-link-btn" type="button" onclick="window.print()">Print</button>
-        <a class="btn nav-link-btn" href="/tools/generate-pdf.php">Export PDF</a>
-        <a class="btn nav-link-btn" href="/tools/generate-word.php">Export DOC</a>
-        <a class="btn nav-link-btn" href="/tools/generate-word.php">Export XLS</a>
+        <button id="exportPdfBtn" class="btn nav-link-btn" type="button">Export PDF</button>
+        <button id="exportDocBtn" class="btn nav-link-btn" type="button">Export DOC</button>
+        <button id="exportXlsBtn" class="btn nav-link-btn" type="button">Export XLS</button>
+        <span id="exportStatus" class="export-status" role="status" aria-live="polite"></span>
       </div>
       <div class="header-right"></div>
     </header>
@@ -32,6 +33,9 @@
       <p>&copy; Copyright 2026 Ben Renegar</p>
     </footer>
 
+    <script>
+      window.PETROCAL_EXPORT_BASE_URL = "http://localhost:8080/petrocal/tools";
+    </script>
     <script src="app/report.js"></script>
   </body>
 </html>
