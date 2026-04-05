@@ -661,11 +661,11 @@ function renderMoveControls(onLeft, onRight) {
   wrap.className = "move-controls";
   const left = document.createElement("button");
   left.className = "btn small-btn";
-  applyButtonIcon(left, "res/icon-move-left.svg", "Move left");
+  applyButtonIcon(left, "res/icon-move-left.svg", "Move");
   left.addEventListener("click", onLeft);
   const right = document.createElement("button");
   right.className = "btn small-btn";
-  applyButtonIcon(right, "res/icon-move-right.svg", "Move right");
+  applyButtonIcon(right, "res/icon-move-right.svg", "Move");
   right.addEventListener("click", onRight);
   wrap.append(left, right);
   return wrap;
@@ -942,8 +942,8 @@ function renderInstruments() {
         addAction: addInstrument,
         removeAction: () => removeInstrument(VIEW_STATE.instrumentsTab),
         extraActions: [
-          { label: "Move left", icon: "res/icon-move-left.svg", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, -1) },
-          { label: "Move right", icon: "res/icon-move-right.svg", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, 1) }
+          { label: "Move", icon: "res/icon-move-left.svg", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, -1) },
+          { label: "Move", icon: "res/icon-move-right.svg", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, 1) }
         ]
       }
     )
@@ -1104,8 +1104,8 @@ function renderHoses() {
       },
       {
         extraActions: [
-          { label: "Move left", icon: "res/icon-move-left.svg", onClick: () => moveHose(instrument, hoseKey, -1) },
-          { label: "Move right", icon: "res/icon-move-right.svg", onClick: () => moveHose(instrument, hoseKey, 1) }
+          { label: "Move", icon: "res/icon-move-left.svg", onClick: () => moveHose(instrument, hoseKey, -1) },
+          { label: "Move", icon: "res/icon-move-right.svg", onClick: () => moveHose(instrument, hoseKey, 1) }
         ]
       }
     )
