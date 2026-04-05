@@ -90,6 +90,37 @@ function renderKeyValueGrid(title, rows) {
   return section;
 }
 
+function renderTwoColumnKeyValueGrid(title, leftRows, rightRows) {
+  const section = document.createElement("section");
+  section.className = "report-section";
+
+  const heading = document.createElement("h2");
+  heading.textContent = title;
+  section.append(heading);
+
+  const columns = document.createElement("div");
+  columns.className = "report-two-column-grid";
+
+  [leftRows, rightRows].forEach((rows) => {
+    const grid = document.createElement("dl");
+    grid.className = "report-grid";
+
+    rows.forEach(([label, value]) => {
+      const dt = document.createElement("dt");
+      dt.textContent = label;
+      const dd = document.createElement("dd");
+      dd.textContent = text(value);
+      decorateOutcomeElement(dd, value);
+      grid.append(dt, dd);
+    });
+
+    columns.append(grid);
+  });
+
+  section.append(columns);
+  return section;
+}
+
 function renderMeasure(measure, index) {
   const section = document.createElement("section");
   section.className = "report-subsection";
@@ -368,7 +399,7 @@ function renderReport() {
   }
 
   root.replaceChildren(
-    renderKeyValueGrid("Test Details", [
+    renderTwoColumnKeyValueGrid("Test Details", [
       ["Date of test", pick(dataset, ["testDetails", "date"], "")],
       ["Job number", pick(dataset, ["testDetails", "jobNumber"], "")],
       ["Type", pick(dataset, ["testDetails", "type"], "")],
@@ -376,7 +407,8 @@ function renderReport() {
       ["Registration number", pick(dataset, ["testDetails", "registrationNumber"], "")],
       ["Verification mark", pick(dataset, ["testDetails", "verificationMark"], "")],
       ["Operator", pick(dataset, ["testDetails", "operator"], "")],
-      ["Maximum permissible error (MPE)", pick(dataset, ["testDetails", "mpe"], "")],
+      ["Maximum permissible error (MPE)", pick(dataset, ["testDetails", "mpe"], "")]
+    ], [
       ["Site name", pick(dataset, ["testDetails", "siteName"], "")],
       ["Site number", pick(dataset, ["testDetails", "siteNumber"], "")],
       ["Contact on site", pick(dataset, ["testDetails", "contactOnSite"], "")],
