@@ -290,6 +290,17 @@ hr {
   max-width: none;
 }
 
+.instrument-tab-columns {
+  display: grid;
+  grid-template-columns: minmax(420px, 1fr) minmax(360px, 1fr);
+  gap: 2rem;
+  align-items: start;
+}
+
+.instrument-tab-column .form-grid {
+  max-width: none;
+}
+
 input,
 select,
 textarea {
@@ -942,6 +953,11 @@ textarea {
 
   .inspection-grid {
     grid-template-columns: 1fr;
+  }
+
+  .instrument-tab-columns {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 
   .data-table th,

@@ -954,6 +954,12 @@ function renderInstruments() {
 
   const card = document.createElement("section");
   card.className = "card";
+  const columns = document.createElement("div");
+  columns.className = "instrument-tab-columns";
+  const detailsColumn = document.createElement("div");
+  detailsColumn.className = "instrument-tab-column";
+  const inspectionColumn = document.createElement("div");
+  inspectionColumn.className = "instrument-tab-column";
   const form = document.createElement("div");
   form.className = "form-grid";
 
@@ -1035,8 +1041,7 @@ function renderInstruments() {
   typeSelect.value = instrument.type || "";
   bindInput(typeSelect, ["instruments", index, "type"]);
   form.append(typeSpan, typeSelect);
-
-  card.append(form, document.createElement("hr"));
+  detailsColumn.append(form);
 
   const inspectionTitle = document.createElement("h4");
   inspectionTitle.textContent = "Visual Inspection (clause 3.1)";
@@ -1055,7 +1060,9 @@ function renderInstruments() {
     inspection.append(span, select);
   });
 
-  card.append(inspectionTitle, inspection);
+  inspectionColumn.append(inspectionTitle, inspection);
+  columns.append(detailsColumn, inspectionColumn);
+  card.append(columns);
   root.append(card);
   instrumentsPanel.replaceChildren(root);
 }
