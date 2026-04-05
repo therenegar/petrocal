@@ -647,7 +647,7 @@ function renderInstrument(instrument, index, dataset) {
 
 function createReportIntro() {
   const intro = document.createElement("p");
-  intro.textContent = "A preview of the Test Report is shown below. Click Print in your browser to print a specially formatted print version, or turn into a PDF file.";
+  intro.textContent = "A preview of the Test Report is shown below. Click Print Report (or the Print function in your browser) to output a specially formatted print version, or turn into a PDF file.";
   return intro;
 }
 

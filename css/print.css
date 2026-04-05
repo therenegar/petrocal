@@ -69,13 +69,17 @@ header, .brand-bar, .top-bar, footer {
   border-radius: 4px;
 }
 
-#reportContent > section:nth-child(3) {
+#reportContent > section:nth-child(4) {
    break-before: page;
 }
 
 .grade-themed {
   background: black !important;
   color: white !important;
+}
+
+.report-grid dd {
+  background: gainsboro;
 }
 
 .report-grid dt {
@@ -94,6 +98,10 @@ header, .brand-bar, .top-bar, footer {
 
 .report-section h4:first-child {
   margin-bottom: .5em;
+}
+
+.form6-preview-note, .report-output > p:first-child {
+  display: none;
 }
 
 

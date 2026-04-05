@@ -466,6 +466,9 @@ textarea {
   box-shadow: none;
 }
 
+
+
+
 .report-subsection {
   background: whitesmoke;
   padding: 0.8rem;
@@ -571,7 +574,7 @@ textarea {
   font-family: "JetBrains Mono", monospace;
   margin: 0;
   font-size: 0.9rem;
-  background: var(--cream);
+  background: var(--paper);
   line-height: 1.5rem;
   padding-left: .3rem;
 }
@@ -894,7 +897,7 @@ textarea {
   background: var(--accent);
 }
 
-.form6-preview-note {
+.form6-preview-note, .report-output > p:first-child {
   background: var(--good);
   padding: 1rem;
   margin-bottom: 2rem;

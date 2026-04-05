@@ -692,7 +692,7 @@ function renderTabbedHeader(tabs, activeIndex, onChange, options = {}) {
   if (duplicateAction) {
     const duplicate = document.createElement("button");
     duplicate.className = "btn small-btn";
-    duplicate.textContent = "Duplicate";
+    applyButtonIcon(duplicate, "res/icon-dupe.svg", "Duplicate");
     duplicate.addEventListener("click", duplicateAction);
     actionsWrap.append(duplicate);
   }
@@ -727,11 +727,11 @@ function renderMoveControls(onLeft, onRight) {
   wrap.className = "move-controls";
   const left = document.createElement("button");
   left.className = "btn small-btn";
-  applyButtonIcon(left, "res/icon-move-left.svg", "Move");
+  applyButtonIcon(left, "res/icon-move-left.svg", "");
   left.addEventListener("click", onLeft);
   const right = document.createElement("button");
   right.className = "btn small-btn";
-  applyButtonIcon(right, "res/icon-move-right.svg", "Move");
+  applyButtonIcon(right, "res/icon-move-right.svg", "");
   right.addEventListener("click", onRight);
   wrap.append(left, right);
   return wrap;
@@ -1081,8 +1081,8 @@ function renderInstruments() {
         duplicateAction: () => duplicateInstrument(VIEW_STATE.instrumentsTab),
         removeAction: () => removeInstrument(VIEW_STATE.instrumentsTab),
         extraActions: [
-          { label: "Move", icon: "res/icon-move-left.svg", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, -1) },
-          { label: "Move", icon: "res/icon-move-right.svg", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, 1) }
+          { label: "", icon: "res/icon-move-left.svg", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, -1) },
+          { label: "", icon: "res/icon-move-right.svg", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, 1) }
         ]
       }
     )
