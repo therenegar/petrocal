@@ -1,7 +1,6 @@
-const STORAGE_KEY = "petrocal.dataset.v2";
+const STORAGE_KEY = "petrocal.dataset.v3";
 const REPORT_SESSION_KEY = "petrocal.report.dataset";
 const IMPORT_SESSION_KEY = "petrocal.start.import.dataset";
-const LEGACY_STORAGE_KEY = "petrocal.dataset.v1";
 
 const VIEW_STATE = {
   measuresTab: 0,
@@ -47,7 +46,7 @@ const PERFORMANCE_CODES = [
 ];
 
 const defaultDataset = () => ({
-  version: 2,
+  version: 3,
   testDetails: {
     date: "",
     jobNumber: "",
@@ -60,7 +59,11 @@ const defaultDataset = () => ({
     siteName: "",
     siteNumber: "",
     contactOnSite: "",
-    address: ""
+    streetAddress: "",
+    suburb: "",
+    state: "",
+    postCode: "",
+    comments: ""
   },
   form6Details: {
     licenceNumber: "",
@@ -71,8 +74,13 @@ const defaultDataset = () => ({
   instruments: []
 });
 
+
+const SAMPLE_DATASET = JSON.parse(`{"version":3,"testDetails":{"date":"06/08/2024","jobNumber":54321,"type":"in-service inspection","verifierName":"Johnny Petro","registrationNumber":"VR-01234","verificationMark":"PET1234","operator":"Caltex (Chevron)","mpe":0.3,"siteName":"Caltex Laverton","siteNumber":"223344","contactOnSite":"Luke Smith","streetAddress":"1-11 Little Boundary Road","suburb":"Laverton","state":"VIC","postCode":3026,"comments":"Luke makes a really a good coffee."},"form6Details":{"licenceNumber":"","businessName":"","abnNumber":""},"measures":[{"type":"conical","sightglass":"no","serialNumber":"LMI 101","volume":15,"certificateNumber":"AB112233","certificateExpiry":"27/10/2030"},{"type":"cylindrical","sightglass":"yes","serialNumber":"LMI 202","volume":100,"certificateNumber":"AB334455","certificateExpiry":"1/12/2030"},{"type":"cylindrical","sightglass":"yes","serialNumber":"LMI 303","volume":200,"certificateNumber":"AB667788","certificateExpiry":"15/05/2030"}],"instruments":[{"numbering":"1/2","hoseCount":8,"manufacturer":"Wayne","make":"Helix 6000","modelNumber":"C(WH/LM)44-44R","serialNumber":"40-1007824","manufactureDate":"2018","nmiPatternApproval":"5/6A/232","productsApproved":["Petrol","Diesel","Bio-diesel","Ethanol","DEF/AdBlue"],"type":"Pressurised","inspection":{"q1":"Yes","q2":"Yes","q3":"Yes","q4":"Yes","q5":"Yes","q6":"Yes","q7":"Yes","q8":"Yes","q9":"Yes","q10":"Yes","q11":"Yes","q12":"N/A"},"hoses":[{"number":"1","grade":"ULP91","hoseSerialSuffix":"B1","unitPrice":"219.90","startTote":"941358","endTote":"941478","qmin":"4","qmax":"40","maxRate":"38","measureCheck":{"performanceCode":"C","checks":[{"measureId":"0","vfd":"15.04","vref":15,"efd":"0.27"},{"measureId":"0","vfd":"15.03","vref":15,"efd":"0.20"},{"measureId":"0","vfd":"15.04","vref":15,"efd":"0.27"}]},"verification":{"deliveries":[{"measureId":"0","vfd":"15","vref":15,"efd":"0.00"},{"measureId":"0","vfd":"14.99","vref":15,"efd":"-0.07"},{"measureId":"0","vfd":"15","vref":15,"efd":"0.00"},{"measureId":"0","vfd":"15","vref":15,"efd":"0.00"}],"preset":{"measureId":"0","vfd":"15.01","vref":15,"efd":"0.07"},"gasElimination":{"measureId":"","vfd":"","vref":15,"efd":"","ed":""},"antiDrainMl":"12","reverification":"ABC9876"},"compliance":{"q1":"Pass","q2":"Pass","q3":"Pass","q4":"Pass","q5":"Pass","q6":"Pass","overall":"Pass"}},{"number":"1","grade":"E-10","hoseSerialSuffix":"B2","unitPrice":"217.90","startTote":"390222","endTote":"390267","qmin":"4","qmax":"40","maxRate":"40","measureCheck":{"performanceCode":"B","checks":[{"measureId":"0","vfd":"15.01","vref":15,"efd":"0.07"},{"measureId":"0","vfd":"15.01","vref":15,"efd":"0.07"},{"measureId":"0","vfd":"15.01","vref":15,"efd":"0.07"}]},"verification":{"deliveries":[{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""}],"preset":{"measureId":"","vfd":"","vref":"","efd":""},"gasElimination":{"measureId":"","vfd":"","vref":"","efd":"","ed":""},"antiDrainMl":"","reverification":""},"compliance":{"q1":"Pass","q2":"Pass","q3":"Pass","q4":"Pass","q5":"Pass","q6":"Pass","overall":"Pass"}},{"number":"1","grade":"PULP98","hoseSerialSuffix":"B3","unitPrice":"242.90","startTote":"133740","endTote":"133785","qmin":"4","qmax":"40","maxRate":"40","measureCheck":{"performanceCode":"B","checks":[{"measureId":"0","vfd":"14.98","vref":15,"efd":"-0.13"},{"measureId":"0","vfd":"14.98","vref":15,"efd":"-0.13"},{"measureId":"0","vfd":"14.99","vref":15,"efd":"-0.07"}]},"verification":{"deliveries":[{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""}],"preset":{"measureId":"","vfd":"","vref":"","efd":""},"gasElimination":{"measureId":"","vfd":"","vref":"","efd":"","ed":""},"antiDrainMl":"","reverification":""},"compliance":{"q1":"Pass","q2":"Pass","q3":"Pass","q4":"Pass","q5":"Pass","q6":"Pass","overall":"Pass"}},{"number":"1","grade":"Premium Diesel","hoseSerialSuffix":"B4","unitPrice":"192.90","startTote":"573440","endTote":"573740","qmin":"7","qmax":"70","maxRate":"55","measureCheck":{"performanceCode":"B","checks":[{"measureId":"1","vfd":100,"vref":"100.20","efd":"-0.20"},{"measureId":"1","vfd":100,"vref":"100.25","efd":"-0.25"},{"measureId":"1","vfd":100,"vref":"100.20","efd":"-0.20"}]},"verification":{"deliveries":[{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""}],"preset":{"measureId":"","vfd":"","vref":"","efd":""},"gasElimination":{"measureId":"","vfd":"","vref":"","efd":"","ed":""},"antiDrainMl":"","reverification":""},"compliance":{"q1":"Pass","q2":"Pass","q3":"Pass","q4":"Pass","q5":"Pass","q6":"Pass","overall":"Pass"}},{"number":"2","grade":"ULP91","hoseSerialSuffix":"A1","unitPrice":"219.90","startTote":"326876","endTote":"326921","qmin":"4","qmax":"40","maxRate":"38","measureCheck":{"performanceCode":"B","checks":[{"measureId":"0","vfd":"15.01","vref":15,"efd":"0.07"},{"measureId":"0","vfd":"15.02","vref":15,"efd":"0.13"},{"measureId":"0","vfd":"15.02","vref":15,"efd":"0.13"}]},"verification":{"deliveries":[{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""}],"preset":{"measureId":"","vfd":"","vref":"","efd":""},"gasElimination":{"measureId":"","vfd":"","vref":"","efd":"","ed":""},"antiDrainMl":"","reverification":""},"compliance":{"q1":"Pass","q2":"Pass","q3":"Pass","q4":"Pass","q5":"Pass","q6":"Pass","overall":"Pass"}},{"number":"2","grade":"E-10","hoseSerialSuffix":"A2","unitPrice":"217.90","startTote":"793989","endTote":"794034","qmin":"4","qmax":"40","maxRate":"40","measureCheck":{"performanceCode":"B","checks":[{"measureId":"0","vfd":"15.02","vref":15,"efd":"0.13"},{"measureId":"0","vfd":"15.02","vref":15,"efd":"0.13"},{"measureId":"0","vfd":"15.03","vref":15,"efd":"0.20"}]},"verification":{"deliveries":[{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""}],"preset":{"measureId":"","vfd":"","vref":"","efd":""},"gasElimination":{"measureId":"","vfd":"","vref":"","efd":"","ed":""},"antiDrainMl":"","reverification":""},"compliance":{"q1":"Pass","q2":"Pass","q3":"Pass","q4":"Pass","q5":"Pass","q6":"Pass","overall":"Pass"}},{"number":"2","grade":"PULP98","hoseSerialSuffix":"A3","unitPrice":"242.90","startTote":"262140","endTote":"262260","qmin":"4","qmax":"40","maxRate":"40","measureCheck":{"performanceCode":"D","checks":[{"measureId":"0","vfd":"15.06","vref":15,"efd":"0.40"},{"measureId":"0","vfd":"15.05","vref":15,"efd":"0.33"},{"measureId":"0","vfd":"15.08","vref":15,"efd":"0.53"}]},"verification":{"deliveries":[{"measureId":"0","vfd":"15","vref":15,"efd":"0.00"},{"measureId":"0","vfd":"15","vref":15,"efd":"0.00"},{"measureId":"0","vfd":"15","vref":15,"efd":"0.00"},{"measureId":"0","vfd":"15.01","vref":15,"efd":"0.07"}],"preset":{"measureId":"0","vfd":"15.02","vref":15,"efd":"0.13"},"gasElimination":{"measureId":"","vfd":"","vref":"","efd":"","ed":""},"antiDrainMl":"8","reverification":"ABC9876"},"compliance":{"q1":"Pass","q2":"Pass","q3":"Pass","q4":"Pass","q5":"Pass","q6":"Pass","overall":"Pass"}},{"number":"2","grade":"Premium Diesel","hoseSerialSuffix":"A4","unitPrice":"192.90","startTote":"406844","endTote":"407144","qmin":"7","qmax":"70","maxRate":"55","measureCheck":{"performanceCode":"B","checks":[{"measureId":"1","vfd":100,"vref":"100.10","efd":"-0.10"},{"measureId":"1","vfd":100,"vref":"100.10","efd":"-0.10"},{"measureId":"1","vfd":100,"vref":"100.15","efd":"-0.15"}]},"verification":{"deliveries":[{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""},{"measureId":"","vfd":"","vref":"","efd":""}],"preset":{"measureId":"","vfd":"","vref":"","efd":""},"gasElimination":{"measureId":"","vfd":"","vref":"","efd":"","ed":""},"antiDrainMl":"","reverification":""},"compliance":{"q1":"Pass","q2":"Pass","q3":"Pass","q4":"Pass","q5":"Pass","q6":"Pass","overall":"Pass"}}]}]}`);
+
 let dataset = loadLocalDataset() || defaultDataset();
-const START_MODE = new URLSearchParams(window.location.search).get("start") || "resume";
+const urlParams = new URLSearchParams(window.location.search);
+const START_MODE = urlParams.get("start") || "resume";
+const LOAD_MODE = urlParams.get("load") || "";
 
 const tabButtons = [...document.querySelectorAll(".tab")];
 const tabPanels = [...document.querySelectorAll(".tab-panel")];
@@ -134,7 +142,7 @@ function selectMainTab(tabId) {
 
 function loadLocalDataset() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
+    const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? normalizeDataset(JSON.parse(raw)) : null;
   } catch {
     return null;
@@ -174,24 +182,16 @@ function normalizeDataset(input) {
     enforceHoseCount(safe);
     return safe;
   });
-  normalized.measures = normalized.measures.map((measure) => {
-    const convertedType = Array.isArray(measure?.type) ? (measure.type.includes("cylindrical") ? "cylindrical" : "conical") : (measure?.type || "");
-    const convertedSightglass = Array.isArray(measure?.type)
-      ? (measure.type.includes("sightglass") ? "yes" : "no")
-      : (measure?.sightglass || "no");
-    return {
-      type: convertedType,
-      sightglass: convertedSightglass,
-      serialNumber: "",
-      volume: "",
-      certificateNumber: "",
-      certificateExpiry: "",
-      ...measure,
-      type: convertedType,
-      sightglass: convertedSightglass,
-      certificateExpiry: toDisplayDate(measure?.certificateExpiry || "")
-    };
-  });
+  normalized.measures = normalized.measures.map((measure) => ({
+    type: "",
+    sightglass: "no",
+    serialNumber: "",
+    volume: "",
+    certificateNumber: "",
+    certificateExpiry: "",
+    ...measure,
+    certificateExpiry: toDisplayDate(measure?.certificateExpiry || "")
+  }));
 
   return normalized;
 }
@@ -215,7 +215,8 @@ function normalizeHose(hose = {}) {
       deliveries: [emptyDelivery(), emptyDelivery(), emptyDelivery(), emptyDelivery()],
       preset: emptyDelivery(),
       gasElimination: { ...emptyDelivery(), ed: "" },
-      antiDrainMl: ""
+      antiDrainMl: "",
+      reverification: ""
     },
     compliance: { ...Object.fromEntries(COMPLIANCE_QUESTIONS.map((_, idx) => [`q${idx + 1}`, ""])), overall: "Pass" }
   };
@@ -268,7 +269,20 @@ function updateAt(path, value) {
   persistLocalDataset();
 }
 
+function schemaNameFromPath(path) {
+  for (let i = path.length - 1; i >= 0; i -= 1) {
+    if (typeof path[i] === "string") return path[i];
+  }
+  return "";
+}
+
+function setSchemaNameAttr(control, schemaName) {
+  if (!schemaName) return;
+  control.dataset.schemaName = schemaName;
+}
+
 function bindInput(input, path, parser = (v) => v, rerender = true) {
+  setSchemaNameAttr(input, schemaNameFromPath(path));
   input.addEventListener("change", (event) => {
     updateAt(path, parser(event.target.value));
     if (rerender) renderAllPanels();
@@ -509,6 +523,29 @@ function validateField(input) {
   }
 }
 
+function applySelectOutcomeStyle(select) {
+  const value = String(select.value || "").trim().toLowerCase();
+  select.classList.remove("select-good", "select-bad");
+  if (value === "yes" || value === "pass") {
+    select.classList.add("select-good");
+    return;
+  }
+  if (value === "no" || value === "fail") {
+    select.classList.add("select-bad");
+  }
+}
+
+function attachOutcomeSelectStyling() {
+  const selects = document.querySelectorAll("#appMain select");
+  selects.forEach((select) => {
+    if (!select.dataset.outcomeStyleBound) {
+      select.addEventListener("change", () => applySelectOutcomeStyle(select));
+      select.dataset.outcomeStyleBound = "true";
+    }
+    applySelectOutcomeStyle(select);
+  });
+}
+
 function attachGlobalValidation() {
   const fields = document.querySelectorAll("#appMain input, #appMain select, #appMain textarea");
   fields.forEach((input) => {
@@ -670,12 +707,45 @@ function renderTestDetails() {
     ["Verifier's name", "verifierName", "text", null, "field-medium"],
     ["Registration number", "registrationNumber", "text", null, "field-small"],
     ["Verification mark", "verificationMark", "text", null, "field-small"],
-    ["Operator/owner", "operator", "select", ["ampol", "bp", "shell", "liberty", "united", "other"], "field-medium"],
+    [
+      "Operator/owner",
+      "operator",
+      "select",
+      [
+        "Ampol",
+        "BP",
+        "Caltex (Chevron)",
+        "EG Fuel",
+        "Mobil (7-Eleven)",
+        "Shell (VIVA)",
+        "OTR (VIVA)",
+        "Liberty Oil",
+        "United",
+        "Astron",
+        "APCO",
+        "Costco",
+        "Freedom",
+        "Gull",
+        "IOR",
+        "Matilda",
+        "Metro Fuel",
+        "Pacific Petroleum",
+        "Pearl Energy",
+        "Sinopec",
+        "Speedway",
+        "X-Convenience"
+      ],
+      "field-medium"
+    ],
     ["Maximum permissible error (MPE)", "mpe", "number", null, "field-small"],
     ["Site name", "siteName", "text", null, "field-medium"],
     ["Site number", "siteNumber", "text", null, "field-small"],
     ["Contact on site", "contactOnSite", "text", null, "field-medium"],
-    ["Address", "address", "textarea", null, "field-large"]
+    ["Street Address", "streetAddress", "text", null, "field-large"],
+    ["Suburb", "suburb", "text", null, "field-medium"],
+    ["State", "state", "select", ["ACT", "NSW", "NT", "QLD", "TAS", "VIC", "WA"], "field-small"],
+    ["Post Code", "postCode", "number", null, "field-small"],
+    ["Comments", "comments", "textarea", null, "field-large"]
   ];
 
   const form = document.createElement("div");
@@ -698,6 +768,11 @@ function renderTestDetails() {
       if (key === "date") control.placeholder = "DD/MM/YYYY";
       if (key === "mpe") control.step = "0.1";
       if (key === "jobNumber") control.min = 0;
+      if (key === "postCode") {
+        control.min = 1000;
+        control.max = 9999;
+        control.step = 1;
+      }
       if (key === "date") control.dataset.validate = "date";
       if (type === "number") control.dataset.validate = "number";
     }
@@ -706,6 +781,12 @@ function renderTestDetails() {
     control.value = key === "date" ? toDisplayDate(dataset.testDetails[key]) : (dataset.testDetails[key] ?? "");
     bindInput(control, ["testDetails", key], (value) => {
       if (key === "date") return toDisplayDate(value);
+      if (key === "postCode") {
+        if (value === "") return "";
+        const numeric = Math.trunc(Number(value));
+        if (Number.isNaN(numeric)) return "";
+        return Math.max(1000, Math.min(9999, numeric));
+      }
       return type === "number" ? (value === "" ? "" : Number(value)) : value;
     });
 
@@ -757,6 +838,7 @@ function renderMeasures() {
   const typeSelect = document.createElement("select");
   ["", "conical", "cylindrical"].forEach((option) => typeSelect.append(new Option(option, option)));
   typeSelect.classList.add("field-medium");
+  setSchemaNameAttr(typeSelect, "type");
   typeSelect.value = current.type || "";
   typeSelect.addEventListener("change", () => {
     updateAt(["measures", VIEW_STATE.measuresTab, "type"], typeSelect.value);
@@ -769,6 +851,7 @@ function renderMeasures() {
   sightglassSpan.textContent = "Sightglass?";
   const sightglassSelect = document.createElement("select");
   sightglassSelect.classList.add("field-small");
+  setSchemaNameAttr(sightglassSelect, "sightglass");
   sightglassSelect.append(new Option("", ""));
   sightglassSelect.append(new Option("Yes", "yes"));
   sightglassSelect.append(new Option("No", "no"));
@@ -909,6 +992,7 @@ function renderInstruments() {
   productsSpan.textContent = "Products approved for delivery";
   const productsSelect = document.createElement("select");
   productsSelect.classList.add("field-medium");
+  setSchemaNameAttr(productsSelect, "productsApproved");
   productsSelect.multiple = true;
   productsSelect.size = 6;
   ["Petrol", "Diesel", "Bio-diesel", "Ethanol", "DEF/AdBlue", "Kerosene"].forEach((option) => {
@@ -947,7 +1031,7 @@ function renderInstruments() {
     span.textContent = question;
     const select = document.createElement("select");
     select.classList.add("field-small");
-    ["", "yes", "no", "N/A"].forEach((value) => select.append(new Option(value, value)));
+    ["", "Yes", "No", "N/A"].forEach((value) => select.append(new Option(value, value)));
     select.value = instrument.inspection?.[key] || "";
     bindInput(select, ["instruments", index, "inspection", key]);
     inspection.append(span, select);
@@ -973,6 +1057,7 @@ function renderHoses() {
   enforceHoseCount(instrument);
 
   const instrumentSelector = document.createElement("select");
+  setSchemaNameAttr(instrumentSelector, "instruments");
   dataset.instruments.forEach((ins, index) => instrumentSelector.append(new Option(instrumentLabel(ins, index), String(index))));
   instrumentSelector.value = String(VIEW_STATE.hosesInstrumentTab);
   instrumentSelector.addEventListener("change", () => {
@@ -1020,6 +1105,7 @@ function renderHoses() {
   posSpan.textContent = "POS Number";
   const posSelect = document.createElement("select");
   posSelect.classList.add("field-tiny");
+  setSchemaNameAttr(posSelect, "number");
   posSelect.append(new Option("", ""));
   parseInstrumentPositions(instrument).forEach((value) => posSelect.append(new Option(value, value)));
   posSelect.value = hose.number || "";
@@ -1034,6 +1120,7 @@ function renderHoses() {
   gradeSpan.textContent = "Grade";
   const grade = document.createElement("select");
   grade.classList.add("field-medium");
+  setSchemaNameAttr(grade, "grade");
   const gradeOptions = ["", "ULP91", "PULP95", "PULP98", "E-10", "E85", "OPAL 91", "Diesel", "Premium Diesel", "Bio Diesel", "AdBlue", "Kerosene"];
   for (const value of gradeOptions) {
     grade.append(new Option(value, value));
@@ -1058,6 +1145,7 @@ function renderHoses() {
   const suffix = document.createElement("input");
   suffix.type = "text";
   suffix.classList.add("field-tiny");
+  setSchemaNameAttr(suffix, "hoseSerialSuffix");
   suffix.value = hose.hoseSerialSuffix || "";
   suffix.addEventListener("change", () => {
     hose.hoseSerialSuffix = suffix.value;
@@ -1087,6 +1175,7 @@ function renderHoses() {
     const input = document.createElement("input");
     input.type = type;
     input.classList.add("field-small");
+    setSchemaNameAttr(input, key);
     if (type === "number") input.dataset.validate = "number";
     input.value = hose[key] ?? "";
     input.addEventListener("change", () => {
@@ -1101,6 +1190,7 @@ function renderHoses() {
   perfSpan.textContent = "Performance code";
   const perf = document.createElement("select");
   perf.classList.add("field-large");
+  setSchemaNameAttr(perf, "performanceCode");
   perf.append(new Option("", ""));
   PERFORMANCE_CODES.forEach((item) => perf.append(new Option(item.label, item.code)));
   perf.value = hose.measureCheck.performanceCode || "";
@@ -1159,6 +1249,7 @@ function visibleHoseTabs(performanceCode) {
 function renderMeasureSelect(value, onChange) {
   const select = document.createElement("select");
   select.classList.add("field-small");
+  setSchemaNameAttr(select, "measureId");
   select.append(new Option("", ""));
   dataset.measures.forEach((measure, index) => {
     select.append(new Option(measureLabel(measure, index), String(index)));
@@ -1322,9 +1413,10 @@ function renderVerificationPanel(hose, instrumentType) {
   table.className = "data-table";
   table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th>EFD (%)<br/>Accuracy<br/>(clause 4.8)</th><th>ED (%)</th></tr></thead>";
   const body = document.createElement("tbody");
+  const isSuctionSystem = String(instrumentType || "").trim().toLowerCase() === "suction";
 
   verificationRows(hose).forEach(([labelText, rowObj], rowIndex) => {
-    if (labelText === "Gas Elimination Delivery" && instrumentType !== "Suction") return;
+    if (labelText.startsWith("Gas Elimination Delivery") && !isSuctionSystem) return;
     const tr = document.createElement("tr");
     const label = document.createElement("td");
     label.textContent = labelText;
@@ -1373,6 +1465,7 @@ function renderVerificationPanel(hose, instrumentType) {
       const input = document.createElement("input");
       input.type = "number";
       input.classList.add("field-small");
+      setSchemaNameAttr(input, "ed");
       input.step = "0.01";
       input.value = rowObj.ed || "";
       input.addEventListener("change", () => {
@@ -1408,13 +1501,26 @@ function renderVerificationPanel(hose, instrumentType) {
   const antiInput = document.createElement("input");
   antiInput.type = "number";
   antiInput.classList.add("field-small");
+  setSchemaNameAttr(antiInput, "antiDrainMl");
   antiInput.value = hose.verification.antiDrainMl || "";
   antiInput.addEventListener("change", () => {
     hose.verification.antiDrainMl = antiInput.value;
     persistLocalDataset();
   });
 
-  meta.append(avgLabel, avgVal, antiLabel, antiInput);
+  const reverificationLabel = document.createElement("span");
+  reverificationLabel.textContent = "Existing verification mark (if reverifying)";
+  const reverificationInput = document.createElement("input");
+  reverificationInput.type = "text";
+  reverificationInput.classList.add("field-medium");
+  setSchemaNameAttr(reverificationInput, "reverification");
+  reverificationInput.value = hose.verification.reverification || "";
+  reverificationInput.addEventListener("change", () => {
+    hose.verification.reverification = reverificationInput.value;
+    persistLocalDataset();
+  });
+
+  meta.append(avgLabel, avgVal, antiLabel, antiInput, reverificationLabel, reverificationInput);
 
   wrap.append(table, meta);
   return wrap;
@@ -1436,7 +1542,8 @@ function renderCompliancePanel(hose) {
     span.textContent = question;
     const select = document.createElement("select");
     select.classList.add("field-small");
-    ["", "pass", "fail", "N/A"].forEach((option) => select.append(new Option(option, option)));
+    setSchemaNameAttr(select, key);
+    ["", "Pass", "Fail", "N/A"].forEach((option) => select.append(new Option(option, option)));
     select.value = hose.compliance[key] || "";
     select.addEventListener("change", () => {
       hose.compliance[key] = select.value;
@@ -1449,6 +1556,7 @@ function renderCompliancePanel(hose) {
   resultSpan.textContent = "Overall result";
   const result = document.createElement("select");
   result.classList.add("field-small");
+  setSchemaNameAttr(result, "overall");
   ["Pass", "Fail"].forEach((option) => result.append(new Option(option, option)));
   result.value = hose.compliance.overall || "Pass";
   result.addEventListener("change", () => {
@@ -1465,6 +1573,7 @@ function numericTableInput(target, key, onChange, disabled = false) {
   const input = document.createElement("input");
   input.type = "number";
   input.classList.add("field-small");
+  setSchemaNameAttr(input, key);
   input.dataset.validate = "number";
   input.step = "0.01";
   input.value = target[key] ?? "";
@@ -1481,7 +1590,6 @@ function numericTableInput(target, key, onChange, disabled = false) {
 
 function clearDatasetAndResetUi() {
   localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem("petrocal.dataset.v1");
   dataset = defaultDataset();
   VIEW_STATE.measuresTab = 0;
   VIEW_STATE.instrumentsTab = 0;
@@ -1504,6 +1612,13 @@ async function importDatasetFromText(rawText) {
 }
 
 function handleStartMode() {
+  if (LOAD_MODE === "sample") {
+    dataset = normalizeDataset(JSON.parse(JSON.stringify(SAMPLE_DATASET)));
+    persistLocalDataset();
+    renderAll();
+    return;
+  }
+
   if (START_MODE === "new") {
     clearDatasetAndResetUi();
     return;
@@ -1528,6 +1643,7 @@ function renderAllPanels() {
   renderMeasures();
   renderInstruments();
   renderHoses();
+  attachOutcomeSelectStyling();
   attachGlobalValidation();
 }
 

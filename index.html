@@ -12,6 +12,7 @@
     </header>
     <main class="launch-card">
       <h4>Welcome!</h4>
+      <div id="resumeOrStartAction" class="launch-actions"></div>
       <p>Petrocal is an open source web-based tool for conducting calibration and verification of fuel dispensers, in compliance with the Australian National Measurement Institute's guidelines. It is therefore only useful and applicable for use by licensed NMI Verifiers within Australia, or those acting on behalf of an NMI licensee.</p>
           <p>Using this tool you can;
           <ul>
@@ -25,12 +26,11 @@
         <hr/>
       <h4>Get started</h4>
       <div class="launch-actions">
-        <a class="btn launch-btn" href="app.html?start=new">Start new worksheet</a>
-        <a class="btn launch-btn" href="app.html">Resume worksheet</a>
-        <a id="launchLoadDataset" class="btn launch-btn" href="app.html?start=load">Load existing dataset</a>
-        <a class="btn launch-btn" href="help.html">Get help</a>
+        <a id="launchLoadDataset" class="btn launch-btn" href="app.html?start=load">Load existing worksheet</a>
+        <a class="btn launch-btn" href="app.html?load=sample">Load sample worksheet</a>
+        <a class="btn launch-btn" href="help.html">Get Help</a>
         <a class="btn launch-btn" href="info.html">App Info</a>
-        <input id="launchDatasetFileInput" type="file" accept=".cal,.json,application/json" hidden />
+        <input id="launchDatasetFileInput" type="file" accept=".cal,.json,application/json" data-schema-name="datasetFile" hidden />
       </div>
     </main>
     <footer>
@@ -39,9 +39,54 @@
     </footer>
     <script>
       (() => {
+        const STORAGE_KEYS = ["petrocal.dataset.v3", "petrocal.dataset.v2", "petrocal.report.dataset"];
         const IMPORT_SESSION_KEY = "petrocal.start.import.dataset";
         const loadLink = document.getElementById("launchLoadDataset");
         const fileInput = document.getElementById("launchDatasetFileInput");
+        const resumeOrStartAction = document.getElementById("resumeOrStartAction");
+
+        function hasMeaningfulData(dataset) {
+          if (!dataset || typeof dataset !== "object") return false;
+          const testDetails = dataset.testDetails || {};
+          return Boolean(
+            (Array.isArray(dataset.measures) && dataset.measures.length) ||
+            (Array.isArray(dataset.instruments) && dataset.instruments.length) ||
+            testDetails.jobNumber ||
+            testDetails.siteName ||
+            testDetails.verifierName
+          );
+        }
+
+        function hasExistingDataset() {
+          try {
+            for (const key of STORAGE_KEYS) {
+              const raw = localStorage.getItem(key) || sessionStorage.getItem(key);
+              if (!raw) continue;
+              try {
+                const parsed = JSON.parse(raw);
+                if (hasMeaningfulData(parsed)) return true;
+              } catch {
+                return true;
+              }
+            }
+          } catch {
+            return false;
+          }
+          return false;
+        }
+
+        if (resumeOrStartAction) {
+          const primaryAction = document.createElement("a");
+          primaryAction.className = "btn launch-btn";
+          if (hasExistingDataset()) {
+            primaryAction.href = "app.html";
+            primaryAction.textContent = "Continue where you left off ...";
+          } else {
+            primaryAction.href = "app.html?start=new";
+            primaryAction.textContent = "Start a new worksheet";
+          }
+          resumeOrStartAction.append(primaryAction);
+        }
 
         if (!loadLink || !fileInput) return;
 
