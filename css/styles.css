@@ -349,6 +349,18 @@ input[disabled] {
 .field-large { width: 20rem; }
 .field-xlarge { width: 28rem; }
 
+.operator-control-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.operator-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
 input[type='date'] {
   width: 11rem;
 }
@@ -399,6 +411,16 @@ textarea {
 .report-page {
   max-width: 1200px;
   margin: 0 auto;
+}
+
+.report-print-header {
+  display: none;
+}
+
+.report-operator-logo {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
 }
 
 .report-output {
@@ -1024,4 +1046,3 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
-

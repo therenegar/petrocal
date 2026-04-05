@@ -27,7 +27,10 @@
     </header>
 
     <main id="appMain" class="report-page">
-      <img src="res/logo.svg" alt="Petrocal" class="print-only" />
+      <div class="report-print-header">
+        <img src="res/logo.svg" alt="Petrocal" class="print-only" />
+        <img id="operatorPrintLogo" alt="Operator logo" class="print-only report-operator-logo" hidden />
+      </div>
       <h1>Test Report</h1>
       <section id="reportContent" class="tab-panel active report-output"></section>
     </main>
