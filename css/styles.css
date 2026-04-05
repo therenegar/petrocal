@@ -371,6 +371,13 @@ input[disabled] {
 
 .operator-control-wrap {
   display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.operator-primary-row {
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
 }

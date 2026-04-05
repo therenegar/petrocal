@@ -828,7 +828,8 @@ function renderTestDetails() {
         "Pearl Energy",
         "Sinopec",
         "Speedway",
-        "X-Convenience"
+        "X-Convenience",
+        "Other"
       ],
       "field-medium"
     ],
@@ -874,25 +875,45 @@ function renderTestDetails() {
     if (sizeClass) control.classList.add(sizeClass);
 
     control.value = key === "date" ? toDisplayDate(dataset.testDetails[key]) : (dataset.testDetails[key] ?? "");
-    bindInput(control, ["testDetails", key], (value) => {
-      if (key === "date") return toDisplayDate(value);
-      if (key === "postCode") {
-        if (value === "") return "";
-        const numeric = Math.trunc(Number(value));
-        if (Number.isNaN(numeric)) return "";
-        return Math.max(1000, Math.min(9999, numeric));
-      }
-      return type === "number" ? (value === "" ? "" : Number(value)) : value;
-    });
+    if (key !== "operator") {
+      bindInput(control, ["testDetails", key], (value) => {
+        if (key === "date") return toDisplayDate(value);
+        if (key === "postCode") {
+          if (value === "") return "";
+          const numeric = Math.trunc(Number(value));
+          if (Number.isNaN(numeric)) return "";
+          return Math.max(1000, Math.min(9999, numeric));
+        }
+        return type === "number" ? (value === "" ? "" : Number(value)) : value;
+      });
+    }
 
     if (key === "operator") {
+      const selectedOperator = String(dataset.testDetails.operator || "");
+      const knownOperators = (options || []).filter((option) => option !== "Other");
+      const usesCustomOperator = Boolean(selectedOperator && !knownOperators.includes(selectedOperator));
+      control.value = usesCustomOperator ? "Other" : selectedOperator;
+
       const wrap = document.createElement("div");
       wrap.className = "operator-control-wrap";
+      const primaryRow = document.createElement("div");
+      primaryRow.className = "operator-primary-row";
       const logo = document.createElement("img");
       logo.className = "operator-logo";
       logo.alt = "Operator logo";
+      const otherInput = document.createElement("input");
+      otherInput.type = "text";
+      otherInput.className = "field-medium operator-other-input";
+      otherInput.placeholder = "Enter operator";
+      otherInput.value = usesCustomOperator ? selectedOperator : "";
+      setSchemaNameAttr(otherInput, "operator");
+
+      const syncOtherInputVisibility = () => {
+        otherInput.hidden = control.value !== "Other";
+      };
       const syncOperatorLogo = () => {
-        const logoPath = getOperatorLogoPath(control.value);
+        const logoName = control.value === "Other" ? otherInput.value : control.value;
+        const logoPath = getOperatorLogoPath(logoName);
         logo.hidden = !logoPath;
         if (logoPath) {
           logo.src = logoPath;
@@ -900,9 +921,21 @@ function renderTestDetails() {
           logo.removeAttribute("src");
         }
       };
-      control.addEventListener("change", syncOperatorLogo);
+      control.addEventListener("change", () => {
+        const nextOperator = control.value === "Other" ? otherInput.value.trim() : control.value;
+        updateAt(["testDetails", "operator"], nextOperator);
+        syncOtherInputVisibility();
+        syncOperatorLogo();
+      });
+      otherInput.addEventListener("change", () => {
+        if (control.value !== "Other") return;
+        updateAt(["testDetails", "operator"], otherInput.value.trim());
+        syncOperatorLogo();
+      });
+      syncOtherInputVisibility();
       syncOperatorLogo();
-      wrap.append(control, logo);
+      primaryRow.append(control, logo);
+      wrap.append(primaryRow, otherInput);
       form.append(span, wrap);
       return;
     }
