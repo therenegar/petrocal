@@ -33,6 +33,127 @@ const PERFORMANCE_CODE_LABELS = {
   H: "H- mark removed and not re-verified"
 };
 
+const DEFAULT_EXPORT_BASE_URL = "http://localhost:8080/petrocal/tools";
+const EXPORT_BASE_URL_STORAGE_KEY = "petrocal.report.exportBaseUrl";
+
+function resolveExportBaseUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const fromQuery = (params.get("exportBaseUrl") || "").trim();
+  if (fromQuery) return fromQuery.replace(/\/+$/, "");
+
+  const fromWindow = String(window.PETROCAL_EXPORT_BASE_URL || "").trim();
+  if (fromWindow) return fromWindow.replace(/\/+$/, "");
+
+  const fromStorage = String(localStorage.getItem(EXPORT_BASE_URL_STORAGE_KEY) || "").trim();
+  if (fromStorage) return fromStorage.replace(/\/+$/, "");
+
+  return DEFAULT_EXPORT_BASE_URL;
+}
+
+async function readStylesheetText() {
+  const stylesheet = document.querySelector('link[rel="stylesheet"][href]');
+  if (!stylesheet) return "";
+
+  try {
+    const response = await fetch(stylesheet.href, { cache: "no-store" });
+    if (!response.ok) return "";
+    return await response.text();
+  } catch {
+    return "";
+  }
+}
+
+async function buildExportHtml() {
+  const stylesheetText = await readStylesheetText();
+  const reportRoot = document.getElementById("appMain");
+  const reportMarkup = reportRoot ? reportRoot.outerHTML : "";
+
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Petrocal Report</title>
+    <style>${stylesheetText}</style>
+  </head>
+  <body>${reportMarkup}</body>
+</html>`;
+}
+
+function setExportStatus(message, isError = false) {
+  const status = document.getElementById("exportStatus");
+  if (!status) return;
+  status.textContent = message;
+  status.classList.toggle("error", isError);
+}
+
+function buildReportFilename(dataset) {
+  const job = String(pick(dataset, ["testDetails", "jobNumber"], "") || "").trim();
+  const site = String(pick(dataset, ["testDetails", "siteName"], "") || "").trim();
+  const stamp = new Date().toISOString().slice(0, 10);
+  return ["test-report", job, site, stamp].filter(Boolean).join("-");
+}
+
+async function exportReport(format) {
+  const dataset = loadDataset();
+  if (!dataset) {
+    setExportStatus("No dataset found to export.", true);
+    return;
+  }
+
+  const endpoint = `${resolveExportBaseUrl()}/export-report.php?format=${encodeURIComponent(format)}`;
+
+  setExportStatus(`Preparing ${format.toUpperCase()} export...`);
+
+  try {
+    const html = await buildExportHtml();
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        filename: buildReportFilename(dataset),
+        html,
+        dataset
+      })
+    });
+
+    if (!response.ok) {
+      const detail = await response.text();
+      throw new Error(detail || `Export request failed (${response.status}).`);
+    }
+
+    const blob = await response.blob();
+    const ext = format === "doc" ? "doc" : format;
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${buildReportFilename(dataset)}.${ext}`;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(link.href);
+
+    setExportStatus(`${format.toUpperCase()} downloaded.`);
+  } catch (error) {
+    setExportStatus(`Export failed: ${error.message || "unknown error"}`, true);
+  }
+}
+
+function bindExportButtons() {
+  const map = [
+    ["exportPdfBtn", "pdf"],
+    ["exportDocBtn", "doc"],
+    ["exportXlsBtn", "xls"]
+  ];
+
+  map.forEach(([id, format]) => {
+    const button = document.getElementById(id);
+    if (!button) return;
+    button.addEventListener("click", () => {
+      exportReport(format);
+    });
+  });
+}
+
 function loadDataset() {
   const raw =
     sessionStorage.getItem(REPORT_SESSION_KEY) ||
@@ -438,3 +559,4 @@ function renderReport() {
 }
 
 renderReport();
+bindExportButtons();
