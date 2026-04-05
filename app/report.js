@@ -236,11 +236,11 @@ function exceedsMpe(dataset, value) {
 
 function hoseDeliveryRows(hose, sectionKey, instrumentType) {
   const rows = [
-    { label: "Delivery #1 (max flow)", ...pick(hose, [sectionKey, "deliveries", 0], {}) },
-    { label: "Delivery #2 (max flow)", ...pick(hose, [sectionKey, "deliveries", 1], {}) },
-    { label: "Delivery #3 (max flow)", ...pick(hose, [sectionKey, "deliveries", 2], {}) },
-    { label: "Delivery #4 (min flow)", ...pick(hose, [sectionKey, "deliveries", 3], {}) },
-    { label: "Preset Delivery (clause 3.10)", ...pick(hose, [sectionKey, "preset"], {}) }
+    { label: "#1", ...pick(hose, [sectionKey, "deliveries", 0], {}) },
+    { label: "#2", ...pick(hose, [sectionKey, "deliveries", 1], {}) },
+    { label: "#3", ...pick(hose, [sectionKey, "deliveries", 2], {}) },
+    { label: "#4", ...pick(hose, [sectionKey, "deliveries", 3], {}) },
+    { label: "Preset", ...pick(hose, [sectionKey, "preset"], {}) }
   ];
   if (String(instrumentType || "").trim().toLowerCase() === "suction") {
     rows.push({ label: "Gas Elimination Delivery (clause 3.12)", ...pick(hose, [sectionKey, "gasElimination"], {}) });

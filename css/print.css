@@ -79,6 +79,11 @@ header, .brand-bar, .top-bar, footer {
   font-weight: bold;
 }
 
+.report-section h4:first-child {
+  margin-bottom: .5em;
+}
+
+
 @media (max-width: 900px) {
   .instrument-columns {
     grid-template-columns: repeat(2, minmax(280px, 1fr));
