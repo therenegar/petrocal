@@ -197,6 +197,14 @@ function pick(obj, path, fallback = undefined) {
   return current === undefined ? fallback : current;
 }
 
+
+function syncPrintBusinessName(dataset) {
+  const heading = document.querySelector(".report-print-header h1");
+  if (!heading) return;
+
+  heading.textContent = text(pick(dataset, ["form6Details", "businessName"], ""), "");
+}
+
 function syncPrintOperatorLogo(dataset) {
   const logo = document.getElementById("operatorPrintLogo");
   if (!logo) return;
@@ -611,11 +619,13 @@ function renderReport() {
 
   if (!dataset) {
     syncPrintOperatorLogo(null);
+    syncPrintBusinessName(null);
     root.innerHTML = "<p>No local dataset found. Open the app and load or enter data first.</p>";
     return;
   }
 
   syncPrintOperatorLogo(dataset);
+  syncPrintBusinessName(dataset);
 
   root.replaceChildren(
     renderTwoColumnKeyValueGrid("Test Details", [
