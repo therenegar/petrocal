@@ -29,6 +29,35 @@ header, .brand-bar, .top-bar, footer {
   border-bottom: none 
 }
 
+.report-subsection {
+  background: none;
+  border: 3px solid black;
+  border-radius: 4px;
+}
+
+#reportContent > section:nth-child(3) {
+   break-before: page;
+}
+
+.grade-themed {
+  background: black !important;
+  color: white !important;
+}
+
+.report-grid dt {
+  border-bottom: 1px solid gainsboro;
+}
+
+.report-section h5 {
+  border-top: none;
+  padding-top: 0;
+  margin: 1rem 0 0 0;
+}
+
+.report-subsection h3 {
+  font-weight: bold;
+}
+
 @media (max-width: 900px) {
   .instrument-columns {
     grid-template-columns: repeat(2, minmax(280px, 1fr));

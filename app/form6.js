@@ -22,8 +22,10 @@ const FORM6_DATA_CELLS = {
   E12: ["testDetails", "postCode"],
   B14: ["form6Details", "licenceNumber"],
   C14: ["form6Details", "businessName"],
-  D14: ["testDetails", "registrationNumber"],
-  B16: ["testDetails", "verificationMark"],
+  D14: ["form6Details", "abnNumber"],
+  B16: ["testDetails", "registrationNumber"],
+  D16: ["testDetails", "verificationMark"],
+  C16: ["testDetails", "verifierName"],
 };
 const FORM6_HOSE_TABLE = {
   startRow: 18,
