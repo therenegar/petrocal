@@ -327,15 +327,13 @@ function renderInstrument(instrument, index, dataset) {
   const detailsGrid = document.createElement("dl");
   detailsGrid.className = "report-grid";
   [
-    ["POS Number", instrument.numbering],
-    ["Hose count", instrument.hoseCount],
     ["Manufacturer", instrument.manufacturer],
     ["Make", instrument.make],
     ["Model number", instrument.modelNumber],
     ["Serial number", instrument.serialNumber],
     ["Manufacture date", instrument.manufactureDate],
     ["NMI pattern approval", instrument.nmiPatternApproval],
-    ["Products approved", instrument.productsApproved],
+    ["Products approved for delivery", instrument.productsApproved],
     ["Type of system", instrument.type]
   ].forEach(([label, value]) => {
     const dt = document.createElement("dt");

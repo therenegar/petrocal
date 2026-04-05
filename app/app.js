@@ -1177,10 +1177,10 @@ function renderHoses() {
     persistLocalDataset();
   });
   const guideLink = document.createElement("a");
-  guideLink.href = "https://www.industry.gov.au/sites/default/files/2019-06/fuel-dispenser-numbering-guide.pdf";
+  guideLink.href = "ref/fuel-dispenser-numbering-guide.pdf";
   guideLink.target = "_blank";
   guideLink.rel = "noopener noreferrer";
-  guideLink.textContent = "Numbering Guide";
+  guideLink.textContent = "NMI Numbering Guide 1.5";
   guideLink.className = "inline-guide-link";
   hoseSerialWrap.append(prefix, suffix, guideLink);
   grid.append(hoseSerialPrefix, hoseSerialWrap);
