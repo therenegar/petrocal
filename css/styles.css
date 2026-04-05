@@ -186,6 +186,14 @@ hr {
   cursor: pointer;
 }
 
+#saveDatasetBtn.save-btn-pending {
+  background: var(--bad);
+}
+
+#saveDatasetBtn.save-btn-saved {
+  background: var(--good);
+}
+
 .btn-with-icon {
   display: inline-flex;
   align-items: center;
