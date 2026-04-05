@@ -38,6 +38,7 @@ const FORM6_HOSE_TABLE = {
     nmiPattern: "F",
     capacity: "G",
     performanceCode: "H",
+    comments: "I",
   },
 };
 
@@ -311,6 +312,9 @@ function hoseRows() {
         nmiPattern: text(instrument.nmiPatternApproval),
         capacity: text(hose.qmax),
         performanceCode: formatPerformanceCode(hose.measureCheck?.performanceCode),
+        comments: (text(hose.measureCheck?.performanceCode).trim().toUpperCase() === "H")
+          ? text(hose.measureCheck?.comments)
+          : "",
       });
     });
   });
@@ -407,6 +411,7 @@ function renderForm6() {
         <th>NMI Pattern Approval Number</th>
         <th>Capacity (L/min)</th>
         <th>Instrument Performance Code</th>
+        <th>Comments</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -423,7 +428,8 @@ function renderForm6() {
       row.serialNumber,
       row.nmiPattern,
       row.capacity,
-      row.performanceCode
+      row.performanceCode,
+      row.comments
     ].forEach((value) => {
       const td = document.createElement("td");
       td.textContent = value || "";
@@ -435,7 +441,7 @@ function renderForm6() {
   if (!tbody.childElementCount) {
     const tr = document.createElement("tr");
     const td = document.createElement("td");
-    td.colSpan = 8;
+    td.colSpan = 9;
     td.textContent = "No hose records available.";
     tr.append(td);
     tbody.append(tr);

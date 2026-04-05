@@ -90,6 +90,13 @@ const measuresPanel = document.getElementById("measures");
 const instrumentsPanel = document.getElementById("instruments");
 const hosesPanel = document.getElementById("hoses");
 const saveStatus = document.getElementById("saveStatus");
+const saveDatasetBtn = document.getElementById("saveDatasetBtn");
+
+const SAVE_BUTTON_STATE = {
+  idle: "idle",
+  pending: "pending",
+  saved: "saved"
+};
 
 document.getElementById("loadDatasetBtn").addEventListener("click", () => {
   document.getElementById("datasetFileInput").click();
@@ -105,7 +112,7 @@ document.getElementById("datasetFileInput").addEventListener("change", async (ev
   event.target.value = "";
 });
 
-document.getElementById("saveDatasetBtn").addEventListener("click", () => {
+saveDatasetBtn.addEventListener("click", () => {
   const blob = new Blob([JSON.stringify(dataset, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -113,6 +120,7 @@ document.getElementById("saveDatasetBtn").addEventListener("click", () => {
   link.download = buildDatasetFilename();
   link.click();
   URL.revokeObjectURL(url);
+  setSaveButtonState(SAVE_BUTTON_STATE.saved);
 });
 
 document.querySelectorAll('a[href="report.html"], a[href="form6.html"]').forEach((link) => {
@@ -209,6 +217,7 @@ function normalizeHose(hose = {}) {
     maxRate: "",
     measureCheck: {
       performanceCode: "",
+      comments: "",
       deliveries: [emptyDelivery(), emptyDelivery(), emptyDelivery(), emptyDelivery()],
       preset: emptyDelivery(),
       gasElimination: { ...emptyDelivery(), ed: "" },
@@ -262,13 +271,19 @@ function normalizeHose(hose = {}) {
   return merged;
 }
 
-function persistLocalDataset() {
+function setSaveButtonState(state) {
+  saveDatasetBtn.classList.toggle("save-btn-pending", state === SAVE_BUTTON_STATE.pending);
+  saveDatasetBtn.classList.toggle("save-btn-saved", state === SAVE_BUTTON_STATE.saved);
+}
+
+function persistLocalDataset({ markDirty = true } = {}) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(dataset));
   try {
     sessionStorage.setItem(REPORT_SESSION_KEY, JSON.stringify(dataset));
   } catch {
     // no-op
   }
+  if (markDirty) setSaveButtonState(SAVE_BUTTON_STATE.pending);
   saveStatus.textContent = `Locally saved @ ${formatNowDdMmYyyyHhMmSs()}`;
 }
 
@@ -1314,6 +1329,20 @@ function renderHoses() {
   });
   grid.append(perfSpan, perf);
 
+  if ((hose.measureCheck.performanceCode || "").toUpperCase() === "H") {
+    const commentsLabel = document.createElement("span");
+    commentsLabel.textContent = "Comments";
+    const commentsInput = document.createElement("textarea");
+    commentsInput.classList.add("field-large");
+    setSchemaNameAttr(commentsInput, "comments");
+    commentsInput.value = hose.measureCheck.comments || "";
+    commentsInput.addEventListener("change", () => {
+      hose.measureCheck.comments = commentsInput.value;
+      persistLocalDataset();
+    });
+    grid.append(commentsLabel, commentsInput);
+  }
+
   const volumeSpan = document.createElement("span");
   volumeSpan.textContent = "Volume used for testing";
   const volumeStrong = document.createElement("strong");
@@ -1734,7 +1763,7 @@ function renderAllPanels() {
 
 function renderAll() {
   renderAllPanels();
-  if (!saveStatus.textContent.includes("Locally saved")) persistLocalDataset();
+  if (!saveStatus.textContent.includes("Locally saved")) persistLocalDataset({ markDirty: false });
 }
 
 renderAll();
