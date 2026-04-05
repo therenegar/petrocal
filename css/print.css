@@ -13,6 +13,10 @@ header, .brand-bar, .top-bar, footer {
   padding: 0;
 }  
 
+#appMain h1::after {
+  content: " for Fuel Dispensers (other than LPG Dispensers)";
+}
+
 .report-page {
   max-width: none;
   margin: none;
