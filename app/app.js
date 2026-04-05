@@ -333,6 +333,37 @@ function addInstrument() {
   renderHoses();
 }
 
+function duplicateInstrument(index) {
+  const source = dataset.instruments[index];
+  if (!source) return;
+
+  const duplicated = normalizeDataset({
+    instruments: [JSON.parse(JSON.stringify(source))]
+  }).instruments[0];
+  const emptyHose = normalizeHose();
+
+  duplicated.numbering = "";
+  duplicated.serialNumber = "";
+  duplicated.inspection = Object.fromEntries(VISUAL_INSPECTION_QUESTIONS.map((_, idx) => [`q${idx + 1}`, ""]));
+  duplicated.hoses = duplicated.hoses.map((hose) => {
+    const clone = normalizeHose(hose);
+    clone.number = "";
+    clone.startTote = "";
+    clone.endTote = "";
+    clone.measureCheck = JSON.parse(JSON.stringify(emptyHose.measureCheck));
+    clone.verification = JSON.parse(JSON.stringify(emptyHose.verification));
+    clone.compliance = JSON.parse(JSON.stringify(emptyHose.compliance));
+    return clone;
+  });
+
+  dataset.instruments.splice(index + 1, 0, duplicated);
+  VIEW_STATE.instrumentsTab = index + 1;
+  VIEW_STATE.hosesInstrumentTab = index + 1;
+  persistLocalDataset();
+  renderInstruments();
+  renderHoses();
+}
+
 function removeInstrument(index) {
   dataset.instruments.splice(index, 1);
   VIEW_STATE.instrumentsTab = clampIndex(VIEW_STATE.instrumentsTab, dataset.instruments.length);
@@ -614,7 +645,7 @@ function applyButtonIcon(button, iconPath, labelText) {
 }
 
 function renderTabbedHeader(tabs, activeIndex, onChange, options = {}) {
-  const { addAction = null, removeAction = null, extraActions = [] } = options;
+  const { addAction = null, duplicateAction = null, removeAction = null, extraActions = [] } = options;
   const row = document.createElement("div");
   row.className = "inner-tabs-row";
 
@@ -639,6 +670,14 @@ function renderTabbedHeader(tabs, activeIndex, onChange, options = {}) {
     applyButtonIcon(add, "res/icon-add.svg", "Add another");
     add.addEventListener("click", addAction);
     actionsWrap.append(add);
+  }
+
+  if (duplicateAction) {
+    const duplicate = document.createElement("button");
+    duplicate.className = "btn small-btn";
+    duplicate.textContent = "Duplicate";
+    duplicate.addEventListener("click", duplicateAction);
+    actionsWrap.append(duplicate);
   }
 
   if (removeAction) {
@@ -988,6 +1027,7 @@ function renderInstruments() {
       },
       {
         addAction: addInstrument,
+        duplicateAction: () => duplicateInstrument(VIEW_STATE.instrumentsTab),
         removeAction: () => removeInstrument(VIEW_STATE.instrumentsTab),
         extraActions: [
           { label: "Move", icon: "res/icon-move-left.svg", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, -1) },
