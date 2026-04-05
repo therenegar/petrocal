@@ -646,15 +646,18 @@ textarea {
 }
 
 .help-tip-trigger {
-  border: 1px solid #444;
+  border: none;
   border-radius: 50%;
-  width: 1.15rem;
-  height: 1.15rem;
+  width: 1.5rem;
+  height: 1.5rem;
   line-height: 1rem;
-  font-size: 0.75rem;
+  font-size: 1rem;
   background: #fff;
   cursor: pointer;
   position: relative;
+  font-weight: bold;
+  background: var(--accent);
+  margin-left: .5rem;
 }
 
 .help-tip-bubble {
@@ -670,6 +673,8 @@ textarea {
   padding: 0.4rem 0.5rem;
   text-align: left;
   z-index: 10;
+  font-weight: bold;
+  font-size: 1rem;
 }
 
 .help-tip-trigger:hover .help-tip-bubble,
@@ -715,7 +720,7 @@ textarea {
 }
 
 .verification-mark {
-  border: 10px solid #9ac559;
+  border: 10px solid var(--good);
   border-radius: 0.4rem;
   font-size: 1.6rem;
   font-weight: 700;
@@ -728,7 +733,7 @@ textarea {
   min-width: 15rem;
   text-align: center;
   font-family: "JetBrains Mono", monospace;
-  background: lightgray;
+  background: var(--paper);
 }
 .verification-mark::before {
   content: "Instrument verified under the National Measurement Act 1960";
@@ -736,7 +741,7 @@ textarea {
   font-size: 0.75rem;
   text-transform: uppercase;
   top: 0px;
-  background: #9ac559;
+  background: var(--good);
   letter-spacing: -0.03rem;
   left: 0;
   text-align: center;
