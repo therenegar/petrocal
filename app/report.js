@@ -134,6 +134,19 @@ function formatPerformanceCode(value) {
   return PERFORMANCE_CODE_LABELS[code] || value;
 }
 
+
+function instrumentLabel(instrument, index) {
+  const numbering = (instrument.numbering || "").trim();
+  if (!numbering) return `Instrument ${index + 1}`;
+  const clean = numbering
+    .split("/")
+    .map((n) => n.trim())
+    .filter(Boolean)
+    .join("/");
+  if (!clean) return `Instrument ${index + 1}`;
+  return instrument.type === "Pressurised" ? `Dispenser ${clean}` : `Pump ${clean}`;
+}
+
 function gradeStyleKey(value) {
   return String(value || "")
     .toUpperCase()
@@ -144,14 +157,15 @@ function renderHose(hose, index, instrument, dataset) {
   const section = document.createElement("section");
   section.className = "report-subsection";
   const heading = document.createElement("h4");
-  heading.textContent = `Hose ${index + 1}: ${text(hose.number, "No POS")} ${text(hose.grade, "")}`.trim();
+  heading.textContent = `${text(hose.number, "No POS")}/${text(hose.grade, "No grade")}`;
+  heading.classList.add("grade-themed");
+  const headingGradeKey = gradeStyleKey(hose.grade);
+  if (headingGradeKey) heading.dataset.grade = headingGradeKey;
   section.append(heading);
 
   const details = document.createElement("dl");
   details.className = "report-grid";
   const rows = [
-    ["POS Number", hose.number],
-    ["Grade", hose.grade],
     [
       "Hose serial",
       `${text(instrument.serialNumber, "")}${instrument.serialNumber && hose.hoseSerialSuffix ? "-" : ""}${text(hose.hoseSerialSuffix, "")}` || "—"
@@ -162,8 +176,7 @@ function renderHose(hose, index, instrument, dataset) {
     ["Qmin", hose.qmin],
     ["Qmax", hose.qmax],
     ["Maximum achievable rate", hose.maxRate],
-    ["Performance code", formatPerformanceCode(pick(hose, ["measureCheck", "performanceCode"], ""))],
-    ["Compliance overall", pick(hose, ["compliance", "overall"], "")]
+    ["Performance code", formatPerformanceCode(pick(hose, ["measureCheck", "performanceCode"], ""))]
   ];
 
   rows.forEach(([label, value]) => {
@@ -171,11 +184,6 @@ function renderHose(hose, index, instrument, dataset) {
     dt.textContent = label;
     const dd = document.createElement("dd");
     dd.textContent = text(value);
-    if (label === "Grade") {
-      dd.classList.add("grade-themed");
-      const key = gradeStyleKey(value);
-      if (key) dd.dataset.grade = key;
-    }
     decorateOutcomeElement(dd, value);
     details.append(dt, dd);
   });
@@ -186,16 +194,16 @@ function renderHose(hose, index, instrument, dataset) {
   if (visibleSections.includes("measureCheck")) {
     const measureCheckTitle = document.createElement("h5");
     measureCheckTitle.textContent = "Measure Check";
-    section.append(measureCheckTitle, renderRunsTable(pick(hose, ["measureCheck", "checks"], []), "Check", false, dataset));
+    section.append(measureCheckTitle, renderRunsTable(pick(hose, ["measureCheck", "checks"], []), (_, idx) => String(idx + 1), false, dataset));
   }
 
   if (visibleSections.includes("verification")) {
     const verificationRows = [
-      ...pick(hose, ["verification", "deliveries"], []).map(function(row, idx) { return ({ label: `Delivery #${idx + 1}`, ...row }); }),
-      { label: "Preset Delivery", ...pick(hose, ["verification", "preset"], {}) }
+      ...pick(hose, ["verification", "deliveries"], []).map(function(row, idx) { return ({ label: String(idx + 1), ...row }); }),
+      { label: "Preset", ...pick(hose, ["verification", "preset"], {}) }
     ];
     if ((pick(instrument, ["type"], "") || "") === "Suction") {
-      verificationRows.push({ label: "Gas Elimination Delivery", ...pick(hose, ["verification", "gasElimination"], {}) });
+      verificationRows.push({ label: "Gas Elim.", ...pick(hose, ["verification", "gasElimination"], {}) });
     }
 
     const verificationTitle = document.createElement("h5");
@@ -246,11 +254,11 @@ function renderHose(hose, index, instrument, dataset) {
   return section;
 }
 
-function renderRunsTable(rows, rowPrefix = "Run", includeEd = false, dataset = null) {
+function renderRunsTable(rows, runLabel = null, includeEd = false, dataset = null) {
   const table = document.createElement("table");
   table.className = "report-table";
   const header = document.createElement("thead");
-  header.innerHTML = `<tr><th>${rowPrefix ? "" : "Run"}</th><th>Measure</th><th>VFD</th><th>VREF</th><th>EFD (%)</th>${includeEd ? "<th>ED (%)</th>" : ""}</tr>`;
+  header.innerHTML = `<tr><th>Run</th><th>Measure</th><th>VFD</th><th>VREF</th><th>EFD (%)</th>${includeEd ? "<th>ED (%)</th>" : ""}</tr>`;
   table.append(header);
 
   const body = document.createElement("tbody");
@@ -261,7 +269,7 @@ function renderRunsTable(rows, rowPrefix = "Run", includeEd = false, dataset = n
     if (Number.isFinite(mpe) && Number.isFinite(efdValue) && Math.abs(efdValue) > Math.abs(mpe)) {
       tr.classList.add("row-error");
     }
-    const label = rowPrefix ? `${rowPrefix} ${idx + 1}` : text(row.label, `Run ${idx + 1}`);
+    const label = runLabel ? runLabel(row, idx) : text(row.label, String(idx + 1));
     tr.innerHTML = `<td>${label}</td><td>${measureVolumeLabel(row.measureId, dataset)}</td><td>${text(row.vfd)}</td><td>${text(row.vref)}</td><td>${text(row.efd)}</td>${includeEd ? `<td>${text(row.ed)}</td>` : ""}`;
     [...tr.children].forEach((cell) => decorateOutcomeElement(cell, cell.textContent));
     body.append(tr);
@@ -281,12 +289,19 @@ function renderInstrument(instrument, index, dataset) {
   section.className = "report-section";
 
   const heading = document.createElement("h2");
-  heading.textContent = `Instrument ${index + 1}`;
+  heading.textContent = instrumentLabel(instrument, index);
   section.append(heading);
 
-  const grid = document.createElement("dl");
-  grid.className = "report-grid";
-  const rows = [
+  const columns = document.createElement("div");
+  columns.className = "instrument-columns";
+
+  const detailsColumn = document.createElement("section");
+  detailsColumn.className = "report-subsection";
+  detailsColumn.append(Object.assign(document.createElement("h3"), { textContent: "Instrument details" }));
+
+  const detailsGrid = document.createElement("dl");
+  detailsGrid.className = "report-grid";
+  [
     ["Numbering", instrument.numbering],
     ["Hose count", instrument.hoseCount],
     ["Manufacturer", instrument.manufacturer],
@@ -296,26 +311,38 @@ function renderInstrument(instrument, index, dataset) {
     ["Manufacture date", instrument.manufactureDate],
     ["NMI pattern approval", instrument.nmiPatternApproval],
     ["Products approved", instrument.productsApproved],
-    ["Type", instrument.type],
-    ...VISUAL_INSPECTION_QUESTIONS.map((question, idx) => [question, pick(instrument, ["inspection", `q${idx + 1}`], "")])
-  ];
-
-  rows.forEach(([label, value]) => {
+    ["Type", instrument.type]
+  ].forEach(([label, value]) => {
     const dt = document.createElement("dt");
     dt.textContent = label;
     const dd = document.createElement("dd");
     dd.textContent = text(value);
     decorateOutcomeElement(dd, value);
-    grid.append(dt, dd);
+    detailsGrid.append(dt, dd);
   });
-  section.append(grid);
+  detailsColumn.append(detailsGrid);
+
+  const characteristicsColumn = document.createElement("section");
+  characteristicsColumn.className = "report-subsection";
+  characteristicsColumn.append(Object.assign(document.createElement("h3"), { textContent: "General chacteristics" }));
+
+  const characteristicsGrid = document.createElement("dl");
+  characteristicsGrid.className = "report-grid";
+  VISUAL_INSPECTION_QUESTIONS.forEach((question, idx) => {
+    const dt = document.createElement("dt");
+    dt.textContent = question;
+    const dd = document.createElement("dd");
+    dd.textContent = text(pick(instrument, ["inspection", `q${idx + 1}`], ""));
+    decorateOutcomeElement(dd, dd.textContent);
+    characteristicsGrid.append(dt, dd);
+  });
+  characteristicsColumn.append(characteristicsGrid);
+
+  columns.append(detailsColumn, characteristicsColumn);
+  section.append(columns);
 
   const hosesWrapper = document.createElement("div");
   hosesWrapper.className = "report-hoses";
-  const hoseTitle = document.createElement("h3");
-  hoseTitle.textContent = "Hoses";
-  hosesWrapper.append(hoseTitle);
-
   if (!instrument.hoses || instrument.hoses.length === 0) {
     const none = document.createElement("p");
     none.textContent = "No hoses.";

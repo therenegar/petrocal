@@ -397,6 +397,20 @@ textarea {
   margin: 1rem 0;
 }
 
+
+.instrument-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(280px, 1fr));
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+@media (max-width: 900px) {
+  .instrument-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
 .report-card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
