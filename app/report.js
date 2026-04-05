@@ -211,7 +211,7 @@ function renderKeyValueGrid(title, rows) {
   return section;
 }
 
-function renderTwoColumnKeyValueGrid(title, leftRows, rightRows) {
+function renderTwoColumnKeyValueGrid(title, leftRows, rightRows, fullWidthRows = []) {
   const section = document.createElement("section");
   section.className = "report-section";
 
@@ -239,6 +239,23 @@ function renderTwoColumnKeyValueGrid(title, leftRows, rightRows) {
   });
 
   section.append(columns);
+
+  if (fullWidthRows.length) {
+    const fullWidthGrid = document.createElement("dl");
+    fullWidthGrid.className = "report-grid";
+
+    fullWidthRows.forEach(([label, value]) => {
+      const dt = document.createElement("dt");
+      dt.textContent = label;
+      const dd = document.createElement("dd");
+      dd.textContent = text(value);
+      decorateOutcomeElement(dd, value);
+      fullWidthGrid.append(dt, dd);
+    });
+
+    section.append(fullWidthGrid);
+  }
+
   return section;
 }
 
@@ -322,14 +339,21 @@ function renderHose(hose, index, instrument, dataset) {
     ["Qmin (L/min)", hose.qmin],
     ["Qmax (L/min)", hose.qmax],
     ["Maximum achievable rate (L/min) (clause 3.8)", hose.maxRate],
-    ["Performance code", formatPerformanceCode(pick(hose, ["measureCheck", "performanceCode"], ""))]
+    ["Performance code", pick(hose, ["measureCheck", "performanceCode"], "")]
   ];
 
   rows.forEach(([label, value]) => {
     const dt = document.createElement("dt");
     dt.textContent = label;
     const dd = document.createElement("dd");
-    dd.textContent = text(value);
+    if (label === "Performance code") {
+      const code = text(value).trim().toUpperCase();
+      const fullLabel = formatPerformanceCode(code);
+      dd.textContent = code || "—";
+      dd.title = fullLabel;
+    } else {
+      dd.textContent = text(value);
+    }
     decorateOutcomeElement(dd, value);
     details.append(dt, dd);
   });
@@ -528,7 +552,8 @@ function renderReport() {
       ["Street Address", pick(dataset, ["testDetails", "streetAddress"], "")],
       ["Suburb", pick(dataset, ["testDetails", "suburb"], "")],
       ["State", pick(dataset, ["testDetails", "state"], "")],
-      ["Post Code", pick(dataset, ["testDetails", "postCode"], "")],
+      ["Post Code", pick(dataset, ["testDetails", "postCode"], "")]
+    ], [
       ["Comments", pick(dataset, ["testDetails", "comments"], "")]
     ])
   );
