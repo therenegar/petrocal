@@ -565,6 +565,7 @@ function validateField(input) {
     error = "This field is required";
   } else if (value) {
     if (kind === "number" && !/^\d+(\.\d+)?$/.test(value)) error = "Only numbers are allowed";
+    if (kind === "decimal2" && !/^\d+(\.\d{1,2})?$/.test(value)) error = "Use a number with up to 2 decimal places";
     if (kind === "date" && !isValidDdMmYyyy(value) && !isValidIsoDate(value)) error = "Use a valid date";
     if (kind === "numbering" && !/^[0-9/]+$/.test(value)) error = "Use numbers and / only";
   }
@@ -612,7 +613,7 @@ function attachGlobalValidation() {
 
     const kind = getValidationKind(input);
     if (!input.dataset.validationBound) {
-      if (kind === "number") restrictNumericInput(input);
+      if (kind === "number" || kind === "decimal2") restrictNumericInput(input);
       input.addEventListener("blur", () => {
         input.dataset.touched = "true";
         validateField(input);
@@ -1721,18 +1722,37 @@ function renderCompliancePanel(hose) {
 function numericTableInput(target, key, onChange, disabled = false) {
   const td = document.createElement("td");
   const input = document.createElement("input");
-  input.type = "number";
+  input.type = "text";
+  input.inputMode = "decimal";
   input.classList.add("field-small");
   setSchemaNameAttr(input, key);
-  input.dataset.validate = "number";
-  input.step = "0.01";
-  input.value = target[key] ?? "";
+  input.dataset.validate = "decimal2";
+  const initialValue = Number(target[key]);
+  input.value = target[key] === "" || target[key] == null || !Number.isFinite(initialValue) ? "" : initialValue.toFixed(2);
   input.disabled = disabled;
-  input.addEventListener("change", () => {
-    target[key] = input.value;
+  const persistDecimal = () => {
+    const raw = (input.value || "").trim();
+    if (!raw) {
+      target[key] = "";
+      onChange?.();
+      persistLocalDataset();
+      renderHoses();
+      return;
+    }
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed)) return;
+    const fixed = parsed.toFixed(2);
+    input.value = fixed;
+    target[key] = fixed;
     onChange?.();
     persistLocalDataset();
     renderHoses();
+  };
+  input.addEventListener("change", () => {
+    persistDecimal();
+  });
+  input.addEventListener("blur", () => {
+    persistDecimal();
   });
   td.append(input);
   return td;
