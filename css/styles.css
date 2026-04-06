@@ -476,6 +476,10 @@ input[disabled] {
   color: var(--line);
 }
 
+strong.value-bad {
+  width: 6rem;
+  padding: 0.5rem;
+}
 
 .field-tiny {
   width: 4rem;
@@ -1175,6 +1179,7 @@ textarea {
 .form6-table tbody tr:nth-child(even) {
   background: #ddd;
 }
+
 
 @media (max-width: 999px) {
   .tab {
