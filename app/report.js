@@ -695,6 +695,7 @@ function renderReport() {
   const measuresSection = document.createElement("section");
   measuresSection.className = "report-section";
   measuresSection.append(Object.assign(document.createElement("h2"), { textContent: "Measures" }));
+  measuresSection.append(Object.assign(document.createElement("p"), { textContent: "Details of the Reference Standards of Measurement in use (clause 2.0)" }));
   if (!dataset.measures || !dataset.measures.length) {
     measuresSection.append(Object.assign(document.createElement("p"), { textContent: "No measures." }));
   } else {
