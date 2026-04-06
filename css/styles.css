@@ -1277,6 +1277,17 @@ textarea {
     padding: 0.1rem 0.25rem;
   }
 
+  .worksheet-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .worksheet-table-scroll .data-table {
+    width: max-content;
+    min-width: 100%;
+  }
+
   .form6-columns {
     grid-template-columns: 1fr;
   }

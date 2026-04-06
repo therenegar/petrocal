@@ -1629,6 +1629,9 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
   });
 
   table.append(body);
+  const tableScroller = document.createElement("div");
+  tableScroller.className = "worksheet-table-scroll";
+  tableScroller.append(table);
 
   const avgError = average([
     data.deliveries[0].efd,
@@ -1673,7 +1676,7 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
     meta.append(reverificationLabel, reverificationInput);
   }
 
-  wrap.append(table, meta);
+  wrap.append(tableScroller, meta);
   return wrap;
 }
 
