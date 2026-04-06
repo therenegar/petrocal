@@ -982,6 +982,7 @@ textarea {
 
 .nested-content {
   margin-top: 1rem;
+  overflow-x: auto;
 }
 
 .top-gap {
@@ -1190,7 +1191,22 @@ textarea {
     border-right-width: 3px;
     margin-top: -3px;
   }
+  
+  .tab-panel {
+    padding: .75rem;
+  }
 
+  .card {
+    box-shadow: none;
+    padding: 1rem;
+    border: none;
+    max-width: 100%;
+  }
+  
+  .instrument-select select {
+    max-width: 15rem;
+  }
+  
   .inner-tab,
   .linkish {
     font-size: 1.2rem;
