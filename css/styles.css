@@ -141,8 +141,17 @@ hr {
   margin-bottom: 2rem;
 }
 
+.launch-card section.intro {
+  margin-top: 3rem;
+}
+
 .launch-card h2 {
   margin-top: 2rem;
+}
+.launch-card h2::before {
+  content: "";
+  display: table;
+  clear: both;
 }
 
 .launch-card h2:first-child {
@@ -555,12 +564,13 @@ textarea {
 
 .report-section h2 {
   font-size: 1.6rem;
-  text-transform: uppercase;
+  font-weight: 900;
 }
 
 .report-section > .report-section h2 {
   text-transform: none;
   font-weight: normal;
+  background: none;
 }
 
 
@@ -585,8 +595,13 @@ textarea {
 .report-section h5 {
   font-size: 1.25rem;
   margin: 2rem 0;
-  border-top: 2px solid var(--line);
-  padding-top: .5rem;
+}
+
+.report-subsection h4.grade-themed {
+  border: 3px solid var(--line);
+  background: var(--paper);
+  color: var(--line);
+  box-shadow: var(--shadow);
 }
 
 
@@ -644,7 +659,6 @@ textarea {
   font-family: "JetBrains Mono", monospace;
   margin: 0;
   font-size: 0.9rem;
-  background: var(--paper);
   line-height: 1.5rem;
   padding-left: .3rem;
 }

@@ -74,12 +74,11 @@ header, .brand-bar, .top-bar, footer {
 }
 
 .grade-themed {
-  background: black !important;
-  color: white !important;
+  background: none !important;
 }
 
 .report-grid dd {
-  background: gainsboro;
+  background: none;
 }
 
 .report-grid dt {
@@ -102,6 +101,13 @@ header, .brand-bar, .top-bar, footer {
 
 .form6-preview-note, .report-output > p:first-child {
   display: none;
+}
+
+.report-table {
+  
+    break-inside: avoid;
+    page-break-inside: avoid;
+  
 }
 
 
