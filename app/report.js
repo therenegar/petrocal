@@ -15,12 +15,12 @@ const VISUAL_INSPECTION_QUESTIONS = [
   "12. For continuous indicators: do the price-posting wheels line up with, and follow, the internal price-setting ranger lever?"
 ];
 const COMPLIANCE_QUESTIONS = [
-  "Checking facility for indicating devices (clause 3.2)",
-  "Zero setting (clause 3.3)",
-  "Price computing (clause 3.4)",
-  "Nozzle cut-off (clause 3.5)",
-  "Interlock (clause 3.6)",
-  "Pre-set indications (clause 3.11)"
+  "Checking facility for indicating devices",
+  "Zero setting",
+  "Price computing",
+  "Nozzle cut-off",
+  "Interlock",
+  "Pre-set indications"
 ];
 const PERFORMANCE_CODE_LABELS = {
   A: "A- new instrument",
@@ -436,7 +436,7 @@ function renderHose(hose, index, instrument, dataset) {
     ["End tote", hose.endTote],
     ["Qmin (L/min)", hose.qmin],
     ["Qmax (L/min)", hose.qmax],
-    ["Max achievable rate (L/min) (clause 3.8)", hose.maxRate],
+    ["Max achievable rate (L/min)", hose.maxRate],
     ["Performance code", pick(hose, ["measureCheck", "performanceCode"], "")]
   ];
   if ((pick(hose, ["measureCheck", "performanceCode"], "") || "").toUpperCase() === "H") {
@@ -475,8 +475,8 @@ function renderHose(hose, index, instrument, dataset) {
     const measureCheckMeta = document.createElement("dl");
     measureCheckMeta.className = "report-grid";
     [
-      ["Average error (EAV) (Clause 3.12)", measureCheckAverage],
-      ["Anti-drain/Hose-dilation fuel volume (mL) (Clause 3.13)", pick(hose, ["measureCheck", "antiDrainMl"], "")]
+      ["Average error (EAV)", measureCheckAverage],
+      ["Anti-drain/Hose-dilation fuel volume (mL)", pick(hose, ["measureCheck", "antiDrainMl"], "")]
     ].forEach(([label, value]) => {
       const dt = document.createElement("dt");
       dt.textContent = label;
@@ -508,9 +508,9 @@ function renderHose(hose, index, instrument, dataset) {
     const verificationMeta = document.createElement("dl");
     verificationMeta.className = "report-grid";
     [
-      ["Average error (EAV) (Clause 3.12)", averageError],
-      ["Anti-drain/Hose-dilation fuel volume (mL) (Clause 3.13)", pick(hose, ["verification", "antiDrainMl"], "")],
-      ["Existing verification mark (if reverifying)", pick(hose, ["verification", "reverification"], "")]
+      ["Average error (EAV)", averageError],
+      ["Anti-drain/Hose-dilation fuel volume (mL)", pick(hose, ["verification", "antiDrainMl"], "")],
+      ["Existing verification mark", pick(hose, ["verification", "reverification"], "")]
     ].forEach(([label, value]) => {
       const dt = document.createElement("dt");
       dt.textContent = label;
@@ -695,7 +695,7 @@ function renderReport() {
   const measuresSection = document.createElement("section");
   measuresSection.className = "report-section";
   measuresSection.append(Object.assign(document.createElement("h2"), { textContent: "Measures" }));
-  measuresSection.append(Object.assign(document.createElement("p"), { textContent: "Details of the Reference Standards of Measurement in use (clause 2.0)" }));
+  measuresSection.append(Object.assign(document.createElement("p"), { textContent: "Details of the Reference Standards of Measurement used for testing." }));
   if (!dataset.measures || !dataset.measures.length) {
     measuresSection.append(Object.assign(document.createElement("p"), { textContent: "No measures." }));
   } else {
