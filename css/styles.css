@@ -148,7 +148,8 @@ hr {
   top: 5px;
   left: 5px;
   border-style: solid;
-  border-width: 30px 30px 0 0; /* Adjust size here */
+  border-width: 30px 30px 0 0;
+  /* Adjust size here */
   border-color: black transparent transparent transparent;
 }
 
@@ -396,8 +397,7 @@ hr {
   background: #f1f1f1;
   padding: 0.8rem 1.5rem;
   font-size: 1.25rem;
-  text-transform: uppercase;
-  font-weight: 900;
+  font-weight: 500;
   cursor: pointer;
   border-bottom: 0;
 }
@@ -1024,11 +1024,11 @@ textarea {
 .form6-sheet {
   border: 3px solid var(--line);
   background: var(--paper);
-  padding: 2rem;
+  padding: .5rem;
 }
 
 .form6-sheet h3:first-child {
-  margin-top: 0;
+  /*margin-top: 0;*/
 }
 
 .form6-columns {
@@ -1040,7 +1040,7 @@ textarea {
 .form6-block h3,
 .form6-table-section h3 {
   font-size: 1.25rem;
-  margin: 2rem 0;
+  margin: 2rem 0 1rem;
   font-weight: 900;
   padding-bottom: .5rem;
 }
@@ -1084,6 +1084,11 @@ textarea {
 .form6-table th {
   background: var(--accent);
 }
+
+.form6-block h3:first-child {
+  margin: 0;
+}
+
 
 .form6-preview-note,
 .report-output>p:first-child {
@@ -1181,13 +1186,33 @@ textarea {
   background: #ddd;
 }
 
-.data-table tr td:nth-child(5), .data-table tr td:nth-child(6) {
+.data-table tr td:nth-child(5),
+.data-table tr td:nth-child(6) {
   font-family: "JetBrains Mono", monospace;
   font-weight: bold;
 }
 
 
 @media (max-width: 999px) {
+
+  #appMain {
+    padding: 0;
+    width: 100%;
+  }
+
+  #appMain h1 {
+    padding-left: 1rem;
+  }
+
+  .brand-logo {
+    max-height: 2rem;
+  }
+
+  .top-bar .separator {
+    width: 0;
+    background: none;
+  }
+
   .tab {
     font-size: 1.4rem;
     padding: 0.7rem 1rem;
@@ -1196,14 +1221,27 @@ textarea {
     border-right-width: 3px;
     margin-top: -3px;
   }
-  
+
   .data-table .field-small {
     width: 4rem;
+  }
+
+  .launch-card,
+  .form6-sheet {
+    border-left: 0;
+    border-right: 0;
+    box-shadow: none;
+    margin: 1rem 0;
+    width: 100%
   }
 
 
   .tab-panel {
     padding: .75rem;
+    border-left: 0;
+    border-right: 0;
+    box-shadow: none;
+    width: 100%;
   }
 
   .card {
@@ -1212,11 +1250,11 @@ textarea {
     border: none;
     max-width: 100%;
   }
-  
+
   .instrument-select select {
     max-width: 15rem;
   }
-  
+
   .inner-tab,
   .linkish {
     font-size: 1.2rem;
@@ -1226,6 +1264,8 @@ textarea {
     flex-direction: column;
     align-items: stretch;
     padding-left: 0;
+    width: 14rem;
+    box-shadow: var(--shadow);
   }
 
   .inner-tabs-row {
@@ -1235,6 +1275,7 @@ textarea {
   .inner-tabs {
     flex-direction: column;
     align-items: stretch;
+    box-shadow: var(--shadow);
   }
 
   .inner-tab {
@@ -1255,6 +1296,7 @@ textarea {
 
   .save-status {
     text-align: left;
+    font-size: 1rem;
   }
 
   .header-right {
@@ -1287,7 +1329,27 @@ textarea {
     padding: 0.1rem 0.25rem;
   }
 
-  .worksheet-table-scroll {
+  .worksheet-table-scroll,
+  .form6-table-section {
+    max-width: calc(85vw);
+    overflow-x: scroll;
+    padding: 0 0 1rem 0;
+    overflow-x: scroll;
+  }
+
+  .form6-table-section {
+    max-width: calc(95vw);
+  }
+
+  .worksheet-table-scroll,
+  .form6-table-section {
+    overflow-x: auto;
+    /* Fades 3rem at the start and end of the scrollable area */
+    mask-image: linear-gradient(to right, black calc(100% - 5rem), transparent);
+  }
+
+  .worksheet-table-scroll,
+  .form6-table-section {
     width: 100%;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -1301,4 +1363,49 @@ textarea {
   .form6-columns {
     grid-template-columns: 1fr;
   }
+
+  .report-grid {
+    display: block;
+  }
+
+  .report-grid dt,
+  .form6-sheet dt {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+
+  .report-grid dd,
+  .form6-sheet dd {
+    padding: 0;
+    border-bottom: 1px dotted var(--line);
+  }
+
+  .report-grid dd.value-good,
+  .report-grid dd.value-bad,
+  .report-grid dd.value-good+dt+dd,
+  .report-grid dd.value-bad+dt+dd {
+    width: 4rem;
+    border: none;
+    text-align: center;
+  }
+
+  .form6-info-row {
+    display: block;
+  }
+
+  .form6-info-row label {
+    display: block;
+    border: none;
+  }
+
+  .report-grid dd,
+  .form6-sheet dd {
+    border-bottom: 0;
+  }
+
+  .launch-card .btn {
+    margin-bottom: 0;
+  }
+
+
 }

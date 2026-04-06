@@ -1,0 +1,123 @@
+@media (max-width: 999px) {
+  .tab {
+    font-size: 1.4rem;
+    padding: 0.7rem 1rem;
+    width: 100%;
+    text-align: left;
+    border-right-width: 3px;
+    margin-top: -3px;
+  }
+  
+  .data-table .field-small {
+    width: 4rem;
+  }
+
+  .launch-card {
+    border-left: 0;
+    border-right: 0;
+    box-shadow: none;
+    margin: 1rem 0;
+    width: 100%
+  }
+
+
+  .tab-panel {
+    padding: .75rem;
+  }
+
+  .card {
+    box-shadow: none;
+    padding: 1rem;
+    border: none;
+    max-width: 100%;
+  }
+  
+  .instrument-select select {
+    max-width: 15rem;
+  }
+  
+  .inner-tab,
+  .linkish {
+    font-size: 1.2rem;
+  }
+
+  .tab-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding-left: 0;
+  }
+
+  .inner-tabs-row {
+    align-items: stretch;
+  }
+
+  .inner-tabs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .inner-tab {
+    width: 100%;
+    margin-right: 0;
+    margin-top: -3px;
+    text-align: left;
+  }
+
+  .tabs-toolbar {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .top-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .save-status {
+    text-align: left;
+  }
+
+  .header-right {
+    justify-items: start;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inspection-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .instrument-tab-columns {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: 0.2rem 0.25rem;
+    font-size: 0.82rem;
+  }
+
+  .data-table input,
+  .data-table select {
+    min-height: 1.8rem;
+    font-size: 1rem;
+    padding: 0.1rem 0.25rem;
+  }
+
+  .worksheet-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .worksheet-table-scroll .data-table {
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .form6-columns {
+    grid-template-columns: 1fr;
+  }
+}
