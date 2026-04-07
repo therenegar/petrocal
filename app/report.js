@@ -369,7 +369,7 @@ function renderMeasure(measure, index) {
     ["Sightglass?", measure.sightglass],
     ["Serial number", measure.serialNumber],
     ["Volume (L)", measure.volume],
-    ["Certificate number", measure.certificateNumber],
+    ["Reg. 13 Certificate number", measure.certificateNumber],
     ["Certificate expiry", measure.certificateExpiry]
   ].forEach(([label, value]) => {
     const dt = document.createElement("dt");
@@ -418,7 +418,7 @@ function renderHose(hose, index, instrument, dataset) {
   const section = document.createElement("section");
   section.className = "report-subsection";
   const heading = document.createElement("h4");
-  heading.textContent = `${text(hose.number, "No POS")}/${text(hose.grade, "No grade")}`;
+  heading.textContent = `${text(hose.number, "No #")}/${text(hose.grade, "Grade unspecified")}`;
   heading.classList.add("grade-themed");
   const headingGradeKey = gradeStyleKey(hose.grade);
   if (headingGradeKey) heading.dataset.grade = headingGradeKey;
@@ -475,7 +475,7 @@ function renderHose(hose, index, instrument, dataset) {
     const measureCheckMeta = document.createElement("dl");
     measureCheckMeta.className = "report-grid";
     [
-      ["Average error (EAV)", measureCheckAverage],
+      ["Average error runs 1-3 (EAV) %", measureCheckAverage],
       ["Anti-drain/Hose-dilation fuel volume (mL)", pick(hose, ["measureCheck", "antiDrainMl"], "")]
     ].forEach(([label, value]) => {
       const dt = document.createElement("dt");
@@ -611,7 +611,7 @@ function renderInstrument(instrument, index, dataset) {
 
   const characteristicsColumn = document.createElement("section");
   characteristicsColumn.className = "report-subsection";
-  characteristicsColumn.append(Object.assign(document.createElement("h3"), { textContent: "General chacteristics" }));
+  characteristicsColumn.append(Object.assign(document.createElement("h3"), { textContent: "Visual inspection (clause 3.1)" }));
 
   const characteristicsGrid = document.createElement("dl");
   characteristicsGrid.className = "report-grid";
@@ -674,11 +674,12 @@ function renderReport() {
       ["Date of test", pick(dataset, ["testDetails", "date"], "")],
       ["Job number", pick(dataset, ["testDetails", "jobNumber"], "")],
       ["Type", pick(dataset, ["testDetails", "type"], "")],
+      ["Maximum permissible error (MPE) %", pick(dataset, ["testDetails", "mpe"], "")]
       ["Verifier's name", pick(dataset, ["testDetails", "verifierName"], "")],
       ["Registration number", pick(dataset, ["testDetails", "registrationNumber"], "")],
       ["Verification mark", pick(dataset, ["testDetails", "verificationMark"], "")],
-      ["Operator", pick(dataset, ["testDetails", "operator"], "")],
-      ["Maximum permissible error (MPE) %", pick(dataset, ["testDetails", "mpe"], "")]
+      ["Trading name", pick(dataset, ["testDetails", "operator"], "")],
+      
     ], [
       ["Site name", pick(dataset, ["testDetails", "siteName"], "")],
       ["Site number", pick(dataset, ["testDetails", "siteNumber"], "")],
@@ -695,7 +696,7 @@ function renderReport() {
   const measuresSection = document.createElement("section");
   measuresSection.className = "report-section";
   measuresSection.append(Object.assign(document.createElement("h2"), { textContent: "Measures" }));
-  measuresSection.append(Object.assign(document.createElement("p"), { textContent: "Details of the Reference Standards of Measurement used for testing." }));
+  measuresSection.append(Object.assign(document.createElement("p"), { textContent: "Details of the Reference Standards of Measurement used for testing (clause 2.0)." }));
   if (!dataset.measures || !dataset.measures.length) {
     measuresSection.append(Object.assign(document.createElement("p"), { textContent: "No measures." }));
   } else {

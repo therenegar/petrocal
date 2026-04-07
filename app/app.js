@@ -802,11 +802,12 @@ function renderTestDetails() {
     ["Date of test", "date", "text", null, "field-small"],
     ["Job number", "jobNumber", "number", null, "field-small"],
     ["Type of test", "type", "select", ["Verification", "Re-verification", "In-service Inspection"]],
+    ["Maximum permissible error (MPE) %", "mpe", "number", null, "field-small"],
     ["Verifier's name", "verifierName", "text", null, "field-medium"],
     ["Registration number", "registrationNumber", "text", null, "field-small"],
     ["Verification mark", "verificationMark", "text", null, "field-small"],
     [
-      "Operator/owner",
+      "Trading name",
       "operator",
       "select",
       [
@@ -836,7 +837,6 @@ function renderTestDetails() {
       ],
       "field-medium"
     ],
-    ["Maximum permissible error (MPE) %", "mpe", "number", null, "field-small"],
     ["Site name", "siteName", "text", null, "field-medium"],
     ["Site number", "siteNumber", "text", null, "field-small"],
     ["Contact on site", "contactOnSite", "text", null, "field-medium"],
@@ -1022,7 +1022,7 @@ function renderMeasures() {
   const fields = [
     ["Volume (L)", "volume", "number", "field-small"],
     ["Serial number", "serialNumber", "text", "field-medium"],
-    ["Certificate number", "certificateNumber", "text", "field-medium"],
+    ["Reg 13 Certificate number", "certificateNumber", "text", "field-medium"],
     ["Certificate expiry", "certificateExpiry", "text", "field-small"]
   ];
 
@@ -1326,7 +1326,7 @@ function renderHoses() {
   grid.append(hoseSerialPrefix, hoseSerialWrap);
 
   const basicFields = [
-    ["Unit price (¢/L)", "unitPrice", "number"],
+    ["Unit price displayed (¢/L)", "unitPrice", "number"],
     ["Start tote", "startTote", "number"],
     ["End tote", "endTote", "number"],
     ["Qmin (L/min)", "qmin", "number"],
@@ -1643,7 +1643,7 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
   meta.className = "form-grid top-gap";
 
   const avgLabel = document.createElement("span");
-  avgLabel.textContent = "Average error (EAV) (clause 3.12)";
+  avgLabel.textContent = "Average error runs 1-3 (EAV) (clause 3.12) %";
   const avgVal = document.createElement("strong");
   avgVal.textContent = avgError === "" ? "" : avgError;
   if (exceedsMpe(avgError)) avgVal.classList.add("value-bad");
@@ -1663,7 +1663,7 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
   meta.append(avgLabel, avgVal, antiLabel, antiInput);
   if (isVerification) {
     const reverificationLabel = document.createElement("span");
-    reverificationLabel.textContent = "Existing verification mark (if reverifying)";
+    reverificationLabel.textContent = "Record existing verification mark (if reverifying)";
     const reverificationInput = document.createElement("input");
     reverificationInput.type = "text";
     reverificationInput.classList.add("field-medium");
