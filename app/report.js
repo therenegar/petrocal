@@ -737,12 +737,11 @@ function renderReport() {
       ["Date of test", pick(dataset, ["testDetails", "date"], "")],
       ["Job number", pick(dataset, ["testDetails", "jobNumber"], "")],
       ["Type", pick(dataset, ["testDetails", "type"], "")],
-      ["Maximum permissible error (MPE) %", pick(dataset, ["testDetails", "mpe"], "")]
+      ["Maximum permissible error (MPE) %", pick(dataset, ["testDetails", "mpe"], "")],
       ["Verifier's name", pick(dataset, ["testDetails", "verifierName"], "")],
       ["Registration number", pick(dataset, ["testDetails", "registrationNumber"], "")],
       ["Verification mark", pick(dataset, ["testDetails", "verificationMark"], "")],
-      ["Trading name", pick(dataset, ["testDetails", "operator"], "")],
-      
+      ["Trading name", pick(dataset, ["testDetails", "operator"], "")]
     ], [
       ["Site name", pick(dataset, ["testDetails", "siteName"], "")],
       ["Site number", pick(dataset, ["testDetails", "siteNumber"], "")],
