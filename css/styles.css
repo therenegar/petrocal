@@ -888,7 +888,7 @@ textarea {
   background: #fff;
   cursor: pointer;
   position: relative;
-  font-weight: bold;
+  font-weight: 900;
   background: var(--gold);
   margin-left: .5rem;
   min-width: 1.5rem;
@@ -901,14 +901,16 @@ textarea {
   top: -0.35rem;
   min-width: 260px;
   max-width: 360px;
-  background: #222;
-  color: #fff;
-  border-radius: 0.35rem;
+  background: var(--cream);
+  color: var(--line_);
   padding: 0.4rem 0.5rem;
   text-align: left;
   z-index: 10;
-  font-weight: bold;
+  font-weight: normal;
   font-size: 1rem;
+  border: 3px solid var(--line);
+  box-shadow: var(--shadow);
+  line-height: 1.2rem;
 }
 
 .help-tip-trigger:hover .help-tip-bubble,
