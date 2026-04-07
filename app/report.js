@@ -303,6 +303,20 @@ function exceedsMpe(dataset, value) {
   return Math.abs(numeric) > Math.abs(mpe);
 }
 
+
+function antiDrainLimitForQmax(qmax) {
+  const parsedQmax = Number(qmax);
+  if (!Number.isFinite(parsedQmax)) return null;
+  return parsedQmax <= 60 ? 20 : 50;
+}
+
+function antiDrainExceedsLimit(hose, value) {
+  const antiDrainValue = Number(value);
+  const limit = antiDrainLimitForQmax(hose.qmax);
+  if (!Number.isFinite(antiDrainValue) || !Number.isFinite(limit)) return false;
+  return antiDrainValue > limit;
+}
+
 function hoseDeliveryRows(hose, sectionKey, instrumentType) {
   const rows = [
     { label: "#1", ...pick(hose, [sectionKey, "deliveries", 0], {}) },
@@ -515,6 +529,12 @@ function renderHose(hose, index, instrument, dataset) {
       const dd = document.createElement("dd");
       dd.textContent = text(value);
       if (label.startsWith("Average error") && exceedsMpe(dataset, value)) dd.classList.add("value-bad");
+      if (label.startsWith("Anti-drain")) {
+        const isAntiDrainValuePresent = String(value || "").trim() !== "";
+        const antiDrainIsBad = antiDrainExceedsLimit(hose, value);
+        if (antiDrainIsBad) dd.classList.add("value-bad");
+        else if (isAntiDrainValuePresent) dd.classList.add("value-good");
+      }
       decorateOutcomeElement(dd, value);
       measureCheckMeta.append(dt, dd);
     });
@@ -549,6 +569,12 @@ function renderHose(hose, index, instrument, dataset) {
       const dd = document.createElement("dd");
       dd.textContent = text(value);
       if (label.startsWith("Average error") && exceedsMpe(dataset, value)) dd.classList.add("value-bad");
+      if (label.startsWith("Anti-drain")) {
+        const isAntiDrainValuePresent = String(value || "").trim() !== "";
+        const antiDrainIsBad = antiDrainExceedsLimit(hose, value);
+        if (antiDrainIsBad) dd.classList.add("value-bad");
+        else if (isAntiDrainValuePresent) dd.classList.add("value-good");
+      }
       decorateOutcomeElement(dd, value);
       verificationMeta.append(dt, dd);
     });
@@ -711,12 +737,11 @@ function renderReport() {
       ["Date of test", pick(dataset, ["testDetails", "date"], "")],
       ["Job number", pick(dataset, ["testDetails", "jobNumber"], "")],
       ["Type", pick(dataset, ["testDetails", "type"], "")],
-      ["Maximum permissible error (MPE) %", pick(dataset, ["testDetails", "mpe"], "")]
+      ["Maximum permissible error (MPE) %", pick(dataset, ["testDetails", "mpe"], "")],
       ["Verifier's name", pick(dataset, ["testDetails", "verifierName"], "")],
       ["Registration number", pick(dataset, ["testDetails", "registrationNumber"], "")],
       ["Verification mark", pick(dataset, ["testDetails", "verificationMark"], "")],
-      ["Trading name", pick(dataset, ["testDetails", "operator"], "")],
-      
+      ["Trading name", pick(dataset, ["testDetails", "operator"], "")]
     ], [
       ["Site name", pick(dataset, ["testDetails", "siteName"], "")],
       ["Site number", pick(dataset, ["testDetails", "siteNumber"], "")],

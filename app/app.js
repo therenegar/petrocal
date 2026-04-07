@@ -1563,6 +1563,25 @@ function exceedsMpe(efd) {
   return Math.abs(efdVal) > Math.abs(mpe);
 }
 
+
+function antiDrainLimitForQmax(qmax) {
+  const parsedQmax = Number(qmax);
+  if (!Number.isFinite(parsedQmax)) return null;
+  return parsedQmax <= 60 ? 20 : 50;
+}
+
+function applyAntiDrainOutcomeStyle(input, qmax) {
+  input.classList.remove("value-good", "value-bad");
+  const antiDrainValue = Number(input.value);
+  const limit = antiDrainLimitForQmax(qmax);
+  if (!Number.isFinite(antiDrainValue) || !Number.isFinite(limit)) return;
+  if (antiDrainValue > limit) {
+    input.classList.add("value-bad");
+    return;
+  }
+  input.classList.add("value-good");
+}
+
 function renderMeasureCheckPanel(hose) {
   return renderDeliveryPanel(hose, "measureCheck");
 }
@@ -1718,8 +1737,13 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
   antiInput.classList.add("field-small");
   setSchemaNameAttr(antiInput, "antiDrainMl");
   antiInput.value = data.antiDrainMl || "";
+  applyAntiDrainOutcomeStyle(antiInput, hose.qmax);
+  antiInput.addEventListener("input", () => {
+    applyAntiDrainOutcomeStyle(antiInput, hose.qmax);
+  });
   antiInput.addEventListener("change", () => {
     data.antiDrainMl = antiInput.value;
+    applyAntiDrainOutcomeStyle(antiInput, hose.qmax);
     persistLocalDataset();
   });
 
