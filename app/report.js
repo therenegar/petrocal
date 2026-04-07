@@ -43,6 +43,38 @@ const OPERATOR_LOGOS = [
   ["united", "res/logos/icon-united.svg"]
 ];
 
+const SUBSCRIPT_TOKENS = new Map([
+  ["Qmin", ["Q", "min"]],
+  ["Qmax", ["Q", "max"]],
+  ["VFD", ["V", "FD"]],
+  ["VREF", ["V", "REF"]],
+  ["ED", ["E", "D"]],
+  ["EAV", ["E", "AV"]],
+  ["EFD", ["E", "FD"]]
+]);
+
+function appendSubscriptText(target, text) {
+  const value = String(text ?? "");
+  const fragment = document.createDocumentFragment();
+  const tokenRegex = /\b(Qmin|Qmax|VFD|VREF|ED|EAV|EFD)\b/g;
+  let cursor = 0;
+  let match = tokenRegex.exec(value);
+  while (match) {
+    if (match.index > cursor) fragment.append(value.slice(cursor, match.index));
+    const [base, sub] = SUBSCRIPT_TOKENS.get(match[0]) || [match[0], ""];
+    fragment.append(base);
+    if (sub) {
+      const subNode = document.createElement("sub");
+      subNode.textContent = sub;
+      fragment.append(subNode);
+    }
+    cursor = match.index + match[0].length;
+    match = tokenRegex.exec(value);
+  }
+  if (cursor < value.length) fragment.append(value.slice(cursor));
+  target.replaceChildren(fragment);
+}
+
 const DEFAULT_EXPORT_BASE_URL = "http://localhost:8080/petrocal/tools";
 const EXPORT_BASE_URL_STORAGE_KEY = "petrocal.report.exportBaseUrl";
 
@@ -298,7 +330,7 @@ function renderKeyValueGrid(title, rows) {
 
   rows.forEach(([label, value]) => {
     const dt = document.createElement("dt");
-    dt.textContent = label;
+    appendSubscriptText(dt, label);
     const dd = document.createElement("dd");
     dd.textContent = text(value);
     decorateOutcomeElement(dd, value);
@@ -445,7 +477,7 @@ function renderHose(hose, index, instrument, dataset) {
 
   rows.forEach(([label, value]) => {
     const dt = document.createElement("dt");
-    dt.textContent = label;
+    appendSubscriptText(dt, label);
     const dd = document.createElement("dd");
     if (label === "Performance code") {
       const code = text(value).trim().toUpperCase();
@@ -479,7 +511,7 @@ function renderHose(hose, index, instrument, dataset) {
       ["Anti-drain/Hose-dilation fuel volume (mL)", pick(hose, ["measureCheck", "antiDrainMl"], "")]
     ].forEach(([label, value]) => {
       const dt = document.createElement("dt");
-      dt.textContent = label;
+      appendSubscriptText(dt, label);
       const dd = document.createElement("dd");
       dd.textContent = text(value);
       if (label.startsWith("Average error") && exceedsMpe(dataset, value)) dd.classList.add("value-bad");
@@ -513,7 +545,7 @@ function renderHose(hose, index, instrument, dataset) {
       ["Existing verification mark", pick(hose, ["verification", "reverification"], "")]
     ].forEach(([label, value]) => {
       const dt = document.createElement("dt");
-      dt.textContent = label;
+      appendSubscriptText(dt, label);
       const dd = document.createElement("dd");
       dd.textContent = text(value);
       if (label.startsWith("Average error") && exceedsMpe(dataset, value)) dd.classList.add("value-bad");
@@ -549,7 +581,12 @@ function renderRunsTable(rows, runLabel = null, includeEd = false, dataset = nul
   const table = document.createElement("table");
   table.className = "report-table";
   const header = document.createElement("thead");
-  header.innerHTML = `<tr><th>Run</th><th>VFD</th><th>VREF</th><th>EFD (%)</th>${includeEd ? "<th>ED (%)</th>" : ""}</tr>`;
+  header.innerHTML = `<tr><th>Run</th><th></th><th></th><th></th>${includeEd ? "<th></th>" : ""}</tr>`;
+  const headerCells = header.querySelectorAll("th");
+  appendSubscriptText(headerCells[1], "VFD");
+  appendSubscriptText(headerCells[2], "VREF");
+  appendSubscriptText(headerCells[3], "EFD (%)");
+  if (includeEd && headerCells[4]) appendSubscriptText(headerCells[4], "ED (%)");
   table.append(header);
 
   const body = document.createElement("tbody");

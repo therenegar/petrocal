@@ -6,6 +6,10 @@
   src: local("DM Sans Regular"), local("DMSans-Regular"), url("../res/fonts/DMSans-Regular.woff2") format("woff2");
 }
 
+sub {
+  color: red;
+}
+
 @font-face {
   font-family: "DM Sans";
   font-style: italic;

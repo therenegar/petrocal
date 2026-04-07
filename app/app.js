@@ -34,6 +34,38 @@ const COMPLIANCE_QUESTIONS = [
   "Pre-set indications (clause 3.11)"
 ];
 
+const SUBSCRIPT_TOKENS = new Map([
+  ["Qmin", ["Q", "min"]],
+  ["Qmax", ["Q", "max"]],
+  ["VFD", ["V", "FD"]],
+  ["VREF", ["V", "REF"]],
+  ["ED", ["E", "D"]],
+  ["EAV", ["E", "AV"]],
+  ["EFD", ["E", "FD"]]
+]);
+
+function appendSubscriptText(target, text) {
+  const value = String(text ?? "");
+  const fragment = document.createDocumentFragment();
+  const tokenRegex = /\b(Qmin|Qmax|VFD|VREF|ED|EAV|EFD)\b/g;
+  let cursor = 0;
+  let match = tokenRegex.exec(value);
+  while (match) {
+    if (match.index > cursor) fragment.append(value.slice(cursor, match.index));
+    const [base, sub] = SUBSCRIPT_TOKENS.get(match[0]) || [match[0], ""];
+    fragment.append(base);
+    if (sub) {
+      const subNode = document.createElement("sub");
+      subNode.textContent = sub;
+      fragment.append(subNode);
+    }
+    cursor = match.index + match[0].length;
+    match = tokenRegex.exec(value);
+  }
+  if (cursor < value.length) fragment.append(value.slice(cursor));
+  target.replaceChildren(fragment);
+}
+
 const PERFORMANCE_CODES = [
   { code: "A", label: "A- new instrument" },
   { code: "B", label: "B- routine inspection or contract requirement (without recalibration or repair)" },
@@ -742,7 +774,7 @@ function buildLabelWithHelp(labelText, helpText = "") {
   const wrapper = document.createElement("span");
   wrapper.className = "label-with-help";
   const label = document.createElement("span");
-  label.textContent = labelText;
+  appendSubscriptText(label, labelText);
   wrapper.append(label);
 
   if (helpText) {
@@ -752,7 +784,7 @@ function buildLabelWithHelp(labelText, helpText = "") {
     trigger.textContent = "?";
     const tip = document.createElement("span");
     tip.className = "help-tip-bubble";
-    tip.textContent = helpText;
+    appendSubscriptText(tip, helpText);
     trigger.append(tip);
     wrapper.append(trigger);
   }
@@ -1352,7 +1384,7 @@ function renderHoses() {
 
   basicFields.forEach(([label, key, type]) => {
     const span = key === "maxRate" ? buildLabelWithHelp(label, LABEL_HELP_TEXT.maxAchievableRate) : document.createElement("span");
-    if (key !== "maxRate") span.textContent = label;
+    if (key !== "maxRate") appendSubscriptText(span, label);
     const input = document.createElement("input");
     input.type = type;
     input.classList.add("field-small");
@@ -1575,7 +1607,11 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
 
   const table = document.createElement("table");
   table.className = "data-table";
-  table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th></th><th></th></tr></thead>";
+  table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th></th><th></th><th></th><th></th></tr></thead>";
+  const vfdHeading = table.querySelector("thead th:nth-child(3)");
+  if (vfdHeading) appendSubscriptText(vfdHeading, "VFD (L)");
+  const vrefHeading = table.querySelector("thead th:nth-child(4)");
+  if (vrefHeading) appendSubscriptText(vrefHeading, "VREF (L)");
   const efdHeading = table.querySelector("thead th:nth-child(5)");
   if (efdHeading) {
     efdHeading.append(buildLabelWithHelp("EFD (%)", LABEL_HELP_TEXT.efdPercent), document.createElement("br"));
@@ -1668,7 +1704,7 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
   meta.className = "form-grid top-gap";
 
   const avgLabel = document.createElement("span");
-  avgLabel.textContent = "Average error runs 1-3 (EAV) (clause 3.12) %";
+  appendSubscriptText(avgLabel, "Average error runs 1-3 (EAV) (clause 3.12) %");
   const avgVal = document.createElement("strong");
   avgVal.textContent = avgError === "" ? "" : avgError;
   if (exceedsMpe(avgError)) avgVal.classList.add("value-bad");
