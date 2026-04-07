@@ -760,6 +760,22 @@ function buildLabelWithHelp(labelText, helpText = "") {
   return wrapper;
 }
 
+const LABEL_HELP_TEXT = {
+  mpe: "The MPE specified by the NMI is 0.3. This may be lower depending on certain client requirements.",
+  hoseCount:
+    "Enter only the number of hoses you are checking/verifying. So if it is an 8 hose pump but you're only calibrating and verifying 2 hoses, enter 2.",
+  typeOfSystem:
+    "Choosing suction will display additional required items for calibration and verification (i.e. gas elimination). All terminology for the instrument will reflect dispenser if pressurised, or pump if suction.",
+  hoseSerialNumber:
+    "The hose serial number comprises the instrument serial number and a suffix. The NMI Numbering Guide will help you determine the suffix for this hose position.",
+  maxAchievableRate:
+    "This can be determined during one of the fast flow accuracy test deliveries or during the conditioning of the reference standard.",
+  antiDrain:
+    "Assuming retail fuel sites don't have a hose reel.",
+  efdPercent: "Calculated as EFD = (VFD - VREF) * 100 / VREF",
+  edPercent: "Calculated as ED = EAV - EFD"
+};
+
 function moveInstrument(index, direction) {
   const target = index + direction;
   if (target < 0 || target >= dataset.instruments.length) return;
@@ -851,8 +867,8 @@ function renderTestDetails() {
   form.className = "form-grid";
 
   fields.forEach(([label, key, type, options, sizeClass]) => {
-    const span = document.createElement("span");
-    span.textContent = label;
+    const span = key === "mpe" ? buildLabelWithHelp(label, LABEL_HELP_TEXT.mpe) : document.createElement("span");
+    if (key !== "mpe") span.textContent = label;
 
     let control;
     if (type === "select") {
@@ -1120,8 +1136,10 @@ function renderInstruments() {
           label,
           "Enter each number assigned to the instrument at POS separated by a forward-slash /"
         )
+      : key === "hoseCount"
+        ? buildLabelWithHelp(label, LABEL_HELP_TEXT.hoseCount)
       : document.createElement("span");
-    if (key !== "numbering") span.textContent = label;
+    if (!["numbering", "hoseCount"].includes(key)) span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
     if (key === "manufactureDate") input.placeholder = "DD/MM/YYYY";
@@ -1173,8 +1191,7 @@ function renderInstruments() {
   });
   form.append(productsSpan, productsSelect);
 
-  const typeSpan = document.createElement("span");
-  typeSpan.textContent = "Type of system";
+  const typeSpan = buildLabelWithHelp("Type of system", LABEL_HELP_TEXT.typeOfSystem);
   const typeSelect = document.createElement("select");
   typeSelect.classList.add("field-small");
   ["", "Pressurised", "Suction"].forEach((option) => typeSelect.append(new Option(option, option)));
@@ -1301,8 +1318,7 @@ function renderHoses() {
   grid.append(gradeSpan, grade);
 
   const baseSerial = instrument.serialNumber || "";
-  const hoseSerialPrefix = document.createElement("span");
-  hoseSerialPrefix.textContent = "Hose serial number";
+  const hoseSerialPrefix = buildLabelWithHelp("Hose serial number", LABEL_HELP_TEXT.hoseSerialNumber);
   const hoseSerialWrap = document.createElement("div");
   hoseSerialWrap.className = "serial-prefix-wrap";
   const prefix = document.createElement("strong");
@@ -1335,8 +1351,8 @@ function renderHoses() {
   ];
 
   basicFields.forEach(([label, key, type]) => {
-    const span = document.createElement("span");
-    span.textContent = label;
+    const span = key === "maxRate" ? buildLabelWithHelp(label, LABEL_HELP_TEXT.maxAchievableRate) : document.createElement("span");
+    if (key !== "maxRate") span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
     input.classList.add("field-small");
@@ -1559,7 +1575,16 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
 
   const table = document.createElement("table");
   table.className = "data-table";
-  table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th>EFD (%)<br/>Accuracy<br/>(clause 3.9)</th><th>ED (%)</th></tr></thead>";
+  table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th>VFD (L)</th><th>VREF (L)</th><th></th><th></th></tr></thead>";
+  const efdHeading = table.querySelector("thead th:nth-child(5)");
+  if (efdHeading) {
+    efdHeading.append(buildLabelWithHelp("EFD (%)", LABEL_HELP_TEXT.efdPercent), document.createElement("br"));
+    efdHeading.append("Accuracy", document.createElement("br"), "(clause 3.9)");
+  }
+  const edHeading = table.querySelector("thead th:nth-child(6)");
+  if (edHeading) {
+    edHeading.append(buildLabelWithHelp("ED (%)", LABEL_HELP_TEXT.edPercent));
+  }
   const body = document.createElement("tbody");
   const isSuctionSystem = String(instrumentType || "").trim().toLowerCase() === "suction";
 
@@ -1648,8 +1673,10 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
   avgVal.textContent = avgError === "" ? "" : avgError;
   if (exceedsMpe(avgError)) avgVal.classList.add("value-bad");
 
-  const antiLabel = document.createElement("span");
-  antiLabel.textContent = "Anti-drain/Hose dilation vol. of drained fuel (mL) (clause 3.13)";
+  const antiLabel = buildLabelWithHelp(
+    "Anti-drain/Hose dilation vol. of drained fuel (mL) (clause 3.13)",
+    LABEL_HELP_TEXT.antiDrain
+  );
   const antiInput = document.createElement("input");
   antiInput.type = "number";
   antiInput.classList.add("field-small");
