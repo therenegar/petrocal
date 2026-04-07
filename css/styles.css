@@ -822,6 +822,7 @@ textarea {
   padding: 0.45rem 1rem;
   cursor: pointer;
   margin-right: -3px;
+  margin-bottom: 3px;
 }
 
 .inner-tab.active {
@@ -1232,6 +1233,7 @@ textarea {
 
   .inner-tab {
     position: relative;
+    margin-bottom: 0;
   }
   .tab.active::after, .inner-tab.active::after {
     content: "";
