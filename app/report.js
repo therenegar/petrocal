@@ -522,7 +522,7 @@ function renderHose(hose, index, instrument, dataset) {
     measureCheckMeta.className = "report-grid";
     [
       ["Average error runs 1-3 (EAV) %", measureCheckAverage],
-      ["Anti-drain/Hose-dilation fuel volume (mL)", pick(hose, ["measureCheck", "antiDrainMl"], "")]
+      ["Anti-drain/Hose-dilation fuel vol. (mL)", pick(hose, ["measureCheck", "antiDrainMl"], "")]
     ].forEach(([label, value]) => {
       const dt = document.createElement("dt");
       appendSubscriptText(dt, label);
@@ -561,7 +561,7 @@ function renderHose(hose, index, instrument, dataset) {
     verificationMeta.className = "report-grid";
     [
       ["Average error (EAV)", averageError],
-      ["Anti-drain/Hose-dilation fuel volume (mL)", pick(hose, ["verification", "antiDrainMl"], "")],
+      ["Anti-drain/Hose-dilation fuel vol. (mL)", pick(hose, ["verification", "antiDrainMl"], "")],
       ["Existing verification mark", pick(hose, ["verification", "reverification"], "")]
     ].forEach(([label, value]) => {
       const dt = document.createElement("dt");

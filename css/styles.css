@@ -6,10 +6,6 @@
   src: local("DM Sans Regular"), local("DMSans-Regular"), url("../res/fonts/DMSans-Regular.woff2") format("woff2");
 }
 
-sub {
-  color: red;
-}
-
 @font-face {
   font-family: "DM Sans";
   font-style: italic;
@@ -125,6 +121,11 @@ hr {
   border: none;
   border-bottom: 3px solid var(--line);
 }
+
+sub {
+  
+}
+
 
 .print-only {
   display: none;
@@ -695,7 +696,7 @@ textarea {
 
 .report-grid {
   display: grid;
-  grid-template-columns: minmax(160px, 240px) 1fr;
+  grid-template-columns: minmax(8rem, 20rem) 1fr;
   gap: 0.35rem 0.8rem;
   margin: 0;
 }
@@ -888,8 +889,9 @@ textarea {
   cursor: pointer;
   position: relative;
   font-weight: bold;
-  background: var(--accent);
+  background: var(--gold);
   margin-left: .5rem;
+  min-width: 1.5rem;
 }
 
 .help-tip-bubble {
