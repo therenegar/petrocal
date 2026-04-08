@@ -714,7 +714,7 @@ dl.report-grid:nth-child(3) dt { border: none; padding-bottom: 0; }
 dl.report-grid:nth-child(3) dd { padding: 0; }
 
 .report-table + .report-grid, h5 + .report-grid {
-  grid-template-columns: minmax(75%, 75%) 1fr;
+  grid-template-columns: minmax(70%, 70%) 1fr;
 }
 
 .report-two-column-grid {
@@ -745,11 +745,15 @@ dl.report-grid:nth-child(3) dd { padding: 0; }
 }
 
 .report-grid dd.value-good {
-  background: none;
+  background: transparent url("../res/icon-field-ok.svg") no-repeat left top 0.2rem;
+  background-size: 1rem;
+  padding-left: 1.5rem;
 }
 
 .report-grid dd.value-bad {
-  background: var(--bad);
+  background: transparent url("../res/icon-field-bad.svg") no-repeat left top 0.2rem;
+  background-size: 1rem;
+  padding-left: 1.5rem;
 }
 
 .instrument-columns section:first-child .report-grid {
@@ -1456,10 +1460,28 @@ textarea {
   .report-grid dd.value-bad,
   .report-grid dd.value-good+dt+dd,
   .report-grid dd.value-bad+dt+dd {
-    width: 4rem;
+    width: fit-content;
+    min-width: 5rem;
     border: none;
-    text-align: center;
+    text-align: left;
   }
+
+.report-grid dd.value-good {
+  background: url("../res/icon-field-ok.svg") no-repeat left top 0.22rem;
+  background-size: 1rem;
+  padding-left: 1.5rem;
+}
+
+.report-grid dd.value-bad {
+  background: url("../res/icon-field-bad.svg") no-repeat left top 0.22rem;
+  background-size: 1rem;
+  padding-left: 1.5em;
+}
+
+
+.instrument-columns > section + section.report-subsection .report-grid dd {
+  text-align: left;
+}
 
   .form6-info-row {
     display: block;
