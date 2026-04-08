@@ -741,8 +741,8 @@ function renderReport() {
       ["Verifier's name", pick(dataset, ["testDetails", "verifierName"], "")],
       ["Registration number", pick(dataset, ["testDetails", "registrationNumber"], "")],
       ["Verification mark", pick(dataset, ["testDetails", "verificationMark"], "")],
-      ["Trading name", pick(dataset, ["testDetails", "operator"], "")]
     ], [
+      ["Operator", pick(dataset, ["testDetails", "operator"], "")],
       ["Site name", pick(dataset, ["testDetails", "siteName"], "")],
       ["Site number", pick(dataset, ["testDetails", "siteNumber"], "")],
       ["Contact on site", pick(dataset, ["testDetails", "contactOnSite"], "")],
@@ -751,7 +751,7 @@ function renderReport() {
       ["State", pick(dataset, ["testDetails", "state"], "")],
       ["Post Code", pick(dataset, ["testDetails", "postCode"], "")]
     ], [
-      ["Comments", pick(dataset, ["testDetails", "comments"], "")]
+      ["Comments", pick(dataset, ["testDetails", "comments"], "")],
     ])
   );
 

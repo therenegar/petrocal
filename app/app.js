@@ -855,7 +855,7 @@ function renderTestDetails() {
     ["Registration number", "registrationNumber", "text", null, "field-small"],
     ["Verification mark", "verificationMark", "text", null, "field-small"],
     [
-      "Trading name",
+      "Operator",
       "operator",
       "select",
       [
@@ -1430,7 +1430,8 @@ function renderHoses() {
 
   const volumeSpan = document.createElement("span");
   volumeSpan.textContent = "Volume used for testing";
-  const volumeStrong = document.createElement("strong");
+  const volumeStrong = document.createElement("span");
+  volumeStrong.className = "test-vol";
   const volumeUsed = Number(hose.endTote) - Number(hose.startTote);
   volumeStrong.textContent = Number.isFinite(volumeUsed) ? `${volumeUsed || 0}L` : "0L";
   grid.append(volumeSpan, volumeStrong);
@@ -1550,7 +1551,7 @@ function validateMeasureSize(hose, measure, context = { section: "measureCheck",
     Number.isFinite(measureVolume) &&
     measureVolume <= maxRate
   ) {
-    return "Invalid measure size selected";
+    return "Invalid size for flow rate.";
   }
 
   return "";
@@ -1571,15 +1572,15 @@ function antiDrainLimitForQmax(qmax) {
 }
 
 function applyAntiDrainOutcomeStyle(input, qmax) {
-  input.classList.remove("value-good", "value-bad");
+  input.classList.remove("select-good", "select-bad");
   const antiDrainValue = Number(input.value);
   const limit = antiDrainLimitForQmax(qmax);
   if (!Number.isFinite(antiDrainValue) || !Number.isFinite(limit)) return;
   if (antiDrainValue > limit) {
-    input.classList.add("value-bad");
+    input.classList.add("select-bad");
     return;
   }
-  input.classList.add("value-good");
+  input.classList.add("select-good");
 }
 
 function renderMeasureCheckPanel(hose) {
@@ -1724,7 +1725,8 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
 
   const avgLabel = document.createElement("span");
   appendSubscriptText(avgLabel, "Average error runs 1-3 (EAV) (clause 3.12) %");
-  const avgVal = document.createElement("strong");
+  const avgVal = document.createElement("span");
+  avgVal.className="avg-error";
   avgVal.textContent = avgError === "" ? "" : avgError;
   if (exceedsMpe(avgError)) avgVal.classList.add("value-bad");
 
