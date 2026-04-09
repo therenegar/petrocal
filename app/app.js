@@ -1505,7 +1505,7 @@ function renderHoses() {
   const body = document.createElement("div");
   body.className = "nested-content";
   const activeTabLabel = innerTabs[innerTab];
-  if (activeTabLabel === "In-service Inspection") body.append(renderMeasureCheckPanel(hose));
+  if (activeTabLabel === "In-service Inspection") body.append(renderMeasureCheckPanel(hose, instrument.type));
   if (activeTabLabel === "Verification") body.append(renderVerificationPanel(hose, instrument.type));
   if (activeTabLabel === "Compliance") body.append(renderCompliancePanel(hose));
 
@@ -1556,6 +1556,13 @@ function calculateEfd(vfd, vref) {
   const b = Number(vref);
   if (!Number.isFinite(a) || !Number.isFinite(b) || b === 0) return "";
   return (((a - b) / b) * 100).toFixed(2);
+}
+
+function calculateEd(eav, efd) {
+  const averageError = Number(eav);
+  const gasEliminationEfd = Number(efd);
+  if (!Number.isFinite(averageError) || !Number.isFinite(gasEliminationEfd)) return "";
+  return (averageError - gasEliminationEfd).toFixed(2);
 }
 
 function findMeasure(measureId) {
@@ -1632,8 +1639,8 @@ function applyAntiDrainOutcomeStyle(input, qmax) {
   input.classList.add("select-good");
 }
 
-function renderMeasureCheckPanel(hose) {
-  return renderDeliveryPanel(hose, "measureCheck");
+function renderMeasureCheckPanel(hose, instrumentType) {
+  return renderDeliveryPanel(hose, "measureCheck", instrumentType);
 }
 
 function verificationMarkWithDateCode() {
@@ -1666,6 +1673,11 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
   const isVerification = sectionKey === "verification";
   const wrap = document.createElement("div");
   const data = hose[sectionKey];
+  const avgError = average([
+    data.deliveries[0].efd,
+    data.deliveries[1].efd,
+    data.deliveries[2].efd
+  ]);
   if (isVerification) {
     const verificationMark = document.createElement("div");
     verificationMark.className = "verification-mark";
@@ -1739,18 +1751,8 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
     efd.textContent = rowObj.efd || "";
 
     const ed = document.createElement("td");
-    if (rowIndex === 5) {
-      const input = document.createElement("input");
-      input.type = "number";
-      input.classList.add("field-small");
-      setSchemaNameAttr(input, "ed");
-      input.step = "0.01";
-      input.value = rowObj.ed || "";
-      input.addEventListener("change", () => {
-        rowObj.ed = input.value;
-        persistLocalDataset();
-      });
-      ed.append(input);
+    if (isVerification && rowIndex === 5 && isSuctionSystem) {
+      ed.textContent = calculateEd(avgError, rowObj.efd);
     }
 
     tr.append(label, measureCell, vfd, vref, efd, ed);
@@ -1762,12 +1764,6 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
   const tableScroller = document.createElement("div");
   tableScroller.className = "worksheet-table-scroll";
   tableScroller.append(table);
-
-  const avgError = average([
-    data.deliveries[0].efd,
-    data.deliveries[1].efd,
-    data.deliveries[2].efd
-  ]);
 
   const meta = document.createElement("div");
   meta.className = "form-grid top-gap";
