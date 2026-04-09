@@ -789,7 +789,7 @@ function buildLabelWithHelp(labelText, helpText = "") {
     trigger.type = "button";
     trigger.className = "help-tip-trigger";
     trigger.textContent = "?";
-    trigger.title = helpText;
+    //trigger.title = helpText;
     const tip = document.createElement("span");
     tip.className = "help-tip-bubble";
     appendSubscriptText(tip, helpText);
@@ -1688,7 +1688,7 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
 
   const table = document.createElement("table");
   table.className = "data-table";
-  table.innerHTML = "<thead><tr><th></th><th>Measure used</th><th></th><th></th><th></th><th></th></tr></thead>";
+  table.innerHTML = "<thead><tr><th>Accuracy (clause 3.0)</th><th>Measure used</th><th></th><th></th><th></th><th></th></tr></thead>";
   const vfdHeading = table.querySelector("thead th:nth-child(3)");
   if (vfdHeading) appendSubscriptText(vfdHeading, "VFD (L)");
   const vrefHeading = table.querySelector("thead th:nth-child(4)");
@@ -1696,7 +1696,7 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
   const efdHeading = table.querySelector("thead th:nth-child(5)");
   if (efdHeading) {
     efdHeading.append(buildLabelWithHelp("EFD (%)", LABEL_HELP_TEXT.efdPercent), document.createElement("br"));
-    efdHeading.append("Accuracy", document.createElement("br"), "(clause 3.9)");
+    //efdHeading.append("Accuracy", document.createElement("br"), "(clause 3.9)");
   }
   const edHeading = table.querySelector("thead th:nth-child(6)");
   if (edHeading) {

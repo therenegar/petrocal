@@ -139,7 +139,7 @@ sub {
 
 
 a {
-  color: var(--dim);
+  color: var(--accent);
   text-decoration: none;
 }
 
@@ -924,13 +924,7 @@ dl.report-grid:nth-child(3) dd { padding: 0; }
 }
 
 .inline-guide-link {
-  font-size: 1rem;
-  color: #666;
   margin-left: 1rem;
-  text-decoration: none;
-}
-.inline-guide-link:hover {
-  text-decoration: underline;
 }
 
 .label-with-help {
@@ -953,6 +947,7 @@ dl.report-grid:nth-child(3) dd { padding: 0; }
   margin-left: .5rem;
   min-width: 1.4rem;
   color: var(--line);
+  cursor: help;
 }
 
 .help-tip-trigger:hover, .help-tip-trigger:focus {
