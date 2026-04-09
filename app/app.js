@@ -1505,7 +1505,7 @@ function renderHoses() {
   const body = document.createElement("div");
   body.className = "nested-content";
   const activeTabLabel = innerTabs[innerTab];
-  if (activeTabLabel === "In-service Inspection") body.append(renderMeasureCheckPanel(hose));
+  if (activeTabLabel === "In-service Inspection") body.append(renderMeasureCheckPanel(hose, instrument.type));
   if (activeTabLabel === "Verification") body.append(renderVerificationPanel(hose, instrument.type));
   if (activeTabLabel === "Compliance") body.append(renderCompliancePanel(hose));
 
@@ -1639,8 +1639,8 @@ function applyAntiDrainOutcomeStyle(input, qmax) {
   input.classList.add("select-good");
 }
 
-function renderMeasureCheckPanel(hose) {
-  return renderDeliveryPanel(hose, "measureCheck");
+function renderMeasureCheckPanel(hose, instrumentType) {
+  return renderDeliveryPanel(hose, "measureCheck", instrumentType);
 }
 
 function verificationMarkWithDateCode() {
