@@ -317,6 +317,28 @@ function antiDrainExceedsLimit(hose, value) {
   return antiDrainValue > limit;
 }
 
+function asFiniteNumber(value) {
+  if (value === null || value === undefined) return null;
+  const normalized = String(value).replace(/,/g, "").trim();
+  if (!normalized) return null;
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function formatDifferenceLitres(startValue, endValue) {
+  const start = asFiniteNumber(startValue);
+  const end = asFiniteNumber(endValue);
+  if (start === null || end === null) return "—";
+  return `${end - start} L`;
+}
+
+function formatWithUnit(value, unit) {
+  if (value === null || value === undefined) return "—";
+  const raw = String(value).trim();
+  if (!raw) return "—";
+  return `${raw} ${unit}`;
+}
+
 function hoseDeliveryRows(hose, sectionKey, instrumentType) {
   const rows = [
     { label: "#1", ...pick(hose, [sectionKey, "deliveries", 0], {}) },
@@ -414,7 +436,7 @@ function renderMeasure(measure, index) {
     ["Type", measure.type],
     ["Sightglass?", measure.sightglass],
     ["Serial number", measure.serialNumber],
-    ["Volume (L)", measure.volume],
+    ["Volume", formatWithUnit(measure.volume, "L")],
     ["Reg. 13 Certificate number", measure.certificateNumber],
     ["Certificate expiry", measure.certificateExpiry]
   ].forEach(([label, value]) => {
@@ -477,12 +499,13 @@ function renderHose(hose, index, instrument, dataset) {
       "Hose serial",
       `${text(instrument.serialNumber, "")}${instrument.serialNumber && hose.hoseSerialSuffix ? "-" : ""}${text(hose.hoseSerialSuffix, "")}` || "—"
     ],
-    ["Unit price (¢/L)", hose.unitPrice],
+    ["Unit price", formatWithUnit(hose.unitPrice, "¢/L")],
     ["Start tote", hose.startTote],
     ["End tote", hose.endTote],
-    ["Qmin (L/min)", hose.qmin],
-    ["Qmax (L/min)", hose.qmax],
-    ["Max achievable rate (L/min)", hose.maxRate],
+    ["Volume used for testing", formatDifferenceLitres(hose.startTote, hose.endTote)],
+    ["Qmin", formatWithUnit(hose.qmin, "L/min")],
+    ["Qmax", formatWithUnit(hose.qmax, "L/min")],
+    ["Max achievable rate", formatWithUnit(hose.maxRate, "L/min")],
     ["Performance code", pick(hose, ["measureCheck", "performanceCode"], "")]
   ];
   if ((pick(hose, ["measureCheck", "performanceCode"], "") || "").toUpperCase() === "H") {
@@ -520,18 +543,27 @@ function renderHose(hose, index, instrument, dataset) {
     ]);
     const measureCheckMeta = document.createElement("dl");
     measureCheckMeta.className = "report-grid";
+    const measureCheckAntiDrain = pick(hose, ["measureCheck", "antiDrainMl"], "");
     [
-      ["Average error runs 1-3 (EAV) %", measureCheckAverage],
-      ["Anti-drain/Hose-dilation fuel vol. (mL)", pick(hose, ["measureCheck", "antiDrainMl"], "")]
-    ].forEach(([label, value]) => {
+      {
+        label: "Average error runs 1-3 (EAV)",
+        value: formatWithUnit(measureCheckAverage, "%"),
+        numericValue: measureCheckAverage
+      },
+      {
+        label: "Anti-drain/Hose-dilation fuel vol.",
+        value: formatWithUnit(measureCheckAntiDrain, "mL"),
+        numericValue: measureCheckAntiDrain
+      }
+    ].forEach(({ label, value, numericValue }) => {
       const dt = document.createElement("dt");
       appendSubscriptText(dt, label);
       const dd = document.createElement("dd");
       dd.textContent = text(value);
-      if (label.startsWith("Average error") && exceedsMpe(dataset, value)) dd.classList.add("value-bad");
+      if (label.startsWith("Average error") && exceedsMpe(dataset, numericValue ?? value)) dd.classList.add("value-bad");
       if (label.startsWith("Anti-drain")) {
-        const isAntiDrainValuePresent = String(value || "").trim() !== "";
-        const antiDrainIsBad = antiDrainExceedsLimit(hose, value);
+        const isAntiDrainValuePresent = String(numericValue || "").trim() !== "";
+        const antiDrainIsBad = antiDrainExceedsLimit(hose, numericValue);
         if (antiDrainIsBad) dd.classList.add("value-bad");
         else if (isAntiDrainValuePresent) dd.classList.add("value-good");
       }
@@ -559,19 +591,24 @@ function renderHose(hose, index, instrument, dataset) {
     ]);
     const verificationMeta = document.createElement("dl");
     verificationMeta.className = "report-grid";
+    const verificationAntiDrain = pick(hose, ["verification", "antiDrainMl"], "");
     [
-      ["Average error (EAV)", averageError],
-      ["Anti-drain/Hose-dilation fuel vol. (mL)", pick(hose, ["verification", "antiDrainMl"], "")],
-      ["Existing verification mark", pick(hose, ["verification", "reverification"], "")]
-    ].forEach(([label, value]) => {
+      { label: "Average error (EAV)", value: formatWithUnit(averageError, "%"), numericValue: averageError },
+      {
+        label: "Anti-drain/Hose-dilation fuel vol.",
+        value: formatWithUnit(verificationAntiDrain, "mL"),
+        numericValue: verificationAntiDrain
+      },
+      { label: "Existing verification mark", value: pick(hose, ["verification", "reverification"], "") }
+    ].forEach(({ label, value, numericValue }) => {
       const dt = document.createElement("dt");
       appendSubscriptText(dt, label);
       const dd = document.createElement("dd");
       dd.textContent = text(value);
-      if (label.startsWith("Average error") && exceedsMpe(dataset, value)) dd.classList.add("value-bad");
+      if (label.startsWith("Average error") && exceedsMpe(dataset, numericValue ?? value)) dd.classList.add("value-bad");
       if (label.startsWith("Anti-drain")) {
-        const isAntiDrainValuePresent = String(value || "").trim() !== "";
-        const antiDrainIsBad = antiDrainExceedsLimit(hose, value);
+        const isAntiDrainValuePresent = String(numericValue || "").trim() !== "";
+        const antiDrainIsBad = antiDrainExceedsLimit(hose, numericValue);
         if (antiDrainIsBad) dd.classList.add("value-bad");
         else if (isAntiDrainValuePresent) dd.classList.add("value-good");
       }
@@ -622,7 +659,7 @@ function renderRunsTable(rows, runLabel = null, includeEd = false, dataset = nul
       tr.classList.add("row-error");
     }
     const label = runLabel ? runLabel(row, idx) : text(row.label, String(idx + 1));
-    tr.innerHTML = `<td>${label}</td><td>${text(row.vfd)}</td><td>${text(row.vref)}</td><td>${text(row.efd)}</td>${includeEd ? `<td>${text(row.ed)}</td>` : ""}`;
+    tr.innerHTML = `<td>${label}</td><td>${text(row.vfd)}</td><td>${text(row.vref)}</td><td>${text(formatWithUnit(row.efd, "%"))}</td>${includeEd ? `<td>${text(formatWithUnit(row.ed, "%"))}</td>` : ""}`;
     [...tr.children].forEach((cell) => decorateOutcomeElement(cell, cell.textContent));
     body.append(tr);
   });
@@ -737,7 +774,7 @@ function renderReport() {
       ["Date of test", pick(dataset, ["testDetails", "date"], "")],
       ["Job number", pick(dataset, ["testDetails", "jobNumber"], "")],
       ["Type", pick(dataset, ["testDetails", "type"], "")],
-      ["Maximum permissible error (MPE) %", pick(dataset, ["testDetails", "mpe"], "")],
+      ["Maximum permissible error (MPE)", formatWithUnit(pick(dataset, ["testDetails", "mpe"], ""), "%")],
       ["Verifier's name", pick(dataset, ["testDetails", "verifierName"], "")],
       ["Registration number", pick(dataset, ["testDetails", "registrationNumber"], "")],
       ["Verification mark", pick(dataset, ["testDetails", "verificationMark"], "")],
