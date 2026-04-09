@@ -502,7 +502,7 @@ function renderHose(hose, index, instrument, dataset) {
     ["Unit price", formatWithUnit(hose.unitPrice, "¢/L")],
     ["Start tote", hose.startTote],
     ["End tote", hose.endTote],
-    ["Volume used for testing", formatDifferenceLitres(hose.startTote, hose.endTote)],
+    ["Vol. used for testing", formatDifferenceLitres(hose.startTote, hose.endTote)],
     ["Qmin", formatWithUnit(hose.qmin, "L/min")],
     ["Qmax", formatWithUnit(hose.qmax, "L/min")],
     ["Max achievable rate", formatWithUnit(hose.maxRate, "L/min")],
@@ -593,7 +593,7 @@ function renderHose(hose, index, instrument, dataset) {
     verificationMeta.className = "report-grid";
     const verificationAntiDrain = pick(hose, ["verification", "antiDrainMl"], "");
     [
-      { label: "Average error (EAV)", value: formatWithUnit(averageError, "%"), numericValue: averageError },
+      { label: "Average error runs 1-3 (EAV)", value: formatWithUnit(averageError, "%"), numericValue: averageError },
       {
         label: "Anti-drain/Hose-dilation fuel vol.",
         value: formatWithUnit(verificationAntiDrain, "mL"),
