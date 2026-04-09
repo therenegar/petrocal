@@ -339,6 +339,13 @@ function formatWithUnit(value, unit) {
   return `${raw} ${unit}`;
 }
 
+function calculateEd(eav, efd) {
+  const averageError = Number(eav);
+  const gasEliminationEfd = Number(efd);
+  if (!Number.isFinite(averageError) || !Number.isFinite(gasEliminationEfd)) return "";
+  return (averageError - gasEliminationEfd).toFixed(2);
+}
+
 function hoseDeliveryRows(hose, sectionKey, instrumentType) {
   const rows = [
     { label: "#1", ...pick(hose, [sectionKey, "deliveries", 0], {}) },
@@ -348,7 +355,18 @@ function hoseDeliveryRows(hose, sectionKey, instrumentType) {
     { label: "Preset", ...pick(hose, [sectionKey, "preset"], {}) }
   ];
   if (String(instrumentType || "").trim().toLowerCase() === "suction") {
-    rows.push({ label: "Gas Elimination Delivery (clause 3.12)", ...pick(hose, [sectionKey, "gasElimination"], {}) });
+    const averageError = average([
+      pick(hose, [sectionKey, "deliveries", 0, "efd"], ""),
+      pick(hose, [sectionKey, "deliveries", 1, "efd"], ""),
+      pick(hose, [sectionKey, "deliveries", 2, "efd"], "")
+    ]);
+    const gasElimination = pick(hose, [sectionKey, "gasElimination"], {});
+    const calculatedEd = calculateEd(averageError, gasElimination.efd);
+    rows.push({
+      label: "Gas Elimination Delivery (clause 3.12)",
+      ...gasElimination,
+      ed: calculatedEd
+    });
   }
   return rows;
 }
