@@ -760,11 +760,11 @@ function renderMoveControls(onLeft, onRight) {
   wrap.className = "move-controls";
   const left = document.createElement("button");
   left.className = "btn small-btn";
-  applyButtonIcon(left, "", "⬅");
+  applyButtonIcon(left, "", "←");
   left.addEventListener("click", onLeft);
   const right = document.createElement("button");
   right.className = "btn small-btn";
-  applyButtonIcon(right, "", "➡");
+  applyButtonIcon(right, "", "→");
   right.addEventListener("click", onRight);
   wrap.append(left, right);
   return wrap;
@@ -1130,8 +1130,8 @@ function renderInstruments() {
         duplicateAction: () => duplicateInstrument(VIEW_STATE.instrumentsTab),
         removeAction: () => removeInstrument(VIEW_STATE.instrumentsTab),
         extraActions: [
-          { label: "⬅", icon: "", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, -1) },
-          { label: "➡", icon: "", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, 1) }
+          { label: "←", icon: "", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, -1) },
+          { label: "→", icon: "", onClick: () => moveInstrument(VIEW_STATE.instrumentsTab, 1) }
         ]
       }
     )
@@ -1300,8 +1300,8 @@ function renderHoses() {
       },
       {
         extraActions: [
-          { label: "⬅", icon: "", onClick: () => moveHose(instrument, hoseKey, -1) },
-          { label: "➡", icon: "", onClick: () => moveHose(instrument, hoseKey, 1) }
+          { label: "←", icon: "", onClick: () => moveHose(instrument, hoseKey, -1) },
+          { label: "→", icon: "", onClick: () => moveHose(instrument, hoseKey, 1) }
         ]
       }
     )
