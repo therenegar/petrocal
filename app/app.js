@@ -1751,7 +1751,7 @@ function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
     efd.textContent = rowObj.efd || "";
 
     const ed = document.createElement("td");
-    if (isVerification && rowIndex === 5 && isSuctionSystem) {
+    if (rowIndex === 5 && isSuctionSystem) {
       ed.textContent = calculateEd(avgError, rowObj.efd);
     }
 

@@ -361,9 +361,9 @@ function hoseDeliveryRows(hose, sectionKey, instrumentType) {
       pick(hose, [sectionKey, "deliveries", 2, "efd"], "")
     ]);
     const gasElimination = pick(hose, [sectionKey, "gasElimination"], {});
-    const calculatedEd = sectionKey === "verification" ? calculateEd(averageError, gasElimination.efd) : "";
+    const calculatedEd = calculateEd(averageError, gasElimination.efd);
     rows.push({
-      label: "Gas elim.",
+      label: "Gas Elimination Delivery (clause 3.12)",
       ...gasElimination,
       ed: calculatedEd
     });
