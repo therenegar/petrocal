@@ -605,7 +605,7 @@ function validateField(input) {
     if (kind === "date" && !isValidDdMmYyyy(value) && !isValidIsoDate(value)) error = "Use a valid date";
     if (kind === "numbering" && !/^[0-9/]+$/.test(value)) error = "Use numbers and / only";
     if (kind === "nmiPatternApproval" && !isValidNmiPatternApproval(value)) {
-      error = "Use format #/#/# (e.g. 5/6A/232b)";
+      error = "Wrong format. Example: 5/6A/101";
     }
   }
 
@@ -1203,11 +1203,11 @@ function renderInstruments() {
     if (!["numbering", "hoseCount"].includes(key)) span.textContent = label;
     const input = document.createElement("input");
     input.type = type;
-    if (key === "manufactureDate") input.placeholder = "DD/MM/YYYY";
+    if (key === "manufactureDate") input.placeholder = "MM/YYYY";
     if (key === "nmiPatternApproval") input.placeholder = "5/6A/";
     if (sizeClass) input.classList.add(sizeClass);
     if (type === "number") input.dataset.validate = "number";
-    if (key === "manufactureDate") input.dataset.validate = "date";
+    //if (key === "manufactureDate") input.dataset.validate = "date";
     if (key === "nmiPatternApproval") input.dataset.validate = "nmiPatternApproval";
     input.value = key === "manufactureDate" ? toDisplayDate(instrument[key]) : (instrument[key] ?? "");
     if (key === "hoseCount") {
@@ -1246,7 +1246,7 @@ function renderInstruments() {
       certificateLink.href = `${nmiCertificateBaseUrl}?${query.toString()}`;
       certificateLink.target = "_blank";
       certificateLink.rel = "noopener noreferrer";
-      certificateLink.textContent = "Find certificate of approval";
+      certificateLink.textContent = "Open certificate of approval →";
       form.append(linkLabel, certificateLink);
     }
   });
@@ -1274,7 +1274,7 @@ function renderInstruments() {
 
   const typeSpan = buildLabelWithHelp("Type of system", LABEL_HELP_TEXT.typeOfSystem);
   const typeSelect = document.createElement("select");
-  typeSelect.classList.add("field-small");
+  typeSelect.classList.add("field-medium");
   ["", "Pressurised", "Suction"].forEach((option) => typeSelect.append(new Option(option, option)));
   typeSelect.value = instrument.type || "";
   bindInput(typeSelect, ["instruments", index, "type"]);
@@ -1417,7 +1417,7 @@ function renderHoses() {
   guideLink.href = "ref/fuel-dispenser-numbering-guide.pdf";
   guideLink.target = "_blank";
   guideLink.rel = "noopener noreferrer";
-  guideLink.textContent = "NMI Numbering Guide 1.5";
+  guideLink.textContent = "NMI Numbering Guide →";
   guideLink.className = "inline-guide-link";
   hoseSerialWrap.append(prefix, suffix, guideLink);
   grid.append(hoseSerialPrefix, hoseSerialWrap);

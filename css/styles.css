@@ -74,6 +74,7 @@
   --cream: #ffef9f;
   --gold: #ffd63d;
   --line: #111111;
+  --dim: #666666;
   --paper: #fffef7;
   --active-tab: #ff9f1c;
   --accent: #00d1ff;
@@ -136,6 +137,15 @@ sub {
   
 }
 
+
+a {
+  color: var(--dim);
+  text-decoration: none;
+}
+
+a:hover, a:active {
+  text-decoration: underline;
+}
 
 .print-only {
   display: none;
@@ -450,6 +460,11 @@ sub {
   border-bottom: 1px dotted var(--line);
   padding: .2rem 0;
 }
+
+input[data-schema-name="manufactureDate"] + span {
+  border-bottom: none;
+}
+
 
 .inspection-grid {
   grid-template-columns: 60% 40%;
