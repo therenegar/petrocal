@@ -544,6 +544,10 @@ function isValidIsoDate(value) {
   return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day;
 }
 
+function isValidNmiPatternApproval(value) {
+  return /^\d+\/[A-Za-z0-9]+\/[A-Za-z0-9]+$/.test(value || "");
+}
+
 function restrictNumericInput(input) {
   input.addEventListener("input", () => {
     let value = input.value.replace(/[^\d.]/g, "");
@@ -600,6 +604,9 @@ function validateField(input) {
     if (kind === "decimal2" && !/^\d+(\.\d{1,2})?$/.test(value)) error = "Use a number with up to 2 decimal places";
     if (kind === "date" && !isValidDdMmYyyy(value) && !isValidIsoDate(value)) error = "Use a valid date";
     if (kind === "numbering" && !/^[0-9/]+$/.test(value)) error = "Use numbers and / only";
+    if (kind === "nmiPatternApproval" && !isValidNmiPatternApproval(value)) {
+      error = "Use format #/#/# (e.g. 5/6A/232b)";
+    }
   }
 
   const errorNode = ensureErrorNode(input);
@@ -1171,6 +1178,7 @@ function renderInstruments() {
   inspectionColumn.className = "instrument-tab-column";
   const form = document.createElement("div");
   form.className = "form-grid";
+  const nmiCertificateBaseUrl = "https://www.industry.gov.au/national-measurement-institute/nmi-services/pattern-approval/search-certificates-approval/certificates-approval-5-flowmeters";
 
   const fields = [
     ["POS Numbering", "numbering", "text", "field-small"],
@@ -1196,9 +1204,11 @@ function renderInstruments() {
     const input = document.createElement("input");
     input.type = type;
     if (key === "manufactureDate") input.placeholder = "DD/MM/YYYY";
+    if (key === "nmiPatternApproval") input.placeholder = "5/6A/";
     if (sizeClass) input.classList.add(sizeClass);
     if (type === "number") input.dataset.validate = "number";
     if (key === "manufactureDate") input.dataset.validate = "date";
+    if (key === "nmiPatternApproval") input.dataset.validate = "nmiPatternApproval";
     input.value = key === "manufactureDate" ? toDisplayDate(instrument[key]) : (instrument[key] ?? "");
     if (key === "hoseCount") {
       input.min = 1;
@@ -1221,6 +1231,24 @@ function renderInstruments() {
       bindInput(input, ["instruments", index, key], (value) => (type === "number" ? (value === "" ? "" : Number(value)) : value));
     }
     form.append(span, input);
+
+    if (key === "nmiPatternApproval") {
+      const linkLabel = document.createElement("span");
+      const certificateLink = document.createElement("a");
+      const nmiPatternApproval = String(instrument.nmiPatternApproval || "").trim();
+      const query = new URLSearchParams({
+        combine: nmiPatternApproval,
+        field_nmi_certificate_status_target_id: "All",
+        term_node_tid_depth: "All",
+        sort_by: "field_date_value",
+        items_per_page: "50"
+      });
+      certificateLink.href = `${nmiCertificateBaseUrl}?${query.toString()}`;
+      certificateLink.target = "_blank";
+      certificateLink.rel = "noopener noreferrer";
+      certificateLink.textContent = "Find certificate of approval";
+      form.append(linkLabel, certificateLink);
+    }
   });
 
   const productsSpan = document.createElement("span");
