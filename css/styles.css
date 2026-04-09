@@ -949,8 +949,8 @@ dl.report-grid:nth-child(3) dd { padding: 0; }
   position: absolute;
   left: 1.30rem;
   top: -1.35rem;
-  min-width: 260px;
-  max-width: 360px;
+  min-width: min(260px, calc(100vw - 1rem));
+  max-width: min(360px, calc(100vw - 1rem));
   background: var(--cream);
   color: var(--line);
   padding: 0.4rem 0.5rem;
@@ -961,6 +961,11 @@ dl.report-grid:nth-child(3) dd { padding: 0; }
   border: 3px solid var(--line);
   box-shadow: var(--shadow);
   line-height: 1.2rem;
+}
+
+.help-tip-bubble.help-tip-bubble-left {
+  left: auto;
+  right: 1.30rem;
 }
 
 .help-tip-trigger:hover .help-tip-bubble,

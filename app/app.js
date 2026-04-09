@@ -782,14 +782,35 @@ function buildLabelWithHelp(labelText, helpText = "") {
     trigger.type = "button";
     trigger.className = "help-tip-trigger";
     trigger.textContent = "?";
+    trigger.title = helpText;
     const tip = document.createElement("span");
     tip.className = "help-tip-bubble";
     appendSubscriptText(tip, helpText);
+    const updateTipPosition = () => positionHelpTipBubble(tip);
+    trigger.addEventListener("mouseenter", updateTipPosition);
+    trigger.addEventListener("focus", updateTipPosition);
     trigger.append(tip);
     wrapper.append(trigger);
   }
 
   return wrapper;
+}
+
+function positionHelpTipBubble(tip) {
+  tip.classList.remove("help-tip-bubble-left");
+  const isHidden = getComputedStyle(tip).display === "none";
+  if (isHidden) {
+    tip.style.display = "block";
+    tip.style.visibility = "hidden";
+  }
+  const rightAlignedRect = tip.getBoundingClientRect();
+  if (rightAlignedRect.right > window.innerWidth - 8) {
+    tip.classList.add("help-tip-bubble-left");
+  }
+  if (isHidden) {
+    tip.style.display = "";
+    tip.style.visibility = "";
+  }
 }
 
 const LABEL_HELP_TEXT = {
