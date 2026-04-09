@@ -659,7 +659,7 @@ function renderRunsTable(rows, runLabel = null, includeEd = false, dataset = nul
       tr.classList.add("row-error");
     }
     const label = runLabel ? runLabel(row, idx) : text(row.label, String(idx + 1));
-    tr.innerHTML = `<td>${label}</td><td>${text(row.vfd)}</td><td>${text(row.vref)}</td><td>${text(formatWithUnit(row.efd, "%"))}</td>${includeEd ? `<td>${text(formatWithUnit(row.ed, "%"))}</td>` : ""}`;
+    tr.innerHTML = `<td>${label}</td><td>${text(row.vfd)}</td><td>${text(row.vref)}</td><td>${text(row.efd)}</td>${includeEd ? `<td>${text(row.ed)}</td>` : ""}`;
     [...tr.children].forEach((cell) => decorateOutcomeElement(cell, cell.textContent));
     body.append(tr);
   });
