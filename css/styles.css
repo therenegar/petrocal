@@ -948,7 +948,7 @@ dl.report-grid:nth-child(3) dd { padding: 0; }
   display: none;
   position: absolute;
   left: 1.30rem;
-  top: -1.35rem;
+  bottom: 0rem;
   min-width: min(260px, calc(100vw - 1rem));
   max-width: min(360px, calc(100vw - 1rem));
   background: var(--cream);
@@ -961,6 +961,11 @@ dl.report-grid:nth-child(3) dd { padding: 0; }
   border: 3px solid var(--line);
   box-shadow: var(--shadow);
   line-height: 1.2rem;
+}
+
+table .help-tip-bubble {
+  top: 0;
+  bottom: unset;
 }
 
 .help-tip-bubble.help-tip-bubble-left {
