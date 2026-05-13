@@ -1,41 +1,100 @@
 @font-face {
-  font-family: "DM Sans";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: local("DM Sans Regular"), local("DMSans-Regular"), url("../res/fonts/DMSans-Regular.woff2") format("woff2");
+    font-family: 'NewsGoth BT';
+    src: url('../res/fonts/NewsGothicBT-Roman.woff2') format('woff2'),
+        url('../res/fonts/NewsGothicBT-Roman.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: "DM Sans";
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: local("DM Sans Italic"), local("DMSans-Italic"), url("../res/fonts/DMSans-Italic.woff2") format("woff2");
+    font-family: 'NewsGoth BT';
+    src: url('../res/fonts/NewsGothicBT-Bold.woff2') format('woff2'),
+        url('../res/fonts/NewsGothicBT-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: "DM Sans";
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: local("DM Sans Medium"), local("DMSans-Medium"), url("../res/fonts/DMSans-Medium.woff2") format("woff2");
+    font-family: 'NewsGoth BT';
+    src: url('../res/fonts/NewsGothicBT-BoldItalic.woff2') format('woff2'),
+        url('../res/fonts/NewsGothicBT-BoldItalic.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: "DM Sans";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: local("DM Sans Bold"), local("DMSans-Bold"), url("../res/fonts/DMSans-Bold.woff2") format("woff2");
+    font-family: 'NewsGoth Dm BT';
+    src: url('../res/fonts/NewsGothicBT-Demi.woff2') format('woff2'),
+        url('../res/fonts/NewsGothicBT-Demi.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
 }
 
 @font-face {
-  font-family: "DM Sans";
-  font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-  src: local("DM Sans Black"), local("DMSans-Black"), url("../res/fonts/DMSans-Black.woff2") format("woff2");
+    font-family: 'NewsGoth Dm BT';
+    src: url('../res/fonts/NewsGothicBT-DemiItalic.woff2') format('woff2'),
+        url('../res/fonts/NewsGothicBT-DemiItalic.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'NewsGoth BT';
+    src: url('../res/fonts/NewsGothicBT-Italic.woff2') format('woff2'),
+        url('../res/fonts/NewsGothicBT-Italic.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'NewsGoth Lt BT';
+    src: url('../res/fonts/NewsGothicBT-Light.woff2') format('woff2'),
+        url('../res/fonts/NewsGothicBT-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'NewsGoth Lt BT';
+    src: url('../res/fonts/NewsGothicBT-LightItalic.woff2') format('woff2'),
+        url('../res/fonts/NewsGothicBT-LightItalic.woff') format('woff');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'News706 BT';
+    src: url('../res/fonts/News706BT-RomanC.woff2') format('woff2'),
+        url('../res/fonts/News706BT-RomanC.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'News706 BT';
+    src: url('../res/fonts/News706BT-BoldC.woff2') format('woff2'),
+        url('../res/fonts/News706BT-BoldC.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'News706 BT';
+    src: url('../res/fonts/News706BT-ItalicC.woff2') format('woff2'),
+        url('../res/fonts/News706BT-ItalicC.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
 }
 
 @font-face {
@@ -91,9 +150,14 @@
 *,
 html,
 body {
-  font-family: "DM Sans", Helvetica, Arial, sans-serif;
+  font-family: "NewsGoth BT", "News Gothic", Helvetica, Arial, sans-serif;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-family: "News706 BT", "Times New Roman", serif;
+}
+
+h1 { font-weight: normal; }
 ::selection {
   background-color: var(--accent); /* Highlight color */
   color: var(--line);              /* Text color */
