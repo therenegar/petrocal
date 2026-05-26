@@ -1,0 +1,12 @@
+:root {
+  --cream: #ffef9f;
+  --gold: #ffd63d;
+  --line: #111111;
+  --paper: #fffef7;
+  --active-tab: #ff9f1c;
+  --accent: #00d1ff;
+  --heading: #a985ff;
+  --good: #8eff78;
+  --bad: #ff8b8b;
+  --shadow: 6px 6px 0 var(--line);
+}
