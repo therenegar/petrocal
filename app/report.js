@@ -504,7 +504,7 @@ function renderHose(hose, index, instrument, dataset) {
   const section = document.createElement("section");
   section.className = "report-subsection";
   const heading = document.createElement("h4");
-  heading.textContent = `${text(hose.number, "No #")}/${text(hose.grade, "Grade unspecified")}`;
+  heading.textContent = `${text(hose.number, "No #")}. ${text(hose.grade, "Grade unspecified")}`;
   heading.classList.add("grade-themed");
   const headingGradeKey = gradeStyleKey(hose.grade);
   if (headingGradeKey) heading.dataset.grade = headingGradeKey;

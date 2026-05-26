@@ -9,6 +9,15 @@
 
 @font-face {
     font-family: 'Swis721 BT';
+    src: url('../res/fonts/Swiss721BT-Italic.woff2') format('woff2'),
+        url('../res/fonts/Swiss721BT-Italic.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Swis721 BT';
     src: url('../res/fonts/Swiss721BT-Bold.woff2') format('woff2'),
         url('../res/fonts/Swiss721BT-Bold.woff') format('woff');
     font-weight: bold;
@@ -26,7 +35,7 @@
 }
 
 @font-face {
-    font-family: 'Swis721 Outline BT';
+    font-family: 'Swis721 Oul BT';
     src: url('../res/fonts/Swiss721BT-BoldOutline.woff2') format('woff2'),
         url('../res/fonts/Swiss721BT-BoldOutline.woff') format('woff');
     font-weight: bold;
@@ -35,37 +44,37 @@
 }
 
 @font-face {
-    font-family: 'Swis721 BT';
-    src: url('../res/fonts/Swiss721BT-Italic.woff2') format('woff2'),
-        url('../res/fonts/Swiss721BT-Italic.woff') format('woff');
-    font-weight: normal;
+    font-family: 'Swis721 Blk BT';
+    src: url('../res/fonts/Swiss721BT-Black.woff2') format('woff2'),
+        url('../res/fonts/Swiss721BT-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Swis721 Blk BT';
+    src: url('../res/fonts/Swiss721BT-BlackItalic.woff2') format('woff2'),
+        url('../res/fonts/Swiss721BT-BlackItalic.woff') format('woff');
+    font-weight: 900;
     font-style: italic;
     font-display: swap;
 }
 
 @font-face {
-    font-family: 'News706 BT';
-    src: url('../res/fonts/News706BT-RomanC.woff2') format('woff2'),
-        url('../res/fonts/News706BT-RomanC.woff') format('woff');
-    font-weight: normal;
+    font-family: 'Swis721 Md BT';
+    src: url('../res/fonts/Swiss721BT-Medium.woff2') format('woff2'),
+        url('../res/fonts/Swiss721BT-Medium.woff') format('woff');
+    font-weight: 500;
     font-style: normal;
     font-display: swap;
 }
 
 @font-face {
-    font-family: 'News706 BT';
-    src: url('../res/fonts/News706BT-BoldC.woff2') format('woff2'),
-        url('../res/fonts/News706BT-BoldC.woff') format('woff');
-    font-weight: bold;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'News706 BT';
-    src: url('../res/fonts/News706BT-ItalicC.woff2') format('woff2'),
-        url('../res/fonts/News706BT-ItalicC.woff') format('woff');
-    font-weight: normal;
+    font-family: 'Swis721 Md BT';
+    src: url('../res/fonts/Swiss721BT-MediumItalic.woff2') format('woff2'),
+        url('../res/fonts/Swiss721BT-MediumItalic.woff') format('woff');
+    font-weight: 500;
     font-style: italic;
     font-display: swap;
 }
@@ -127,8 +136,29 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "News706 BT", "Times New Roman", serif;
+  font-family: "Swis721 Blk BT", Helvetica Neue, Nimbus Sans, Arial, sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.1rem;
 }
+
+h1 {
+  font-size: 2.75rem;
+  font-family: "Swis721 Md BT", Helvetica Neue, Nimbus Sans, Arial, sans-serif;
+}
+
+h2 {
+  font-size: 2.25rem;
+}
+
+h3, h4, h5 {
+  font-family: "Swis721 Md BT", Helvetica Neue, Nimbus Sans, Arial, sans-serif;
+  letter-spacing: -0.05rem;
+}
+
+h3 {
+  font-size: 2rem;
+}
+
 
 h1 { font-weight: normal; }
 ::selection {
@@ -703,14 +733,14 @@ textarea {
 }
 
 .report-section h2 {
-  font-size: 1.6rem;
-  font-weight: 900;
+  font-size: 2rem;
 }
 
 .report-section>.report-section h2 {
   text-transform: none;
-  font-weight: normal;
+  font-family: "Swis721 Md BT", Helvetica Neue, Nimbus Sans, Arial, sans-serif;
   background: none;
+  font-size: 1.75rem;
 }
 
 
@@ -719,7 +749,6 @@ textarea {
 }
 
 .report-subsection h3 {
-  font-size: 1.25rem;
   font-weight: normal;
 }
 
@@ -738,12 +767,13 @@ textarea {
 }
 
 .report-subsection h4.grade-themed {
-  border: 3px solid var(--line);
-  background: var(--paper);
-  color: var(--line);
-  box-shadow: var(--shadow);
+  background: none;
+  color: black;
+  font-family: "Swis721 Md BT", Helvetica Neue, Nimbus Sans, Arial, sans-serif;
+  font-size: 2rem;
+  padding: 0;
+  margin-bottom: 1.25rem;
 }
-
 
 .instrument-columns {
   display: grid;

@@ -20,6 +20,9 @@ header, .brand-bar, .top-bar, footer {
 #appMain h1 {
   border-bottom: 3px solid black;
   padding-bottom: 1rem;
+  font-family: "Swis721 Md BT", Helvetica Neue, Nimbus Sans, Arial, sans-serif;
+  letter-spacing: -0.15rem;
+  text-transform: none;
 }
 
 #appMain h1.header-licensee {
@@ -27,7 +30,6 @@ header, .brand-bar, .top-bar, footer {
   padding: none;
   display: block;
   margin-bottom: 0;
-  font-size: 2.8rem;
 }
 
 #appMain h1.header-licensee + h1 {
@@ -97,9 +99,8 @@ header, .brand-bar, .top-bar, footer {
 }
 
 .report-section h4:first-child {
-  margin-bottom: 1.25em;
-  font-family: Swis721 BT, Helvetica Neue, Nimbus Sans, Arial, sans-serif;
-  font-size: 1.25rem;
+  margin-bottom: .5em;
+  font-size: 2rem;
 }
 
 .form6-preview-note, .report-output > p:first-child {
