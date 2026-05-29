@@ -346,14 +346,20 @@ function calculateEd(eav, efd) {
   return (averageError - gasEliminationEfd).toFixed(2);
 }
 
+function hasPresetIndications(hose) {
+  return String(pick(hose, ["compliance", "q6"], "") || "").trim().toUpperCase() !== "N/A";
+}
+
 function hoseDeliveryRows(hose, sectionKey, instrumentType) {
   const rows = [
     { label: "#1", ...pick(hose, [sectionKey, "deliveries", 0], {}) },
     { label: "#2", ...pick(hose, [sectionKey, "deliveries", 1], {}) },
     { label: "#3", ...pick(hose, [sectionKey, "deliveries", 2], {}) },
-    { label: "#4", ...pick(hose, [sectionKey, "deliveries", 3], {}) },
-    { label: "Preset", ...pick(hose, [sectionKey, "preset"], {}) }
+    { label: "#4", ...pick(hose, [sectionKey, "deliveries", 3], {}) }
   ];
+  if (hasPresetIndications(hose)) {
+    rows.push({ label: "Preset", ...pick(hose, [sectionKey, "preset"], {}) });
+  }
   if (String(instrumentType || "").trim().toLowerCase() === "suction") {
     const averageError = average([
       pick(hose, [sectionKey, "deliveries", 0, "efd"], ""),

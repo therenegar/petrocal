@@ -178,6 +178,7 @@ tabButtons.forEach((button) => {
 function selectMainTab(tabId) {
   tabButtons.forEach((button) => button.classList.toggle("active", button.dataset.tab === tabId));
   tabPanels.forEach((panel) => panel.classList.toggle("active", panel.id === tabId));
+  setSequentialTabIndexes();
 }
 
 function loadLocalDataset() {
@@ -565,6 +566,25 @@ function getValidationKind(input) {
   return "text";
 }
 
+function configureDecimalInput(input, validationKind = "number") {
+  input.type = "text";
+  input.inputMode = "decimal";
+  input.dataset.validate = validationKind;
+}
+
+function setSequentialTabIndexes(root = document.getElementById("appMain")) {
+  if (!root) return;
+  let tabIndex = 1;
+  root.querySelectorAll("input, select, textarea").forEach((control) => {
+    if (control.type === "hidden" || control.disabled || control.hidden || control.offsetParent === null) {
+      control.removeAttribute("tabindex");
+      return;
+    }
+    control.tabIndex = tabIndex;
+    tabIndex += 1;
+  });
+}
+
 function ensureErrorNode(input) {
   let wrapper = input.parentElement;
   if (!wrapper || !wrapper.classList.contains("field-control-wrap")) {
@@ -941,7 +961,10 @@ function renderTestDetails() {
       control = document.createElement("input");
       control.type = type;
       if (key === "date") control.placeholder = "DD/MM/YYYY";
-      if (key === "mpe") control.step = "0.1";
+      if (key === "mpe") {
+        configureDecimalInput(control);
+        control.step = "0.1";
+      }
       if (key === "jobNumber") control.min = 0;
       if (key === "postCode") {
         control.min = 1000;
@@ -949,7 +972,7 @@ function renderTestDetails() {
         control.step = 1;
       }
       if (key === "date") control.dataset.validate = "date";
-      if (type === "number") control.dataset.validate = "number";
+      if (type === "number" && key !== "mpe") control.dataset.validate = "number";
     }
     if (sizeClass) control.classList.add(sizeClass);
 
@@ -1005,6 +1028,7 @@ function renderTestDetails() {
         updateAt(["testDetails", "operator"], nextOperator);
         syncOtherInputVisibility();
         syncOperatorLogo();
+        setSequentialTabIndexes();
       });
       otherInput.addEventListener("change", () => {
         if (control.value !== "Other") return;
@@ -1438,7 +1462,8 @@ function renderHoses() {
     input.type = type;
     input.classList.add("field-small");
     setSchemaNameAttr(input, key);
-    if (type === "number") input.dataset.validate = "number";
+    if (key === "unitPrice") configureDecimalInput(input);
+    else if (type === "number") input.dataset.validate = "number";
     input.value = hose[key] ?? "";
     input.addEventListener("change", () => {
       hose[key] = input.value;
@@ -1515,6 +1540,7 @@ function renderHoses() {
   hosesPanel.replaceChildren(root);
   attachOutcomeSelectStyling();
   attachGlobalValidation();
+  setSequentialTabIndexes();
 }
 
 function visibleHoseTabs(performanceCode) {
@@ -1658,15 +1684,22 @@ function renderVerificationPanel(hose, instrumentType) {
   return renderDeliveryPanel(hose, "verification", instrumentType);
 }
 
+function hasPresetIndications(hose) {
+  return String(hose?.compliance?.q6 || "").trim().toUpperCase() !== "N/A";
+}
+
 function deliveryRows(hose, sectionKey) {
-  return [
+  const rows = [
     ["Delivery #1 (max flow)", hose[sectionKey].deliveries[0]],
     ["Delivery #2 (max flow)", hose[sectionKey].deliveries[1]],
     ["Delivery #3 (max flow)", hose[sectionKey].deliveries[2]],
-    ["Delivery #4 (min flow)", hose[sectionKey].deliveries[3]],
-    ["Preset Delivery (clause 3.10)", hose[sectionKey].preset],
-    ["Gas Elimination Delivery (clause 3.12)", hose[sectionKey].gasElimination]
+    ["Delivery #4 (min flow)", hose[sectionKey].deliveries[3]]
   ];
+  if (hasPresetIndications(hose)) {
+    rows.push(["Preset Delivery (clause 3.10)", hose[sectionKey].preset]);
+  }
+  rows.push(["Gas Elimination Delivery (clause 3.12)", hose[sectionKey].gasElimination]);
+  return rows;
 }
 
 function renderDeliveryPanel(hose, sectionKey, instrumentType = "") {
@@ -1836,6 +1869,7 @@ function renderCompliancePanel(hose) {
     select.addEventListener("change", () => {
       hose.compliance[key] = select.value;
       persistLocalDataset();
+      if (key === "q6") renderHoses();
     });
     form.append(span, select);
   });
@@ -1952,6 +1986,7 @@ function renderAllPanels() {
   renderHoses();
   attachOutcomeSelectStyling();
   attachGlobalValidation();
+  setSequentialTabIndexes();
 }
 
 function renderAll() {
