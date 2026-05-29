@@ -23,6 +23,7 @@ header, .brand-bar, .top-bar, footer {
   font-family: "Swis721 Md BT", Helvetica Neue, Nimbus Sans, Arial, sans-serif;
   letter-spacing: -0.15rem;
   text-transform: none;
+ font-weight: normal; 
 }
 
 #appMain h1.header-licensee {
@@ -64,6 +65,14 @@ header, .brand-bar, .top-bar, footer {
 .report-section { 
   border-bottom: none;
   clear: both;
+}
+
+.report-section > .report-section {
+  break-before: page;
+}
+
+.report-section > h2 + .report-section {
+  break-before: revert;
 }
 
 .report-subsection {
@@ -123,6 +132,10 @@ header, .brand-bar, .top-bar, footer {
 .verification-mark {
   font-size: 1.2rem;
   padding: 2rem 0 .3rem 0;
+}
+
+.instrument-columns > section + section.report-subsection .report-grid dd {
+  text-align: left;
 }
 
 
