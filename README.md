@@ -1,33 +1,12 @@
 # petrocal
 
-Fuel dispenser calibration tool.
+PetroCAL is a free to use web-based tool for conducting calibration and verification of fuel dispensers, in compliance with the Australian National Measurement Institute's guidelines [(NITP 5.1 Fuel Dispensers other than LPG Dispensers)](https://petrocal.app/ref/nitp_5.1_fuel_dispensers_other_than_lpg_dispensers.pdf). It is therefore only useful and applicable for use by licensed NMI Verifiers within Australia, or those acting on behalf of an NMI licensee.
 
-## Current prototype
+Using the tool you can;
 
-This repository includes a prototype with:
+- Capture all relevant job, site, test, measure, instrument and hose details
+- Enter calibration test results - with automatic calculation, automatic validation of NMI requirements, and clear pass/fail results
+- Create a test report as per the NMI's reference for easy printing or PDF creation
+- Download an automatically populated Form 6 spreadsheet compliant with NMI requirements
 
-- Landing page (`index.html`) to choose start mode
-- Main app (`app.html`) focused on test workflow sections:
-  - Test Details
-  - Measures
-  - Instruments
-  - Hoses
-- Separate pages for:
-  - `report.html` (data output + print view)
-  - `form6.html` (NMI Form 6 view + verification details table)
-
-### Key behavior implemented
-
-- **Start modes from `index.html`**:
-  - `Start New Blank Test` opens `app.html?start=new`
-  - `Load Existing Dataset` opens `app.html?start=load`
-- **Load Dataset**: import a JSON file into app state.
-- **Save Dataset**: download current app state as a JSON file.
-- **New**: clears Petrocal local storage and resets UI state.
-- **Local persistence**: edits auto-save into browser local storage.
-- **Form 6 mapping**:
-  - pulls verifier/site/instrument/hose values from the saved dataset
-  - provides editable licence number, business name, and ABN fields
-  - persists Form 6 fields back into the shared dataset (`form6Details`)
-
-
+<img width="1319" height="867" alt="brave_screenshot_petrocal app" src="https://github.com/user-attachments/assets/3c9d97b3-9fed-4a50-a9c1-0466710d959e" />
