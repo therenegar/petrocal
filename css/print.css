@@ -31,6 +31,7 @@ header, .brand-bar, .top-bar, footer {
   padding: none;
   display: block;
   margin-bottom: 0;
+  display: none;
 }
 
 #appMain h1.header-licensee + h1 {
