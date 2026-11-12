@@ -11,4 +11,4 @@ Using the tool you can;
 - Create a test report as per the NMI's reference for easy printing or PDF creation
 - Download an automatically populated Form 6 spreadsheet compliant with NMI requirements
 
-<img width="1319" height="867" alt="brave_screenshot_petrocal app" src="https://github.com/user-attachments/assets/3c9d97b3-9fed-4a50-a9c1-0466710d959e" />
+<img width="1344" height="954" alt="Screenshot of PetroCAL" src="https://github.com/user-attachments/assets/ac0bf153-8003-4341-8a12-c500480e8556" />
