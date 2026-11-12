@@ -1,4 +1,4 @@
-  
+
 body {
   zoom: 70%; /* Scales the entire page to 75% of its original size */
   background-image: none;
@@ -57,8 +57,7 @@ header, .brand-bar, .top-bar, footer {
 }
 
 .report-licensee-logo {
-  max-width: 13rem;
-  max-height: 4rem;
+  max-height: 6rem;
   object-fit: contain;
   object-position: right top;
 }
