@@ -56,6 +56,13 @@ header, .brand-bar, .top-bar, footer {
   margin-bottom: 0.5rem;
 }
 
+.report-licensee-logo {
+  max-width: 13rem;
+  max-height: 4rem;
+  object-fit: contain;
+  object-position: right top;
+}
+
 .tab-panel {
   border: none;
   padding: 0;
