@@ -178,7 +178,10 @@ tabButtons.forEach((button) => {
 function selectMainTab(tabId) {
   tabButtons.forEach((button) => button.classList.toggle("active", button.dataset.tab === tabId));
   tabPanels.forEach((panel) => panel.classList.toggle("active", panel.id === tabId));
-  setSequentialTabIndexes();
+  if (tabId === "testDetails") renderTestDetails();
+  if (tabId === "measures") renderMeasures();
+  if (tabId === "instruments") renderInstruments();
+  if (tabId === "hoses") renderHoses();
 }
 
 function loadLocalDataset() {
@@ -531,6 +534,64 @@ function toInputDate(value) {
   return value;
 }
 
+function addDatePicker(input) {
+  const wrapper = document.createElement("div");
+  wrapper.className = "date-field-wrap";
+  if (input.parentElement) input.replaceWith(wrapper);
+  wrapper.append(input);
+
+  const pickerButton = document.createElement("button");
+  pickerButton.type = "button";
+  pickerButton.className = "date-picker-button";
+  pickerButton.textContent = "▦";
+  pickerButton.tabIndex = -1;
+  pickerButton.setAttribute("aria-label", "Choose date");
+  pickerButton.title = "Choose date";
+
+  const picker = document.createElement("input");
+  picker.type = "date";
+  picker.className = "date-picker-control";
+  picker.tabIndex = -1;
+  picker.setAttribute("aria-label", "Choose date");
+  picker.value = toInputDate(input.value);
+
+  const openPicker = () => {
+    picker.value = toInputDate(input.value);
+    if (typeof picker.showPicker === "function") {
+      try {
+        picker.showPicker();
+        return;
+      } catch {
+        // Fall through to click for browsers without showPicker support.
+      }
+    }
+    picker.click();
+  };
+
+  pickerButton.addEventListener("click", openPicker);
+  input.addEventListener("keydown", (event) => {
+    if (event.altKey && event.key === "ArrowDown") {
+      event.preventDefault();
+      openPicker();
+    }
+  });
+  picker.addEventListener("change", () => {
+    if (!picker.value) return;
+    input.value = toDisplayDate(picker.value);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  });
+  input.addEventListener("change", () => {
+    picker.value = toInputDate(input.value);
+  });
+
+  const pickerControlWrap = document.createElement("span");
+  pickerControlWrap.className = "date-picker-control-wrap";
+  pickerControlWrap.append(pickerButton, picker);
+  wrapper.append(pickerControlWrap);
+  return wrapper;
+}
+
 function isValidDdMmYyyy(value) {
   if (!/^\d{2}\/\d{2}\/\d{4}$/.test(value || "")) return false;
   const [day, month, year] = value.split("/").map(Number);
@@ -551,6 +612,10 @@ function isValidNmiPatternApproval(value) {
 
 function restrictNumericInput(input) {
   input.addEventListener("input", () => {
+    if (getValidationKind(input) === "integer") {
+      input.value = input.value.replace(/\D/g, "");
+      return;
+    }
     let value = input.value.replace(/[^\d.]/g, "");
     const firstDot = value.indexOf(".");
     if (firstDot !== -1) {
@@ -572,17 +637,21 @@ function configureDecimalInput(input, validationKind = "number") {
   input.dataset.validate = validationKind;
 }
 
-function setSequentialTabIndexes(root = document.getElementById("appMain")) {
-  if (!root) return;
-  let tabIndex = 1;
-  root.querySelectorAll("input, select, textarea").forEach((control) => {
-    if (control.type === "hidden" || control.disabled || control.hidden || control.offsetParent === null) {
-      control.removeAttribute("tabindex");
-      return;
-    }
-    control.tabIndex = tabIndex;
-    tabIndex += 1;
-  });
+function visibleFocusableElements(root = document.getElementById("appMain")) {
+  if (!root) return [];
+  return [...root.querySelectorAll('a[href], button, input:not([type="hidden"]), select, textarea, [tabindex]')]
+    .filter((element) => !element.disabled && element.tabIndex >= 0 && element.getClientRects().length > 0);
+}
+
+function replacePanelContents(panel, content) {
+  const focusableBefore = visibleFocusableElements();
+  const focusedIndex = focusableBefore.indexOf(document.activeElement);
+  panel.replaceChildren(content);
+  if (focusedIndex < 0) return;
+
+  const focusableAfter = visibleFocusableElements();
+  const replacement = focusableAfter[Math.min(focusedIndex, focusableAfter.length - 1)];
+  replacement?.focus({ preventScroll: true });
 }
 
 function ensureErrorNode(input) {
@@ -605,22 +674,20 @@ function ensureErrorNode(input) {
 
 function validateField(input) {
   const touched = input.dataset.touched === "true";
+  const existingError = input.closest(".field-control-wrap")?.querySelector(".validation-message");
   if (!touched) {
     input.classList.remove("invalid-field");
-    const node = ensureErrorNode(input);
-    node.textContent = "";
+    if (existingError) existingError.textContent = "";
     return;
   }
 
-  const required = input.dataset.required !== "false";
   const value = input.value?.trim() || "";
   const kind = getValidationKind(input);
   let error = "";
 
-  if (required && !value) {
-    error = "This field is required";
-  } else if (value) {
+  if (value) {
     if (kind === "number" && !/^\d+(\.\d+)?$/.test(value)) error = "Only numbers are allowed";
+    if (kind === "integer" && !/^\d+$/.test(value)) error = "Only whole numbers are allowed";
     if (kind === "decimal2" && !/^\d+(\.\d{1,2})?$/.test(value)) error = "Use a number with up to 2 decimal places";
     if (kind === "date" && !isValidDdMmYyyy(value) && !isValidIsoDate(value)) error = "Use a valid date";
     if (kind === "numbering" && !/^[0-9/]+$/.test(value)) error = "Use numbers and / only";
@@ -629,13 +696,12 @@ function validateField(input) {
     }
   }
 
-  const errorNode = ensureErrorNode(input);
   if (error) {
     input.classList.add("invalid-field");
-    errorNode.textContent = error;
+    ensureErrorNode(input).textContent = error;
   } else {
     input.classList.remove("invalid-field");
-    errorNode.textContent = "";
+    if (existingError) existingError.textContent = "";
   }
 }
 
@@ -668,11 +734,9 @@ function attachGlobalValidation() {
   const fields = document.querySelectorAll("#appMain input, #appMain select, #appMain textarea");
   fields.forEach((input) => {
     if (input.type === "hidden" || input.disabled) return;
-    if (!input.dataset.required) input.dataset.required = "true";
-
     const kind = getValidationKind(input);
     if (!input.dataset.validationBound) {
-      if (kind === "number" || kind === "decimal2") restrictNumericInput(input);
+      if (kind === "number" || kind === "integer" || kind === "decimal2") restrictNumericInput(input);
       input.addEventListener("blur", () => {
         input.dataset.touched = "true";
         validateField(input);
@@ -965,14 +1029,18 @@ function renderTestDetails() {
         configureDecimalInput(control);
         control.step = "0.1";
       }
-      if (key === "jobNumber") control.min = 0;
+      if (key === "jobNumber") {
+        control.min = 0;
+        control.dataset.validate = "integer";
+      }
       if (key === "postCode") {
         control.min = 1000;
         control.max = 9999;
         control.step = 1;
+        control.dataset.validate = "integer";
       }
       if (key === "date") control.dataset.validate = "date";
-      if (type === "number" && key !== "mpe") control.dataset.validate = "number";
+      if (type === "number" && key !== "mpe" && !control.dataset.validate) control.dataset.validate = "number";
     }
     if (sizeClass) control.classList.add(sizeClass);
 
@@ -987,7 +1055,8 @@ function renderTestDetails() {
           return Math.max(1000, Math.min(9999, numeric));
         }
         return type === "number" ? (value === "" ? "" : Number(value)) : value;
-      });
+      }, key !== "date");
+      if (key === "date") control = addDatePicker(control);
     }
 
     if (key === "operator") {
@@ -1028,7 +1097,6 @@ function renderTestDetails() {
         updateAt(["testDetails", "operator"], nextOperator);
         syncOtherInputVisibility();
         syncOperatorLogo();
-        setSequentialTabIndexes();
       });
       otherInput.addEventListener("change", () => {
         if (control.value !== "Other") return;
@@ -1046,7 +1114,7 @@ function renderTestDetails() {
     form.append(span, control);
   });
 
-  testDetailsPanel.replaceChildren(form);
+  replacePanelContents(testDetailsPanel, form);
 }
 
 function renderMeasures() {
@@ -1062,7 +1130,7 @@ function renderMeasures() {
     addOnly.textContent = "Add Measure";
     addOnly.addEventListener("click", addMeasure);
     root.append(addOnly);
-    measuresPanel.replaceChildren(root);
+    replacePanelContents(measuresPanel, root);
     return;
   }
 
@@ -1144,13 +1212,14 @@ function renderMeasures() {
     bindInput(input, ["measures", VIEW_STATE.measuresTab, key], (value) => {
       if (key === "certificateExpiry") return toDisplayDate(value);
       return type === "number" ? (value === "" ? "" : Number(value)) : value;
-    });
-    form.append(span, input);
+    }, key !== "certificateExpiry");
+    const fieldControl = key === "certificateExpiry" ? addDatePicker(input) : input;
+    form.append(span, fieldControl);
   });
 
   card.append(form);
   root.append(card);
-  measuresPanel.replaceChildren(root);
+  replacePanelContents(measuresPanel, root);
 }
 
 function renderInstruments() {
@@ -1163,7 +1232,7 @@ function renderInstruments() {
     addOnly.textContent = "Add Instrument";
     addOnly.addEventListener("click", addInstrument);
     root.append(addOnly);
-    instrumentsPanel.replaceChildren(root);
+    replacePanelContents(instrumentsPanel, root);
     return;
   }
 
@@ -1326,7 +1395,7 @@ function renderInstruments() {
   columns.append(detailsColumn, inspectionColumn);
   card.append(columns);
   root.append(card);
-  instrumentsPanel.replaceChildren(root);
+  replacePanelContents(instrumentsPanel, root);
 }
 
 function renderHoses() {
@@ -1335,7 +1404,7 @@ function renderHoses() {
 
   if (dataset.instruments.length === 0) {
     root.textContent = "Add an instrument first to be able to view hoses.";
-    hosesPanel.replaceChildren(root);
+    replacePanelContents(hosesPanel, root);
     return;
   }
 
@@ -1537,10 +1606,9 @@ function renderHoses() {
   content.append(body);
   root.append(content);
 
-  hosesPanel.replaceChildren(root);
+  replacePanelContents(hosesPanel, root);
   attachOutcomeSelectStyling();
   attachGlobalValidation();
-  setSequentialTabIndexes();
 }
 
 function visibleHoseTabs(performanceCode) {
@@ -1986,7 +2054,6 @@ function renderAllPanels() {
   renderHoses();
   attachOutcomeSelectStyling();
   attachGlobalValidation();
-  setSequentialTabIndexes();
 }
 
 function renderAll() {
