@@ -1,115 +1,85 @@
 @font-face {
-    font-family: 'Swis721 BT';
-    src: url('../res/fonts/Swiss721BT-Roman.woff2') format('woff2'),
-        url('../res/fonts/Swiss721BT-Roman.woff') format('woff');
+    font-family: 'Nimbus Sans';
+    src: local('Nimbus Sans Bold'), local('NimbusSans-Bold'),
+        url('../res/fonts/NimbusSans-Bold.woff2') format('woff2'),
+        url('../res/fonts/NimbusSans-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nimbus Sans';
+    src: local('Nimbus Sans Bold Italic'), local('NimbusSans-BoldItalic'),
+        url('../res/fonts/NimbusSans-BoldItalic.woff2') format('woff2'),
+        url('../res/fonts/NimbusSans-BoldItalic.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nimbus Sans';
+    src: local('Nimbus Sans Italic'), local('NimbusSans-Italic'),
+        url('../res/fonts/NimbusSans-Italic.woff2') format('woff2'),
+        url('../res/fonts/NimbusSans-Italic.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Nimbus Sans';
+    src: local('Nimbus Sans'), local('NimbusSans-Regular'),
+        url('../res/fonts/NimbusSans-Regular.woff2') format('woff2'),
+        url('../res/fonts/NimbusSans-Regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
 }
 
 @font-face {
-    font-family: 'Swis721 BT';
-    src: url('../res/fonts/Swiss721BT-Italic.woff2') format('woff2'),
-        url('../res/fonts/Swiss721BT-Italic.woff') format('woff');
+    font-family: 'JetBrains Mono';
+    src: local('JetBrains Mono Bold'), local('JetBrainsMono-Bold'),
+        url('../res/fonts/JetBrainsMono-Bold.woff2') format('woff2'),
+        url('../res/fonts/JetBrainsMono-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: local('JetBrains Mono Bold Italic'), local('JetBrainsMono-BoldItalic'),
+        url('../res/fonts/JetBrainsMono-BoldItalic.woff2') format('woff2'),
+        url('../res/fonts/JetBrainsMono-BoldItalic.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: local('JetBrains Mono Italic'), local('JetBrainsMono-Italic'),
+        url('../res/fonts/JetBrainsMono-Italic.woff2') format('woff2'),
+        url('../res/fonts/JetBrainsMono-Italic.woff') format('woff');
     font-weight: normal;
     font-style: italic;
     font-display: swap;
 }
 
 @font-face {
-    font-family: 'Swis721 BT';
-    src: url('../res/fonts/Swiss721BT-Bold.woff2') format('woff2'),
-        url('../res/fonts/Swiss721BT-Bold.woff') format('woff');
-    font-weight: bold;
+    font-family: 'JetBrains Mono';
+    src: local('JetBrains Mono Regular'), local('JetBrainsMono-Regular'),
+        url('../res/fonts/JetBrainsMono-Regular.woff2') format('woff2'),
+        url('../res/fonts/JetBrainsMono-Regular.woff') format('woff');
+    font-weight: normal;
     font-style: normal;
     font-display: swap;
 }
 
-@font-face {
-    font-family: 'Swis721 BT';
-    src: url('../res/fonts/Swiss721BT-BoldItalic.woff2') format('woff2'),
-        url('../res/fonts/Swiss721BT-BoldItalic.woff') format('woff');
-    font-weight: bold;
-    font-style: italic;
-    font-display: swap;
-}
 
-@font-face {
-    font-family: 'Swis721 Oul BT';
-    src: url('../res/fonts/Swiss721BT-BoldOutline.woff2') format('woff2'),
-        url('../res/fonts/Swiss721BT-BoldOutline.woff') format('woff');
-    font-weight: bold;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Swis721 Blk BT';
-    src: url('../res/fonts/Swiss721BT-Black.woff2') format('woff2'),
-        url('../res/fonts/Swiss721BT-Black.woff') format('woff');
-    font-weight: 900;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Swis721 Blk BT';
-    src: url('../res/fonts/Swiss721BT-BlackItalic.woff2') format('woff2'),
-        url('../res/fonts/Swiss721BT-BlackItalic.woff') format('woff');
-    font-weight: 900;
-    font-style: italic;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Swis721 Md BT';
-    src: url('../res/fonts/Swiss721BT-Medium.woff2') format('woff2'),
-        url('../res/fonts/Swiss721BT-Medium.woff') format('woff');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Swis721 Md BT';
-    src: url('../res/fonts/Swiss721BT-MediumItalic.woff2') format('woff2'),
-        url('../res/fonts/Swiss721BT-MediumItalic.woff') format('woff');
-    font-weight: 500;
-    font-style: italic;
-    font-display: swap;
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: local("JetBrains Mono Regular"), local("JetBrainsMono-Regular"), url("../res/fonts/JetBrainsMono-Regular.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: local("JetBrains Mono Italic"), local("JetBrainsMono-Italic"), url("../res/fonts/jJetBrainsMono-Italic.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: local("JetBrains Mono Bold"), local("JetBrainsMono-Bold"), url("../res/fonts/JetBrainsMono-Bold.woff2") format("woff2");
-}
-
-@font-face {
-  font-family: "JetBrains Mono";
-  font-style: italic;
-  font-weight: 700;
-  font-display: swap;
-  src: local("JetBrains Mono Bold Italic"), local("JetBrainsMono-BoldItalic"), url("../res/fonts/JetBrainsMono-BoldItalic.woff2") format("woff2");
-}
+    
 
 :root {
   --cream: #ffef9f;
@@ -133,18 +103,17 @@
 *,
 html,
 body {
-  font-family: "Swis721 BT", Helvetica Neue, Nimbus Sans, Arial, sans-serif;
+  font-family: Nimbus Sans, Helvetica Neue, Arial, sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Swis721 Blk BT", Arial Black, sans-serif;
-  font-weight: 900;
+  font-family: Nimbus Sans, Helvetica Neue, Arial, sans-serif;
+  font-weight: bold;
   letter-spacing: -0.1rem;
 }
 
 h1 {
   font-size: 2.5rem;
-  font-family: "Swis721 Blk BT", Arial Black, sans-serif;
   text-transform: uppercase;
 }
 
@@ -157,8 +126,6 @@ h3 {
 }
 
 h3, h4, h5 {
-  font-family: "Swis721 Md BT", Helvetica Neue, Nimbus Sans, Arial, sans-serif;
-  font-weight: normal;
   letter-spacing: -0.05rem;
 }
 
@@ -666,7 +633,7 @@ strong.value-bad {
   max-width: 15rem;
   box-shadow: var(--shadow);
   background: gold;
-  font-family: Swis721 BT, Helvetica Neue, Nimbus Sans, Arial, sans-serif;
+  font-family: Nimbus Sans, Helvetica Neue, Arial, sans-serif;
   transition: transform 0.06s ease, box-shadow 0.06s ease, background 0.12s ease;
 }
 
@@ -763,7 +730,7 @@ textarea {
 
 .report-section>.report-section h2 {
   text-transform: none;
-  font-family: "Swis721 Md BT", Helvetica Neue, Nimbus Sans, Arial, sans-serif;
+  font-family: Nimbus Sans, Helvetica Neue, Arial, sans-serif;
   font-weight: normal;
   background: none;
   font-size: 1.75rem;
@@ -775,7 +742,7 @@ textarea {
 }
 
 .report-subsection h3 {
-  font-family: "Swis721 BT", Helvetica Neue, Nimbus Sans, Arial , sans-serif;
+  font-family: Nimbus Sans, Helvetica Neue, Arial, sans-serif;
   font-weight: bold;
   font-size: 1.4rem;
 }
@@ -790,7 +757,7 @@ textarea {
 }
 
 .report-section h5 {
-  font-family: "Swis721 BT", Helvetica Neue, Nimbus Sans, Arial , sans-serif;
+  font-family: Nimbus Sans, Helvetica Neue, Arial, sans-serif;
   font-weight: bold;  
   font-size: 1.25rem;
   margin: 2rem 0;
@@ -799,7 +766,8 @@ textarea {
 .report-subsection h4.grade-themed {
   background: none;
   color: black;
-  font-family: "Swis721 Blk BT", Arial Black, sans-serif;
+  font-family: Nimbus Sans, Helvetica Neue, Arial, sans-serif;
+  font-weight: bold;
   font-size: 1.6rem;
   padding: 0;
   margin-bottom: 1.25rem;
@@ -1214,7 +1182,7 @@ table .help-tip-bubble {
   text-align: center;
   line-height: 0.65rem;
   padding-bottom: 7px;
-  font-family: Swis721 BT, Helvetica Neue, Nimbus Sans, Arial, sans-serif;
+  font-family: Nimbus Sans, Helvetica Neue, Arial, sans-serif;
 }
 
 .form6-sheet {

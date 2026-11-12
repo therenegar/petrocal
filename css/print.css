@@ -20,7 +20,7 @@ header, .brand-bar, .top-bar, footer {
 #appMain h1 {
   border-bottom: 3px solid black;
   padding-bottom: 1rem;
-  font-family: "Swis721 Md BT", Helvetica Neue, Nimbus Sans, Arial, sans-serif;
+  font-family: "FreeSans", Helvetica Neue, Nimbus Sans, Arial, sans-serif;
   letter-spacing: -0.15rem;
   text-transform: none;
  font-weight: normal; 
