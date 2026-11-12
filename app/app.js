@@ -674,10 +674,10 @@ function ensureErrorNode(input) {
 
 function validateField(input) {
   const touched = input.dataset.touched === "true";
+  const existingError = input.closest(".field-control-wrap")?.querySelector(".validation-message");
   if (!touched) {
     input.classList.remove("invalid-field");
-    const node = ensureErrorNode(input);
-    node.textContent = "";
+    if (existingError) existingError.textContent = "";
     return;
   }
 
@@ -696,13 +696,12 @@ function validateField(input) {
     }
   }
 
-  const errorNode = ensureErrorNode(input);
   if (error) {
     input.classList.add("invalid-field");
-    errorNode.textContent = error;
+    ensureErrorNode(input).textContent = error;
   } else {
     input.classList.remove("invalid-field");
-    errorNode.textContent = "";
+    if (existingError) existingError.textContent = "";
   }
 }
 
