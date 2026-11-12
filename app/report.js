@@ -237,6 +237,22 @@ function syncPrintBusinessName(dataset) {
   heading.textContent = text(pick(dataset, ["form6Details", "businessName"], ""), "");
 }
 
+function syncPrintLicenseeLogo(dataset) {
+  const logo = document.getElementById("licenseePrintLogo");
+  if (!logo) return;
+
+  const licenseeName = String(pick(dataset, ["form6Details", "businessName"], "") || "").toLowerCase();
+  const companyLogos = [
+    ["nqpetro", "res/logos/logo-nqpetro.svg"],
+    ["psa", "res/logos/logo-psa.svg"],
+    ["gilbarco", "res/logos/logo-gilbarco.svg"]
+  ];
+  const match = companyLogos.find(([name]) => licenseeName.includes(name));
+
+  logo.src = match ? match[1] : "res/logo.svg";
+  logo.alt = match ? `${match[0]} logo` : "PetroCAL";
+}
+
 function syncPrintOperatorLogo(dataset) {
   const logo = document.getElementById("operatorPrintLogo");
   if (!logo) return;
@@ -782,6 +798,7 @@ function renderReport() {
   if (!dataset) {
     syncPrintOperatorLogo(null);
     syncPrintBusinessName(null);
+    syncPrintLicenseeLogo(null);
     root.replaceChildren(
       createReportIntro(),
       Object.assign(document.createElement("p"), { textContent: "No local dataset found. Open the app and load or enter data first." })
@@ -791,6 +808,7 @@ function renderReport() {
 
   syncPrintOperatorLogo(dataset);
   syncPrintBusinessName(dataset);
+  syncPrintLicenseeLogo(dataset);
 
   root.replaceChildren(
     createReportIntro(),
